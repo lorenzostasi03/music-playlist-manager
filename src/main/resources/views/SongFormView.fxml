@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="480" spacing="0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.song.SongFormController">
+
+    <!-- ══════════════════════ HEADER ══════════════════════ -->
+    <VBox spacing="4">
+        <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
+        <Label fx:id="formTitleLabel" text="Nuova Traccia" />
+    </VBox>
+
+    <Separator />
+
+    <!-- ══════════════════════ BODY ══════════════════════ -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+
+        <VBox spacing="16">
+            <padding><Insets bottom="12" left="24" right="24" top="20" /></padding>
+
+            <GridPane hgap="16" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="140" prefWidth="140" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+
+                <!-- Titolo -->
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="2">
+                        <Label text="Titolo" />
+                        <Label text="*" />
+                    </HBox>
+                    <TextField fx:id="titleField" promptText="es. Bohemian Rhapsody" />
+                    <Label fx:id="titleErrorLabel" managed="false" text="Il titolo è obbligatorio" visible="false" />
+                </VBox>
+
+                <!-- Autore -->
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="2">
+                        <Label text="Autore" />
+                        <Label text="*" />
+                    </HBox>
+                    <TextField fx:id="authorField" promptText="es. Queen" />
+                    <Label fx:id="authorErrorLabel" managed="false" text="L'autore è obbligatorio" visible="false" />
+                </VBox>
+
+                <!-- Genere -->
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                    <Label text="Genere" />
+                    <ComboBox fx:id="genreComboBox" maxWidth="Infinity" promptText="Seleziona…">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Pop" />
+                                <String fx:value="Rock" />
+                                <String fx:value="Hip-Hop" />
+                                <String fx:value="Jazz" />
+                                <String fx:value="Classical" />
+                                <String fx:value="Electronic" />
+                                <String fx:value="R&amp;B" />
+                                <String fx:value="Country" />
+                                <String fx:value="Metal" />
+                                <String fx:value="Indie" />
+                                <String fx:value="Folk" />
+                                <String fx:value="Reggae" />
+                                <String fx:value="Blues" />
+                                <String fx:value="Altro" />
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                </VBox>
+
+                <!-- Anno -->
+                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <Label text="Anno di pubblicazione" />
+                    <TextField fx:id="yearField" promptText="es. 1975" />
+                    <Label fx:id="yearErrorLabel" managed="false" text="Anno non valido" visible="false" />
+                </VBox>
+
+                <!-- Durata -->
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                    <Label text="Durata (in secondi)" />
+                    <TextField fx:id="durationField" />
+                    <Label fx:id="durationErrorLabel" managed="false" text="Formato non valido (mm:ss)" visible="false" />
+                </VBox>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
+
+            </GridPane>
+
+            <!-- ── Sezione: Tag ── -->
+            <Label text="Tag" />
+
+            <VBox spacing="8">
+                <CheckBox fx:id="favouriteCheckBox" text="Preferito" />
+                <CheckBox fx:id="explicitCheckBox" text="Esplicito" />
+                <CheckBox fx:id="newReleaseCheckBox" text="Nuova uscita" />
+            </VBox>
+
+            <!-- Nota campi obbligatori -->
+            <Label text="* Campi obbligatori" />
+
+            <!-- Messaggio errore globale -->
+            <Label fx:id="globalErrorLabel" managed="false" text="" visible="false" wrapText="true" />
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- ══════════════════════ FOOTER ══════════════════════ -->
+    <Separator />
+
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <padding><Insets bottom="14" left="24" right="24" top="14" /></padding>
+        <Button fx:id="cancelButton" onAction="#onCancel" text="Annulla" />
+        <Button fx:id="confirmButton" defaultButton="true" onAction="#onConfirm" text="Salva traccia" />
+    </HBox>
+
+</VBox>

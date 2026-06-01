@@ -17,4 +17,5 @@ module it.unisa.musicplaylistmanager {
 
     exports it.unisa.musicplaylistmanager.persistence.dao;
     exports it.unisa.musicplaylistmanager.persistence.sqlite;
+    exports it.unisa.musicplaylistmanager.util;
 }
