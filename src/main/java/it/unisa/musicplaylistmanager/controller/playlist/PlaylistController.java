@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.controller;
+package it.unisa.musicplaylistmanager.controller.playlist;
 
 public class PlaylistController {
 }

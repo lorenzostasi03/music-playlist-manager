@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.persistence.dao;
+package it.unisa.musicplaylistmanager.persistence.sqlite;
 
-public class SQLiteDAO {
+public abstract class SQLiteDAO {
 }
