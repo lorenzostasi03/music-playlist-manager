@@ -99,3 +99,46 @@
     -fx-background-color: #3E3E3E;
     -fx-text-fill: #1DB954;
 }
+
+.list-row {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 10 0;
+    -fx-border-color: #121212;
+    -fx-border-width: 0 0 1 0;
+}
+
+.list-row:hover {
+    -fx-background-color: #121212;
+}
+
+.row-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.row-meta {
+    -fx-text-fill: #B3B3B3;
+    -fx-font-size: 12px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.row-action {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1DB954;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 4 6 4 6;
+}
+
+.list-view .list-cell {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+.list-view .list-cell:filled:selected,
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #121212;
+}

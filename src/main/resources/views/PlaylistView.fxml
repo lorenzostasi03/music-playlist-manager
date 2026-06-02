@@ -21,17 +21,17 @@
         </HBox>
         <HBox alignment="CENTER_LEFT" spacing="15">
             <padding><Insets top="5" /></padding>
-            <Button fx:id="playButton" onAction="#onPlay" styleClass="play-btn" style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-min-width: auto; -fx-min-height: auto; -fx-padding: 8 20 8 20;" text="▶  Riproduci" />
+            <Button fx:id="playButton" disable="true" onAction="#onPlay" styleClass="play-btn" style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-min-width: auto; -fx-min-height: auto; -fx-padding: 8 20 8 20;" text="▶  Riproduci" />
             <Button fx:id="editNameButton" onAction="#onRename" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-cursor: hand;" text="Rinomina" />
             <Button fx:id="deletePlaylistButton" onAction="#onDeletePlaylist" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" text="Elimina playlist" />
         </HBox>
     </VBox>
     <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
-        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
+        <TextField fx:id="searchField" disable="true" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
         <Separator orientation="VERTICAL" style="-fx-opacity: 0;" />
         <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Ordina per:" />
-        <ComboBox fx:id="sortComboBox" onAction="#onSortChanged" promptText="—" styleClass="dark-combo" />
+        <ComboBox fx:id="sortComboBox" disable="true" onAction="#onSortChanged" promptText="—" styleClass="dark-combo" />
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="addTrackButton" onAction="#onAddTrack" style="-fx-background-color: transparent; -fx-border-color: #1DB954; -fx-border-radius: 8; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 7 15 7 15; -fx-cursor: hand;" text="+ Aggiungi traccia" />
     </HBox>

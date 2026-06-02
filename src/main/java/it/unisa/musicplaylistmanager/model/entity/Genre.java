@@ -14,7 +14,7 @@ public enum Genre {
         METAL,
         INDIE,
         FOLK,
-        RAGGAE,
+        REGGAE,
         BLUES,
         ALTRO
 

@@ -1,10 +1,29 @@
 package it.unisa.musicplaylistmanager.controller;
 
+import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
+import it.unisa.musicplaylistmanager.model.entity.Playlist;
+import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.util.AlertManager;
+import it.unisa.musicplaylistmanager.util.ViewSwitcher;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Controller responsabile della schermata principale (Home).
+ * Gestisce la visualizzazione, la creazione e l'eliminazione delle playlist,
+ * oltre a permettere la navigazione verso i dettagli di una playlist specifica.
+ */
 public class HomeController {
 
     @FXML private TextField searchBar;
@@ -13,7 +32,7 @@ public class HomeController {
 
     @FXML private Button newPlaylistBtn;
 
-    @FXML private ComboBox<?> sortComboBox;
+    @FXML private ComboBox<String> sortComboBox;
 
     @FXML private Label countLabel;
 
@@ -24,10 +43,34 @@ public class HomeController {
 
     @FXML private Button emptyCreateBtn;
 
-    @FXML private ListView<?> playlistListView;
+    @FXML private ListView<Playlist> playlistListView;
 
+    /**
+     * Inizializza il controller configurando la lista delle playlist
+     * e caricando i dati attualmente presenti nella libreria.
+     */
     @FXML
     private void initialize() {
+        sortComboBox.getItems().setAll("Nome", "Numero brani", "Riproduzioni");
+        sortComboBox.setValue("Nome");
+
+        playlistListView.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Playlist playlist, boolean empty) {
+                super.updateItem(playlist, empty);
+
+                if (empty || playlist == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+
+                setText(null);
+                setGraphic(createPlaylistRow(playlist));
+            }
+        });
+
+        refreshPlaylists();
     }
 
     @FXML
@@ -50,8 +93,12 @@ public class HomeController {
     private void onAutoCreateByTag() {
     }
 
+    /**
+     * Apre la finestra modale per la creazione di una nuova playlist vuota.
+     */
     @FXML
     private void onNewPlaylist() {
+        openPlaylistForm(null);
     }
 
     @FXML
@@ -60,5 +107,111 @@ public class HomeController {
 
     @FXML
     private void onListViewClicked() {
+    }
+
+    private HBox createPlaylistRow(Playlist playlist) {
+        Label nameLabel = new Label(playlist.getName());
+        nameLabel.getStyleClass().add("row-title");
+        nameLabel.setPrefWidth(300);
+
+        Label songsLabel = new Label(String.valueOf(playlist.size()));
+        songsLabel.getStyleClass().add("row-meta");
+        songsLabel.setPrefWidth(60);
+
+        Label durationLabel = new Label(formatDuration(playlist));
+        durationLabel.getStyleClass().add("row-meta");
+        durationLabel.setPrefWidth(80);
+
+        Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
+        playCountLabel.getStyleClass().add("row-meta");
+        playCountLabel.setPrefWidth(90);
+
+        Button renameButton = new Button("✎");
+        renameButton.getStyleClass().add("row-action");
+        renameButton.setTooltip(new Tooltip("Rinomina playlist"));
+        renameButton.setPrefWidth(28);
+        renameButton.setOnAction(event -> {
+            event.consume();
+            openPlaylistForm(playlist);
+        });
+
+        Button deleteButton = new Button("×");
+        deleteButton.getStyleClass().add("row-action");
+        deleteButton.setTooltip(new Tooltip("Elimina playlist"));
+        deleteButton.setPrefWidth(28);
+        deleteButton.setOnAction(event -> {
+            event.consume();
+            deletePlaylist(playlist);
+        });
+
+        HBox row = new HBox(0, nameLabel, songsLabel, durationLabel, playCountLabel, renameButton, deleteButton);
+        row.getStyleClass().add("list-row");
+        row.setOnMouseClicked(event -> openPlaylistView(playlist));
+        return row;
+    }
+
+    private void refreshPlaylists() {
+        List<Playlist> playlists = App.getMusicLibrary().getAllPlaylists();
+
+        playlistListView.getItems().setAll(playlists);
+        countLabel.setText(playlists.size() + " playlist");
+
+        boolean empty = playlists.isEmpty();
+        emptyStateBox.setVisible(empty);
+        emptyStateBox.setManaged(empty);
+        playlistListView.setVisible(!empty);
+        playlistListView.setManaged(!empty);
+    }
+
+    private String formatDuration(Playlist playlist) {
+        int totalSeconds = playlist.getSongs().stream()
+            .mapToInt(Song::getDuration)
+            .sum();
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
+    }
+
+    private void deletePlaylist(Playlist playlist) {
+        boolean confirmed = AlertManager.showConfirmation(
+            "Vuoi eliminare la playlist '" + playlist.getName() + "'?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            App.getMusicLibrary().removePlaylist(playlist);
+            refreshPlaylists();
+            AlertManager.showInfo("Playlist eliminata correttamente.");
+        } catch (IllegalArgumentException e) {
+            AlertManager.showError(e.getMessage());
+        }
+    }
+
+    private void openPlaylistView(Playlist playlist) {
+        App.setSelectedPlaylist(playlist);
+        ViewSwitcher.switchTo("PlaylistView.fxml");
+    }
+
+    private void openPlaylistForm(Playlist playlist) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PlaylistFormView.fxml"));
+            Parent root = loader.load();
+            PlaylistFormController controller = loader.getController();
+            controller.setPlaylistToEdit(playlist);
+            controller.setOnSave(this::refreshPlaylists);
+
+            Stage stage = new Stage();
+            stage.setTitle(playlist == null ? "Nuova playlist" : "Rinomina playlist");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(newPlaylistBtn.getScene().getWindow());
+            stage.setResizable(false);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (IOException e) {
+            AlertManager.showError("Impossibile aprire il form playlist.");
+        }
     }
 }

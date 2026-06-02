@@ -77,7 +77,15 @@
                     <TextField fx:id="durationField" promptText="es. 120" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                     <Label fx:id="durationErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px;" text="Formato non valido (mm:ss)" visible="false" />
                 </VBox>
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="File audio" />
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Button fx:id="chooseFileButton" onAction="#onChooseFile" style="-fx-background-color: #000000; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;" text="Scegli file" />
+                        <Label fx:id="filePathLabel" maxWidth="260" style="-fx-text-fill: #8E8E93; -fx-font-size: 12px;" text="Nessun file selezionato" textOverrun="ELLIPSIS" />
+                    </HBox>
+                </VBox>
                 <rowConstraints>
+                    <RowConstraints />
                     <RowConstraints />
                     <RowConstraints />
                     <RowConstraints />
