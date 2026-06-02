@@ -10,50 +10,73 @@ import java.io.IOException;
  * Classe di utilità che gestisce la navigazione tra le schermate
  * dell'applicazione.
  *
- * Le view FXML vengono caricate e mostrate nella regione centrale
- * del layout principale dell'applicazione.
+ * Le view FXML vengono caricate e mostrate nella regione centrale del layout
+ * principale dell'applicazione.
  */
 public final class ViewSwitcher {
 
-    private static BorderPane mainRoot;
+	private static BorderPane mainRoot;
 
-    private ViewSwitcher() {}
+	private ViewSwitcher() {
+	}
 
-    /**
-     * Imposta il contenitore principale dell'applicazione nel quale
-     * verranno visualizzate le schermate.
-     *
-     * Questo metodo deve essere invocato prima di effettuare
-     * qualsiasi operazione di navigazione.
-     *
-     * @param root il BorderPane principale dell'applicazione
-     */
-    public static void setMainRoot(BorderPane root) {
-        mainRoot = root;
-    }
+	/**
+	 * Imposta il contenitore principale dell'applicazione nel quale verranno
+	 * visualizzate le schermate.
+	 *
+	 * Questo metodo deve essere invocato prima di effettuare qualsiasi operazione
+	 * di navigazione.
+	 *
+	 * @param root
+	 *            il BorderPane principale dell'applicazione
+	 */
+	public static void setMainRoot(BorderPane root) {
+		mainRoot = root;
+	}
 
-    /**
-     * Carica la view specificata e la visualizza nella regione centrale
-     * del layout principale dell'applicazione.
-     *
-     * @param fxml nome del file FXML da visualizzare
-     */
-    public static void switchTo(String fxml) {
-        if (mainRoot == null || fxml == null || fxml.isBlank()) {
-            return;
-        }
+	/**
+	 * Carica la view specificata e la visualizza nella regione centrale del layout
+	 * principale dell'applicazione.
+	 *
+	 * @param fxml
+	 *            nome del file FXML da visualizzare
+	 */
+	public static void switchTo(String fxml) {
+		if (mainRoot == null || fxml == null || fxml.isBlank()) {
+			return;
+		}
 
-        String path = "/views/" + fxml;
+		String path = "/views/" + fxml;
 
-        try {
-            FXMLLoader loader =
-                new FXMLLoader(ViewSwitcher.class.getResource(path));
+		try {
+			FXMLLoader loader = new FXMLLoader(ViewSwitcher.class.getResource(path));
 
-            Parent view = loader.load();
-            mainRoot.setCenter(view);
+			Parent view = loader.load();
+			mainRoot.setCenter(view);
 
-        } catch (IOException e) {
-            System.err.println("File non trovato: " + path);
-        }
-    }
+		} catch (IOException e) {
+			System.err.println("File non trovato: " + path);
+		}
+	}
+
+	public static <T> T switchToAndGetController(String fxml) {
+		if (mainRoot == null || fxml == null || fxml.isBlank()) {
+			return null;
+		}
+
+		String path = "/views/" + fxml;
+
+		try {
+			FXMLLoader loader = new FXMLLoader(ViewSwitcher.class.getResource(path));
+			Parent view = loader.load();
+			mainRoot.setCenter(view);
+
+			return loader.getController();
+
+		} catch (IOException e) {
+			System.err.println("File non trovato: " + path);
+			return null;
+		}
+	}
+
 }
