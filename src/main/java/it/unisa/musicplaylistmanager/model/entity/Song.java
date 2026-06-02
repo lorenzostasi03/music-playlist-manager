@@ -185,7 +185,7 @@ public class Song {
      *
      * @param filePath nuovo percorso;
      */
-    private void setFilePath(String filePath) {
+    public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
@@ -194,7 +194,7 @@ public class Song {
      * Incrementa di uno il contatore di riproduzioni della traccia.
      *
      */
-    private void incrementPlayCount(){
+    public void incrementPlayCount(){
     this.playCount++;
     }
 
