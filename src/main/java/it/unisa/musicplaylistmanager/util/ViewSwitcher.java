@@ -5,20 +5,15 @@ import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Classe di utilità che gestisce la navigazione tra le schermate
  * dell'applicazione.
  *
  * Le view FXML vengono caricate e mostrate nella regione centrale
- * del layout principale dell'applicazione. Le view già caricate
- * vengono memorizzate in cache per evitarne il caricamento ripetuto.
+ * del layout principale dell'applicazione.
  */
 public final class ViewSwitcher {
-
-    private static final Map<String, Parent> cache = new HashMap<>();
 
     private static BorderPane mainRoot;
 
@@ -41,9 +36,6 @@ public final class ViewSwitcher {
      * Carica la view specificata e la visualizza nella regione centrale
      * del layout principale dell'applicazione.
      *
-     * Se la view è già presente in cache, viene riutilizzata senza
-     * eseguire nuovamente il caricamento del file FXML.
-     *
      * @param fxml nome del file FXML da visualizzare
      */
     public static void switchTo(String fxml) {
@@ -54,18 +46,10 @@ public final class ViewSwitcher {
         String path = "/views/" + fxml;
 
         try {
-            Parent view;
+            FXMLLoader loader =
+                new FXMLLoader(ViewSwitcher.class.getResource(path));
 
-            if (cache.containsKey(path)) {
-                view = cache.get(path);
-            } else {
-                FXMLLoader loader =
-                    new FXMLLoader(ViewSwitcher.class.getResource(path));
-
-                view = loader.load();
-                cache.put(path, view);
-            }
-
+            Parent view = loader.load();
             mainRoot.setCenter(view);
 
         } catch (IOException e) {

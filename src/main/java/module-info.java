@@ -4,6 +4,8 @@ module it.unisa.musicplaylistmanager {
     requires javafx.fxml;
 
     opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
+    opens it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
+    opens it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
 
     exports it.unisa.musicplaylistmanager.app;
 
