@@ -1,4 +1,4 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
-public class PlaylistPlayable extends Playable {
+public class PlaylistPlayable {
 }
