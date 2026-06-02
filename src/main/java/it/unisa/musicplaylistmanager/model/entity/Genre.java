@@ -17,6 +17,4 @@ public enum Genre {
         REGGAE,
         BLUES,
         ALTRO
-
-
 }

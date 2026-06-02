@@ -1,6 +1,11 @@
 package it.unisa.musicplaylistmanager.model.library;
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
+import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
+import it.unisa.musicplaylistmanager.util.AlertManager;
 
 import java.util.List;
 
@@ -10,14 +15,18 @@ import java.util.List;
  */
 public class MusicLibrary {
     private final SongCatalog songCatalog;
-    private final PlaylistCatalog playlistCollection;
+    private final PlaylistCatalog playlistCatalog;
+    private final SongDAO songDAO;
+    private final PlaylistDAO playlistDAO;
 
     /**
      * Crea una nuova libreria musicale con catalogo e collezione playlist vuoti.
      */
-    public MusicLibrary() {
+    public MusicLibrary(SongDAO songDAO, PlaylistDAO playlistDAO) {
         this.songCatalog = new SongCatalog();
-        this.playlistCollection = new PlaylistCatalog();
+        this.playlistCatalog = new PlaylistCatalog();
+        this.songDAO = songDAO;
+        this.playlistDAO = playlistDAO;
     }
 
 
@@ -26,8 +35,10 @@ public class MusicLibrary {
      *
      * @param song traccia da aggiungere;
      */
-    public void addSongToCatalog(Song song) {
-        songCatalog.addSong(song);
+    public void addSongToCatalog(Song song) throws PersistenceException, IllegalArgumentException,
+                                                                                DuplicatedSongException {
+            songCatalog.addSong(song);
+            songDAO.save(song);
     }
 
     /**
@@ -37,7 +48,7 @@ public class MusicLibrary {
      */
     public void removeSongFromCatalog(Song song) {
         List<Playlist> playlistConTraccia =
-            playlistCollection.getPlaylistsContaining(song);
+            playlistCatalog.getPlaylistsContaining(song);
         for (Playlist playlist : playlistConTraccia) {
             playlist.removeSong(song);
         }
@@ -83,7 +94,7 @@ public class MusicLibrary {
      */
     public void addPlaylist(Playlist playlist) {
 
-        playlistCollection.addPlaylist(playlist);
+        playlistCatalog.addPlaylist(playlist);
     }
 
     /**
@@ -93,7 +104,7 @@ public class MusicLibrary {
      */
     public void removePlaylist(Playlist playlist) {
 
-        playlistCollection.removePlaylist(playlist);
+        playlistCatalog.removePlaylist(playlist);
     }
 
     /**
@@ -110,7 +121,7 @@ public class MusicLibrary {
             throw new IllegalArgumentException(
                 "Il nuovo nome della playlist non può essere vuoto.");
         }
-        if (playlistCollection.isNameTakenByOther(playlist.getName(), newName)) {
+        if (playlistCatalog.isNameTakenByOther(playlist.getName(), newName)) {
             throw new IllegalArgumentException(
                 "Esiste già una playlist con il nome '" + newName + "'.");
         }
@@ -149,6 +160,6 @@ public class MusicLibrary {
      * @return lista non modificabile di tutte le playlist
      */
     public List<Playlist> getAllPlaylists() {
-        return playlistCollection.getAllPlaylists();
+        return playlistCatalog.getAllPlaylists();
     }
 }

@@ -1,15 +1,13 @@
 package it.unisa.musicplaylistmanager.model.entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Rappresenta una playlist musicale.
  */
 public class Playlist {
 
+    private final UUID id;
     private String name;
     private final List<Song> songs;
     private int playCount;
@@ -22,12 +20,34 @@ public class Playlist {
      * @param name nome della playlist;
      */
     public Playlist(String name) {
-        validaNome(name);
+        validateName(name);
+        this.id = UUID.randomUUID();
         this.name = name.trim();
         this.songs = new ArrayList<>();
         this.playCount = 0;
     }
 
+    /**
+     * Crea una playlist con stato già esistente.
+     * La lista dei brani non è inclusa e deve essere gestita separatamente.
+     *
+     * @param id identificatore della playlist.
+     * @param name nome della playlist.
+     * @param playCount numero di riproduzioni della playlist.
+     */
+    public Playlist(UUID id, String name, int playCount) {
+        validateName(name);
+        this.id = id;
+        this.name = name;
+        this.songs = new ArrayList<>();
+        this.playCount = playCount;
+    }
+
+    /**
+     * Restituisce l'id della playlist.
+     * @return id della playlist.
+     */
+    public UUID getId() { return id;}
 
     /**
      * Restituisce il nome della playlist.
@@ -78,7 +98,7 @@ public class Playlist {
      * @param name nuovo nome;
      */
     public void setName(String name) {
-        validaNome(name);
+        validateName(name);
         this.name = name.trim();
     }
 
@@ -207,7 +227,7 @@ public class Playlist {
      *
      * @param name nome da validare
      */
-    private void validaNome(String name) {
+    private void validateName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException(
                 "Il nome della playlist non può essere vuoto.");

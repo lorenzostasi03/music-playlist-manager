@@ -2,23 +2,19 @@ package it.unisa.musicplaylistmanager.model.library;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Collezione di tutte le playlist dell'utente.
  */
 public class PlaylistCatalog {
-    private final List<Playlist> playlists;
+    private final Map<UUID, Playlist> playlists;
 
     /**
      * Crea una nuova collezione vuota di playlist.
      */
-    public PlaylistCatalog() {
-        this.playlists = new ArrayList<>();
-    }
+    public PlaylistCatalog() { this.playlists = new HashMap<>();}
 
     /**
      * Aggiunge una playlist
@@ -36,7 +32,7 @@ public class PlaylistCatalog {
             throw new IllegalArgumentException(
                 "Esiste già una playlist con il nome '" + playlist.getName() + "'.");
         }
-        playlists.add(playlist);
+        playlists.put(playlist.getId(), playlist);
     }
 
     /**
@@ -51,12 +47,13 @@ public class PlaylistCatalog {
         if (playlist == null) {
             throw new IllegalArgumentException("La playlist non può essere null.");
         }
-        boolean rimossa = playlists.removeIf(
-            p -> p.getName().equalsIgnoreCase(playlist.getName()));
-        if (!rimossa) {
+
+        if (!playlists.containsKey(playlist.getId())) {
             throw new IllegalArgumentException(
                 "La playlist '" + playlist.getName() + "' non è presente nella collezione.");
         }
+
+        playlists.remove(playlist.getId());
     }
 
     /**
@@ -68,7 +65,7 @@ public class PlaylistCatalog {
      * @return  true se il nuovo nome è già in uso da un'altra playlist
      */
     public boolean isNameTakenByOther(String currentName, String newName) {
-        return playlists.stream()
+        return playlists.values().stream()
             .filter(p -> !p.getName().equalsIgnoreCase(currentName))
             .anyMatch(p -> p.getName().equalsIgnoreCase(newName));
     }
@@ -82,9 +79,9 @@ public class PlaylistCatalog {
      */
     public List<Playlist> getPlaylistsContaining(Song song) {
         if (song == null) return Collections.emptyList();
-        return playlists.stream()
+        return playlists.values().stream()
             .filter(p -> p.contains(song))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**
@@ -95,7 +92,7 @@ public class PlaylistCatalog {
      */
     public boolean existsByName(String name) {
         if (name == null) return false;
-        return playlists.stream()
+        return playlists.values().stream()
             .anyMatch(p -> p.getName().equalsIgnoreCase(name.trim()));
     }
 
@@ -105,7 +102,7 @@ public class PlaylistCatalog {
      * @return lista non modificabile delle playlist
      */
     public List<Playlist> getAllPlaylists() {
-        return Collections.unmodifiableList(playlists);
+        return Collections.unmodifiableList(playlists.values().stream().toList());
     }
 
     /**

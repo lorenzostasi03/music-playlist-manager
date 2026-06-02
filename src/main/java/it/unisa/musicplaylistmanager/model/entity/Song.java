@@ -5,7 +5,7 @@ import java.util.*;
  * Rappresenta una traccia musicale all'interno del catalogo.
  */
 public class Song {
-    private final String id;
+    private final UUID id;
 
     private String title;
     private String author;
@@ -14,7 +14,7 @@ public class Song {
     private int duration;
     private String filePath;
     private int playCount;
-    private final Set<Tag> tags;
+    private Set<Tag> tags;
 
 
     /**
@@ -26,17 +26,15 @@ public class Song {
      * @param year     anno di pubblicazione;
      * @param duration durata in secondi;
      * @param filePath percorso del file audio;
-     * @throws IllegalArgumentException
-     *
-     *
+     * @throws IllegalArgumentException se uno dei parametri non è valido.
      */
     public Song(String title, String author, Genre genre, int year, int duration, String filePath) {
-        validaTitle(title);
-        validaAuthor(author);
-        validaYear(year);
-        validaDuration(duration);
+        validateTitle(title);
+        validateAuthor(author);
+        validateYear(year);
+        validateDuration(duration);
 
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.title = title.trim();
         this.author = author.trim();
         this.genre = genre;
@@ -48,11 +46,36 @@ public class Song {
     }
 
     /**
+     * Crea una traccia musicale a partire da dati già persistenti.
+     * Questo costruttore viene utilizzato per ricostruire un oggetto Song
+     * già esistente nel sistema.
+     *
+     * @param id identificatore univoco del brano.
+     * @param title titolo della traccia.
+     * @param author autore della traccia.
+     * @param genre genere musicale.
+     * @param year anno di pubblicazione.
+     * @param duration durata in secondi.
+     * @param filePath percorso del file audio.
+     * @param playCount numero di riproduzioni.
+     */
+    public Song(UUID id, String title, String author, Genre genre, int year, int duration, String filePath, int playCount) {
+        this.id = id;
+        this.title = title.trim();
+        this.author = author.trim();
+        this.genre = genre;
+        this.year = year;
+        this.duration = duration;
+        this.filePath = filePath;
+        this.playCount = playCount;
+    }
+
+    /**
      * Restituisce l'identificativo univoco della traccia.
      *
      * @return ID della traccia
      */
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -137,7 +160,7 @@ public class Song {
      * @param title nuovo titolo;
      */
     public void setTitle(String title) {
-        validaTitle(title);
+        validateTitle(title);
         this.title = title.trim();
     }
 
@@ -147,7 +170,7 @@ public class Song {
      * @param author nuovo autore;
      */
     public void setAuthor(String author) {
-        validaAuthor(author);
+        validateAuthor(author);
         this.author = author.trim();
     }
 
@@ -166,7 +189,7 @@ public class Song {
      * @param year nuovo anno;
      */
     public void setYear(int year) {
-        validaYear(year);
+        validateYear(year);
         this.year = year;
     }
 
@@ -176,7 +199,7 @@ public class Song {
      * @param duration nuova durata;
      */
     public void setDuration(int duration) {
-        validaDuration(duration);
+        validateDuration(duration);
         this.duration = duration;
     }
 
@@ -185,7 +208,7 @@ public class Song {
      *
      * @param filePath nuovo percorso;
      */
-    public void setFilePath(String filePath) {
+    private void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
@@ -194,7 +217,7 @@ public class Song {
      * Incrementa di uno il contatore di riproduzioni della traccia.
      *
      */
-    public void incrementPlayCount(){
+    private void incrementPlayCount(){
     this.playCount++;
     }
 
@@ -285,7 +308,7 @@ public class Song {
      *
      * @param title titolo da validare
      */
-    private void validaTitle(String title) {
+    private void validateTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Il titolo della traccia non può essere vuoto.");
         }
@@ -296,7 +319,7 @@ public class Song {
      *
      * @param author autore da validare
      */
-    private void validaAuthor(String author) {
+    private void validateAuthor(String author) {
         if (author == null || author.trim().isEmpty()) {
             throw new IllegalArgumentException("L'autore della traccia non può essere vuoto.");
         }
@@ -308,7 +331,7 @@ public class Song {
      *
      * @param year anno da validare
      */
-    private void validaYear(int year) {
+    private void validateYear(int year) {
         int annoCorrente = java.time.Year.now().getValue();
         if (year <= 0 || year > annoCorrente + 1) {
             throw new IllegalArgumentException(
@@ -321,7 +344,7 @@ public class Song {
      *
      * @param duration durata da validare
      */
-    private void validaDuration(int duration) {
+    private void validateDuration(int duration) {
         if (duration < 0) {
             throw new IllegalArgumentException(
                 "La durata non può essere negativa: " + duration);
