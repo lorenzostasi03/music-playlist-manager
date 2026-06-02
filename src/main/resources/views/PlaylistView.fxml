@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -12,57 +11,33 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox spacing="0" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
-
-    <!-- ══════════════════════ HEADER ══════════════════════ -->
-    <VBox spacing="4">
-        <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
-
+<VBox spacing="0" VBox.vgrow="ALWAYS" stylesheets="@style.css" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
+    <VBox spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
+        <padding><Insets bottom="20" left="25" right="25" top="25" /></padding>
         <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label fx:id="playlistNameLabel" text="Nome Playlist" />
-            <Separator orientation="VERTICAL" />
-            <Label fx:id="trackCountLabel" text="0 brani" />
+            <Label fx:id="playlistNameLabel" style="-fx-text-fill: #FFFFFF; -fx-font-size: 32px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Nome Playlist" />
+            <Separator orientation="VERTICAL" style="-fx-opacity: 0;" />
+            <Label fx:id="trackCountLabel" style="-fx-text-fill: #B3B3B3; -fx-font-size: 16px; -fx-font-weight: bold;" text="0 brani" />
         </HBox>
-
-        <HBox alignment="CENTER_LEFT" spacing="8">
-            <padding><Insets top="8" /></padding>
-            <Button fx:id="playButton" onAction="#onPlay" text="▶  Riproduci" />
-            <Button fx:id="editNameButton" onAction="#onRename" text="Rinomina" />
-            <Button fx:id="deletePlaylistButton" onAction="#onDeletePlaylist" text="Elimina playlist" />
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <padding><Insets top="5" /></padding>
+            <Button fx:id="playButton" onAction="#onPlay" styleClass="play-btn" style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-min-width: auto; -fx-min-height: auto; -fx-padding: 8 20 8 20;" text="▶  Riproduci" />
+            <Button fx:id="editNameButton" onAction="#onRename" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-cursor: hand;" text="Rinomina" />
+            <Button fx:id="deletePlaylistButton" onAction="#onDeletePlaylist" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" text="Elimina playlist" />
         </HBox>
     </VBox>
-
-    <Separator />
-
-    <!-- ══════════════════════ TOOLBAR ══════════════════════ -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <padding><Insets bottom="12" left="24" right="24" top="12" /></padding>
-
-        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefWidth="220" promptText="Cerca per titolo…" />
-
-        <Separator orientation="VERTICAL" />
-
-        <Label text="Ordina per:" />
-        <ComboBox fx:id="sortComboBox" onAction="#onSortChanged" promptText="—" />
-
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
+        <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
+        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
+        <Separator orientation="VERTICAL" style="-fx-opacity: 0;" />
+        <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Ordina per:" />
+        <ComboBox fx:id="sortComboBox" onAction="#onSortChanged" promptText="—" styleClass="dark-combo" />
         <Region HBox.hgrow="ALWAYS" />
-
-        <Button fx:id="addTrackButton" onAction="#onAddTrack" text="+ Aggiungi traccia" />
+        <Button fx:id="addTrackButton" onAction="#onAddTrack" style="-fx-background-color: transparent; -fx-border-color: #1DB954; -fx-border-radius: 8; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 7 15 7 15; -fx-cursor: hand;" text="+ Aggiungi traccia" />
     </HBox>
-
-    <Separator />
-
-    <!-- ══════════════════════ BODY ══════════════════════ -->
     <StackPane VBox.vgrow="ALWAYS">
-
-        <!-- Tabella tracce -->
-        <TableView fx:id="tracksTable" VBox.vgrow="ALWAYS">
-
-            <placeholder>
-                <Label text="Nessuna traccia trovata" />
-            </placeholder>
-
+        <TableView fx:id="tracksTable" VBox.vgrow="ALWAYS" style="-fx-background-color: #000000; -fx-control-inner-background: #000000; -fx-table-cell-border-color: #121212; -fx-padding: 5;">
+            <placeholder><Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 16px;" text="Nessuna traccia trovata" /></placeholder>
             <columns>
                 <TableColumn fx:id="indexColumn" prefWidth="40" text="#" />
                 <TableColumn fx:id="titleColumn" prefWidth="200" text="Titolo" />
@@ -73,24 +48,16 @@
                 <TableColumn fx:id="tagsColumn" prefWidth="120" text="Tag" />
             </columns>
         </TableView>
-
-        <!-- Stato vuoto -->
-        <VBox fx:id="emptyStateBox" alignment="CENTER" managed="false" spacing="8" visible="false">
-            <Label text="La playlist è vuota" />
-            <Label text="Aggiungi qualche traccia per iniziare" />
-            <Button onAction="#onAddTrackClicked" text="+ Aggiungi traccia" />
+        <VBox fx:id="emptyStateBox" alignment="CENTER" managed="false" spacing="12" visible="false">
+            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;" text="La playlist è vuota" />
+            <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Aggiungi qualche traccia per iniziare" />
+            <Button onAction="#onAddTrackClicked" styleClass="spotify-btn" text="+ Aggiungi traccia">
+                <VBox.margin><Insets top="10" /></VBox.margin>
+            </Button>
         </VBox>
-
     </StackPane>
-
-    <Separator />
-
-    <!-- ══════════════════════ FOOTER ══════════════════════ -->
-    <HBox alignment="CENTER_LEFT" spacing="8">
-        <padding><Insets bottom="10" left="24" right="24" top="10" /></padding>
-
-        <Button fx:id="removeTrackButton" disable="true" onAction="#onRemoveTrack" text="Rimuovi selezionata" />
-
+    <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-border-color: #282828; -fx-border-width: 1 0 0 0;">
+        <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
+        <Button fx:id="removeTrackButton" disable="true" onAction="#onRemoveTrack" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" text="Rimuovi selezionata" />
     </HBox>
-
 </VBox>

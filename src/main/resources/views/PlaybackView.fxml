@@ -1,113 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
-<HBox prefHeight="580.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.PlaybackController">
-
-    <!-- MAIN PLAYBACK AREA -->
-    <VBox alignment="CENTER" spacing="14" styleClass="pb-main" HBox.hgrow="ALWAYS">
-
+<HBox prefHeight="580.0" prefWidth="900.0" stylesheets="@style.css" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.PlaybackController">
+    <fx:define>
+        <ToggleGroup fx:id="playModeGroup" />
+    </fx:define>
+    <VBox alignment="CENTER" spacing="25" HBox.hgrow="ALWAYS">
         <padding>
-            <Insets bottom="20" left="20" right="20" top="20" />
+            <Insets bottom="20" left="40" right="40" top="20" />
         </padding>
-
-        <!-- COVER -->
-        <StackPane maxHeight="110" maxWidth="110" prefHeight="110" prefWidth="110" styleClass="pb-cover">
-
-            <Label styleClass="pb-cover-icon" text="♫" />
-
+        <StackPane maxHeight="250" maxWidth="250" prefHeight="250" prefWidth="250" style="-fx-background-color: #121212; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 20, 0, 0, 10);">
+            <Label style="-fx-text-fill: #282828; -fx-font-size: 90px;" text="♫" />
         </StackPane>
-
-        <!-- TRACK INFO -->
-        <VBox alignment="CENTER" spacing="4">
-
-            <Label fx:id="trackTitleLabel" styleClass="pb-track" text="Titolo" />
-
-            <Label fx:id="trackArtistLabel" styleClass="pb-artist" text="Artista - Nome playlist" />
-
+        <VBox alignment="CENTER" spacing="8">
+            <Label fx:id="trackTitleLabel" style="-fx-text-fill: #FFFFFF; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Titolo" />
+            <Label fx:id="trackArtistLabel" style="-fx-text-fill: #1DB954; -fx-font-size: 16px; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-weight: bold;" text="Artista - Nome playlist" />
         </VBox>
-
-        <!-- PROGRESS -->
-        <VBox maxWidth="420" prefWidth="420" spacing="5">
-
-            <Slider fx:id="progressSlider" value="37" />
-
+        <VBox maxWidth="500" prefWidth="500" spacing="8">
+            <Slider fx:id="progressSlider" value="37" style="-fx-cursor: hand;" />
             <HBox alignment="CENTER">
-
-                <Label fx:id="currentTimeLabel" styleClass="pb-time" text="2:12" />
-
+                <Label fx:id="currentTimeLabel" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="2:12" />
                 <Region HBox.hgrow="ALWAYS" />
-
-                <Label fx:id="totalTimeLabel" styleClass="pb-time" text="5:55" />
-
+                <Label fx:id="totalTimeLabel" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="5:55" />
             </HBox>
-
         </VBox>
-
-        <!-- CONTROLS -->
-        <HBox alignment="CENTER" spacing="16">
-
-            <Button fx:id="previousButton" onAction="#onPrevious" styleClass="ctrl-btn" text="precedente" />
-
-            <Button fx:id="playPauseButton" onAction="#onPlayPause" styleClass="ctrl-btn-play" text="play" />
-
-            <Button fx:id="nextButton" onAction="#onNext" styleClass="ctrl-btn" text="successiva" />
-
+        <HBox alignment="CENTER" spacing="30">
+            <Button fx:id="previousButton" onAction="#onPrevious" minWidth="110" styleClass="transparent-btn" text="Precedente" />
+            <Button fx:id="playPauseButton" onAction="#onPlayPause" styleClass="play-btn" text="Play" />
+            <Button fx:id="nextButton" onAction="#onNext" minWidth="110" styleClass="transparent-btn" text="Successiva" />
         </HBox>
-
-        <!-- PLAY MODES -->
-        <FlowPane alignment="CENTER" hgap="8" vgap="8">
-
-            <ToggleButton fx:id="sequentialModeButton" onAction="#onSequential" selected="true" styleClass="mode-btn" text="Sequenziale" />
-
-            <ToggleButton fx:id="shuffleModeButton" onAction="#onShuffle" styleClass="mode-btn" text="Shuffle" />
-
-            <ToggleButton fx:id="loopTrackButton" onAction="#onLoopTrack" styleClass="mode-btn" text="Loop traccia" />
-
-            <ToggleButton fx:id="loopPlaylistButton" onAction="#onLoopPlaylist" styleClass="mode-btn" text="Loop playlist" />
-
-        </FlowPane>
-
-        <!-- PLAY COUNT -->
-        <Label fx:id="playCountLabel" styleClass="pb-play-count" text="142 riproduzioni totali" />
-
+        <VBox alignment="CENTER" spacing="10">
+            <HBox alignment="CENTER" spacing="10">
+                <ToggleButton fx:id="sequentialModeButton" toggleGroup="$playModeGroup" onAction="#onSequential" selected="true" minWidth="130" styleClass="mode-btn" text="↓ Sequenziale" />
+                <ToggleButton fx:id="shuffleModeButton" toggleGroup="$playModeGroup" onAction="#onShuffle" minWidth="130" styleClass="mode-btn" text="🔀 Shuffle" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10">
+                <ToggleButton fx:id="loopTrackButton" toggleGroup="$playModeGroup" onAction="#onLoopTrack" minWidth="130" styleClass="mode-btn" text="🔂 Loop traccia" />
+                <ToggleButton fx:id="loopPlaylistButton" toggleGroup="$playModeGroup" onAction="#onLoopPlaylist" minWidth="130" styleClass="mode-btn" text="🔁 Loop playlist" />
+            </HBox>
+        </VBox>
+        <Label fx:id="playCountLabel" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="142 RIPRODUZIONI TOTALI" />
     </VBox>
-
-    <!-- QUEUE -->
-    <VBox maxWidth="240" minWidth="240" prefWidth="240" styleClass="pb-queue">
-
-        <!-- QUEUE HEADER -->
-        <HBox alignment="CENTER_LEFT" spacing="6" styleClass="queue-header">
-
+    <VBox maxWidth="280" minWidth="280" prefWidth="280" style="-fx-background-color: #0A0A0A; -fx-border-color: #121212; -fx-border-width: 0 0 0 1;">
+        <HBox alignment="CENTER_LEFT" spacing="6">
             <padding>
-                <Insets bottom="8" left="14" right="14" top="12" />
+                <Insets bottom="15" left="20" right="20" top="30" />
             </padding>
-
-            <Label styleClass="queue-header-title" text="Coda di riproduzione" />
-
+            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="≣ Coda di riproduzione" />
         </HBox>
-
-        <!-- QUEUE LIST -->
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="queue-scroll" VBox.vgrow="ALWAYS">
-
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0A0A0A; -fx-background-color: transparent; -fx-control-inner-background: #0A0A0A; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
             <content>
-
-                <VBox fx:id="queueView" />
-
+                <VBox fx:id="queueView" style="-fx-padding: 0 10 0 10;" />
             </content>
-
         </ScrollPane>
-
     </VBox>
-
 </HBox>

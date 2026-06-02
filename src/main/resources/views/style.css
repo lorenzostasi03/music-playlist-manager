@@ -1,0 +1,101 @@
+.button, .toggle-button, .combo-box, .menu-button, .text-field {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #B3B3B3;
+    -fx-font-size: 14px;
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+    -fx-alignment: BASELINE_LEFT;
+}
+.sidebar-btn:hover {
+    -fx-background-color: #282828;
+    -fx-text-fill: #FFFFFF;
+}
+
+.spotify-btn {
+    -fx-background-color: #1DB954;
+    -fx-text-fill: #000000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 15 8 15;
+    -fx-cursor: hand;
+}
+.spotify-btn:hover {
+    -fx-background-color: #1ed760;
+}
+
+.play-btn {
+    -fx-background-color: #1DB954;
+    -fx-text-fill: #000000;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50em;
+    -fx-min-width: 90;
+    -fx-min-height: 50;
+    -fx-cursor: hand;
+}
+.play-btn:hover {
+    -fx-background-color: #1ed760;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.transparent-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.transparent-btn:hover {
+    -fx-text-fill: #1DB954;
+}
+
+.mode-btn {
+    -fx-background-color: #121212;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+.mode-btn:hover {
+    -fx-background-color: #282828;
+}
+.mode-btn:selected {
+    -fx-text-fill: #1DB954;
+}
+
+.dark-combo {
+    -fx-background-color: #121212;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+.dark-combo:hover {
+    -fx-background-color: #282828;
+}
+.dark-combo .label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.combo-box-popup .list-view, .context-menu {
+    -fx-background-color: #282828;
+    -fx-border-color: #121212;
+    -fx-background-radius: 8;
+}
+.combo-box-popup .list-cell, .menu-item {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-padding: 8 12;
+}
+.combo-box-popup .list-cell:hover, .menu-item:focused {
+    -fx-background-color: #3E3E3E;
+    -fx-text-fill: #1DB954;
+}

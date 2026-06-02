@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -12,66 +11,47 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox prefHeight="600" prefWidth="900" spacing="0" styleClass="home-root" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.HomeController">
-
-    <!-- ═══════════════════ HEADER ═══════════════════ -->
-    <VBox spacing="12" styleClass="view-header">
-        <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
-
-        <HBox alignment="CENTER_LEFT" spacing="8">
-
-            <TextField fx:id="searchBar" maxWidth="Infinity" prefWidth="340" promptText="Cerca playlist..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-
+<VBox prefHeight="600" prefWidth="900" spacing="0" stylesheets="@style.css" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.HomeController">
+    <VBox spacing="15">
+        <padding><Insets bottom="16" left="25" right="25" top="25" /></padding>
+        <Label text="Home" style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" />
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <VBox.margin><Insets top="5" /></VBox.margin>
+            <TextField fx:id="searchBar" maxWidth="Infinity" prefWidth="340" promptText="Cerca playlist..." style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" HBox.hgrow="ALWAYS" />
             <Region HBox.hgrow="ALWAYS" />
-
-            <MenuButton fx:id="autoCreateBtn" onAction="#onAutoPlaylist" text="Playlist automatica">
+            <MenuButton fx:id="autoCreateBtn" onAction="#onAutoPlaylist" minWidth="160" mnemonicParsing="false" styleClass="dark-combo" text="Playlist automatica">
                 <items>
-                    <MenuItem onAction="#onAutoCreateByGenre" text="Per genere" />
-                    <MenuItem onAction="#onAutoCreateByYear" text="Per anno" />
-                    <MenuItem onAction="#onAutoCreateByArtist" text="Per artista" />
-                    <MenuItem onAction="#onAutoCreateByTag" text="Per tag" />
+                    <MenuItem mnemonicParsing="false" onAction="#onAutoCreateByGenre" text="Per genere" />
+                    <MenuItem mnemonicParsing="false" onAction="#onAutoCreateByYear" text="Per anno" />
+                    <MenuItem mnemonicParsing="false" onAction="#onAutoCreateByArtist" text="Per artista" />
+                    <MenuItem mnemonicParsing="false" onAction="#onAutoCreateByTag" text="Per tag" />
                 </items>
             </MenuButton>
-
-            <Button fx:id="newPlaylistBtn" onAction="#onNewPlaylist" text="+ Nuova playlist" />
+            <Button fx:id="newPlaylistBtn" onAction="#onNewPlaylist" minWidth="140" styleClass="spotify-btn" text="+ Nuova playlist" />
         </HBox>
     </VBox>
-
-    <!-- ═══════════════════ SORT BAR ═══════════════════ -->
-    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="sort-bar">
-        <padding><Insets bottom="8" left="24" right="24" top="8" /></padding>
-
-        <Label styleClass="sort-label" text="Ordina per:" />
-
-        <ComboBox fx:id="sortComboBox" onAction="#onSortChanged" prefWidth="180" />
-
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets bottom="10" left="25" right="25" top="0" /></padding>
+        <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Ordina per:" />
+        <ComboBox fx:id="sortComboBox" onAction="#onSortChanged" minWidth="150" prefWidth="180" styleClass="dark-combo" />
         <Region HBox.hgrow="ALWAYS" />
-
-        <Label fx:id="countLabel" prefHeight="18.0" prefWidth="109.0" styleClass="count-label" text="Numero di playlists" />
+        <Label fx:id="countLabel" alignment="CENTER_RIGHT" prefHeight="18.0" prefWidth="150.0" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="Numero di playlists" />
     </HBox>
-
-    <!-- ═══════════════════ COLUMN HEADERS ═══════════════════ -->
-    <HBox alignment="CENTER_LEFT" spacing="0" styleClass="col-header">
-        <padding><Insets bottom="4" left="24" right="24" top="4" /></padding>
-        <Label prefWidth="360" text="NOME" />
-        <Label prefWidth="80" text="BRANI" />
-        <Label prefWidth="100" styleClass="col-label" text="DURATA" />
-        <Label prefWidth="120" styleClass="col-label" text="RIPRODUZIONI" />
+    <HBox alignment="CENTER_LEFT" spacing="0" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
+        <padding><Insets bottom="10" left="25" right="25" top="10" /></padding>
+        <Label prefWidth="360" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="NOME" />
+        <Label prefWidth="80" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="BRANI" />
+        <Label prefWidth="100" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="DURATA" />
+        <Label prefWidth="120" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="RIPRODUZIONI" />
     </HBox>
-
-    <!-- ═══════════════════ CONTENT ═══════════════════ -->
     <StackPane VBox.vgrow="ALWAYS">
-
-        <!-- Empty state -->
         <VBox fx:id="emptyStateBox" alignment="CENTER" managed="false" spacing="12" visible="false">
-            <Label fx:id="emptyTitle" styleClass="empty-title" text="Nessuna playlist" />
-            <Label fx:id="emptySubtitle" maxWidth="300" styleClass="empty-subtitle" text="Crea la tua prima playlist per organizzare la musica." textAlignment="CENTER" wrapText="true" />
-            <Button fx:id="emptyCreateBtn" onAction="#onNewPlaylist" styleClass="btn-primary" text="+ Crea playlist" />
+            <Label fx:id="emptyTitle" style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;" text="Nessuna playlist" />
+            <Label fx:id="emptySubtitle" maxWidth="300" style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Crea la tua prima playlist per organizzare la musica." textAlignment="CENTER" wrapText="true" />
+            <Button fx:id="emptyCreateBtn" onAction="#onNewPlaylist" styleClass="spotify-btn" text="+ Crea playlist">
+                <VBox.margin><Insets top="10" /></VBox.margin>
+            </Button>
         </VBox>
-
-        <ListView fx:id="playlistListView" onMouseClicked="#onListViewClicked" styleClass="playlist-list-view" />
-
+        <ListView fx:id="playlistListView" onMouseClicked="#onListViewClicked" style="-fx-background-color: #000000; -fx-control-inner-background: #000000; -fx-border-color: transparent; -fx-padding: 10 25 10 25; -fx-focus-color: transparent;" />
     </StackPane>
-
 </VBox>
