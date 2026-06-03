@@ -77,7 +77,6 @@ public class App extends Application {
           System.err.println("File non trovato: " + path);
       }
 
-      initMusicLibrary();
       stage.setTitle("Music Playlist Manager");
       stage.setScene(scene);
       stage.setResizable(false);

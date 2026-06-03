@@ -41,9 +41,12 @@ public class MusicLibrary {
         List<UUID> songUUIDs;
         for (Playlist playlist : playlists) {
             songUUIDs = playlistDAO.getSongIds(playlist.getId());
+
             for (UUID songId : songUUIDs) {
                 playlist.addSong(songCatalog.getSongById(songId));
             }
+
+            playlistCatalog.addPlaylist(playlist);
         }
     }
 
@@ -64,6 +67,8 @@ public class MusicLibrary {
      * @param song traccia da rimuovere;
      */
     public void removeSongFromCatalog(Song song) {
+        if (!songCatalog.contains(song)) return;
+
         List<Playlist> playlistConTraccia =
             playlistCatalog.getPlaylistsContaining(song);
 
