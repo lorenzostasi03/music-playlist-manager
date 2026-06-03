@@ -208,7 +208,7 @@ public class Song {
      *
      * @param filePath nuovo percorso;
      */
-    private void setFilePath(String filePath) {
+    public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 

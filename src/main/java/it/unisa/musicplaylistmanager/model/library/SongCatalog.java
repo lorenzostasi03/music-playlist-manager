@@ -91,6 +91,10 @@ public class SongCatalog {
         return Collections.unmodifiableList(songs.values().stream().toList());
     }
 
+    public Song getSongById(UUID id) {
+        return songs.get(id);
+    }
+
     /**
      * Restituisce il numero di tracce presenti nel catalogo.
      *

@@ -2,6 +2,10 @@ package it.unisa.musicplaylistmanager.app;
 
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
+import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
+import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
+import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
+import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,7 +19,7 @@ import java.io.IOException;
  */
 public class App extends Application {
 
-  private static final MusicLibrary MUSIC_LIBRARY = new MusicLibrary();
+  private static MusicLibrary MUSIC_LIBRARY;
   private static Playlist selectedPlaylist;
 
   /**
@@ -45,15 +49,26 @@ public class App extends Application {
       return selectedPlaylist;
   }
 
-    /**
-     * Avvia l'interfaccia grafica caricando la vista principale (MainView).
-     *
-     * @param stage la finestra principale dell'applicazione fornita dal framework JavaFX
-     */
+  public static void initMusicLibrary() {
+      SongDAO songDAO = new SQLiteSongDAO();
+      PlaylistDAO playlistDAO = new SQLitePlaylistDAO();
+
+      MUSIC_LIBRARY = new MusicLibrary(songDAO, playlistDAO);
+      MUSIC_LIBRARY.init();
+  }
+
+/**
+ * Avvia l'interfaccia grafica caricando la vista principale (MainView).
+ *
+ * @param stage la finestra principale dell'applicazione fornita dal framework JavaFX
+ */
   @Override
   public void start(Stage stage) {
+      initMusicLibrary();
+
       Scene scene = null;
       String path = "/views/MainView.fxml";
+
       try {
           scene = new Scene(
               FXMLLoader.load(getClass().getResource(path))
@@ -62,6 +77,7 @@ public class App extends Application {
           System.err.println("File non trovato: " + path);
       }
 
+      initMusicLibrary();
       stage.setTitle("Music Playlist Manager");
       stage.setScene(scene);
       stage.setResizable(false);

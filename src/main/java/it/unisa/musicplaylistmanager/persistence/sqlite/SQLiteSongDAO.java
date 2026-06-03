@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.persistence.sqlite;
 
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -31,7 +32,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenceException("Si è verificato un errore durante il salvataggio del brano!");
         }
     }
 
@@ -55,7 +56,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenceException("Si è verificato un errore durante la modifica del brano!");
         }
     }
 
@@ -70,7 +71,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenceException("Si è verificato un errore durante l'eliminazione del brano!");
         }
     }
 
@@ -95,7 +96,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
                 songs.add(new Song(id, title, author, Genre.valueOf(genre), year, duration, filePath, playCount));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new PersistenceException("Si è verificato un errore durante il caricamento dei brani!");
         }
 
         return songs;

@@ -5,12 +5,12 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
-import it.unisa.musicplaylistmanager.util.AlertManager;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
- * Facciata  che espone un'interfaccia unificata
+ * Facciata che espone un'interfaccia unificata
  * per tutte le operazioni sul catalogo musicale e sulle playlist.
  */
 public class MusicLibrary {
@@ -29,6 +29,23 @@ public class MusicLibrary {
         this.playlistDAO = playlistDAO;
     }
 
+    /**
+     * Carica i brani e le playlist salvate precedentemente e inizializza songCatalog e playlistCatalog.
+     */
+    public void init() {
+        List<Song> songs = songDAO.getSongs();
+        List<Playlist> playlists = playlistDAO.getPlaylists();
+
+        songs.forEach(songCatalog::addSong);
+
+        List<UUID> songUUIDs;
+        for (Playlist playlist : playlists) {
+            songUUIDs = playlistDAO.getSongIds(playlist.getId());
+            for (UUID songId : songUUIDs) {
+                playlist.addSong(songCatalog.getSongById(songId));
+            }
+        }
+    }
 
     /**
      * Aggiunge una traccia al catalogo globale
@@ -49,10 +66,14 @@ public class MusicLibrary {
     public void removeSongFromCatalog(Song song) {
         List<Playlist> playlistConTraccia =
             playlistCatalog.getPlaylistsContaining(song);
+
         for (Playlist playlist : playlistConTraccia) {
             playlist.removeSong(song);
+            playlistDAO.removeSong(playlist.getId(), song.getId());
         }
+
         songCatalog.removeSong(song);
+        songDAO.delete(song.getId());
     }
 
     /**
@@ -95,6 +116,7 @@ public class MusicLibrary {
     public void addPlaylist(Playlist playlist) {
 
         playlistCatalog.addPlaylist(playlist);
+        playlistDAO.save(playlist);
     }
 
     /**
@@ -105,6 +127,7 @@ public class MusicLibrary {
     public void removePlaylist(Playlist playlist) {
 
         playlistCatalog.removePlaylist(playlist);
+        playlistDAO.delete(playlist.getId());
     }
 
     /**
@@ -125,7 +148,9 @@ public class MusicLibrary {
             throw new IllegalArgumentException(
                 "Esiste già una playlist con il nome '" + newName + "'.");
         }
+
         playlist.setName(newName);
+        playlistDAO.update(playlist);
     }
 
     /**
@@ -140,7 +165,9 @@ public class MusicLibrary {
                 "La traccia '" + song.getTitle() +
                     "' non è presente nel catalogo. Aggiungila prima al catalogo.");
         }
+
         playlist.addSong(song);
+        playlistDAO.addSong(playlist.getId(), song.getId());
     }
 
     /**
@@ -152,6 +179,7 @@ public class MusicLibrary {
     public void removeSongFromPlaylist(Song song, Playlist playlist) {
 
         playlist.removeSong(song);
+        playlistDAO.removeSong(playlist.getId(), song.getId());
     }
 
     /**
