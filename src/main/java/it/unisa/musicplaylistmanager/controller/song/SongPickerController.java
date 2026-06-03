@@ -127,6 +127,9 @@ public class SongPickerController {
         }
     }
 
+    /**
+     * Configura le proprietà della {@link TableView} e le relative colonne.
+     */
     private void configureTable() {
         checkColumn.setCellValueFactory(cellData ->
             cellData.getValue().selectedProperty()
@@ -171,6 +174,11 @@ public class SongPickerController {
         );
     }
 
+    /**
+     * Recupera dal catalogo  tutte le canzoni disponibili, escludendo quelle
+     * già presenti nella playlist di destinazione. Popola la tabella con i risultati
+     * o mostra lo stato vuoto se non ci sono tracce disponibili per l'aggiunta.
+     */
     private void refreshSongs() {
         if (playlist == null) {
             return;
@@ -190,12 +198,24 @@ public class SongPickerController {
         confirmButton.setDisable(true);
     }
 
+    /**
+     * Valuta lo stato di selezione degli elementi nella tabella.
+     * Se almeno un elemento è selezionato, abilita il pulsante di conferma;
+     * in caso contrario, lo disabilita per prevenire inserimenti a vuoto.
+     */
     private void updateConfirmButton() {
         boolean hasSelection = tracksTable.getItems().stream()
             .anyMatch(SelectableSong::isSelected);
         confirmButton.setDisable(!hasSelection);
     }
 
+    /**
+     * Converte un'istanza dell'enumerazione {@link Genre} in una stringa testuale
+     * formattata per la visualizzazione nella colonna della tabella.
+     *
+     * @param genre il genere musicale da formattare
+     * @return una stringa leggibile rappresentante il genere, o "Altro" se nullo
+     */
     private String formatGenre(Genre genre) {
         if (genre == null) {
             return "Altro";
@@ -223,6 +243,11 @@ public class SongPickerController {
         cancelButton.getScene().getWindow().hide();
     }
 
+
+    /**
+     * Classe wrapper interna che incapsula un oggetto {@link Song} aggiungendo
+     * una proprietà booleana osservabile.
+     */
     private static final class SelectableSong {
         private final Song song;
         private final BooleanProperty selected;

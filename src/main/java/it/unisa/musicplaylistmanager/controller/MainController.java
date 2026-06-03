@@ -5,6 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 
+/**
+ * Controller principale dell'applicazione.
+ * Gestisce la barra di navigazione per spostarsi tra le sezioni principali del programma
+ * (Home, Catalogo, Riproduzione).
+ */
 public class MainController {
 
     @FXML private BorderPane root;
