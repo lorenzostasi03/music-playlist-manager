@@ -142,3 +142,15 @@
 .list-view .list-cell:filled:hover {
     -fx-background-color: #121212;
 }
+/* --- FIX TESTI SCURI --- */
+.text-field, .combo-box {
+    -fx-prompt-text-fill: #B3B3B3;
+}
+
+.text-field {
+    -fx-text-fill: #FFFFFF;
+}
+
+.dark-combo > .list-cell {
+    -fx-text-fill: #FFFFFF;
+}

@@ -163,7 +163,9 @@ public class PlaylistController {
             AlertManager.showError(e.getMessage());
         }
     }
-
+    /**
+     * Configura le proprietà della TableView.
+     */
     private void configureTable() {
         indexColumn.setSortable(false);
         titleColumn.setSortable(false);
@@ -198,6 +200,11 @@ public class PlaylistController {
         );
     }
 
+    /**
+     * Ricarica i dati della playlist selezionata e aggiorna l'interfaccia .
+     * Aggiorna le etichette descrittive, popola la tabella
+     * e gestisce la visualizzazione del pannello di avviso  se la playlist risulta vuota.
+     */
     private void refreshPlaylist() {
         if (playlist == null) {
             playlistNameLabel.setText("Nessuna playlist selezionata");
@@ -220,6 +227,9 @@ public class PlaylistController {
         removeTrackButton.setDisable(tracksTable.getSelectionModel().getSelectedItem() == null);
     }
 
+    /**
+     * Instanzia e visualizza la finestra per la selezione dei brani.
+     */
     private void openSongPicker() {
         if (playlist == null) {
             return;
@@ -244,6 +254,9 @@ public class PlaylistController {
         }
     }
 
+    /**
+     * Instanzia e visualizza la finestra  per la modifica della playlist.
+     */
     private void openPlaylistForm() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PlaylistFormView.fxml"));

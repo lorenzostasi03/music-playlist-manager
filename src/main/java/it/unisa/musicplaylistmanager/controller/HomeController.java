@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Controller responsabile della schermata principale (Home).
+ * Controller responsabile della schermata principale.
  * Gestisce la visualizzazione, la creazione e l'eliminazione delle playlist,
  * oltre a permettere la navigazione verso i dettagli di una playlist specifica.
  */
@@ -47,7 +47,7 @@ public class HomeController {
 
     /**
      * Inizializza il controller configurando la lista delle playlist
-     * e caricando i dati attualmente presenti nella libreria.
+     * e caricando i dati attualmente presenti nel catalogo.
      */
     @FXML
     private void initialize() {
@@ -108,7 +108,13 @@ public class HomeController {
     @FXML
     private void onListViewClicked() {
     }
-
+    /**
+     * Crea un componente grafico che rappresenta visivamente una singola playlist
+     * all'interno della ListView, includendo metadati e pulsanti di azione.
+     *
+     * @param playlist la playlist da visualizzare nella riga
+     * @return un oggetto  HBox configurato con le informazioni della playlist
+     */
     private HBox createPlaylistRow(Playlist playlist) {
         Label nameLabel = new Label(playlist.getName());
         nameLabel.getStyleClass().add("row-title");
@@ -149,7 +155,9 @@ public class HomeController {
         row.setOnMouseClicked(event -> openPlaylistView(playlist));
         return row;
     }
-
+    /**
+     * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
+     */
     private void refreshPlaylists() {
         List<Playlist> playlists = App.getMusicLibrary().getAllPlaylists();
 
@@ -162,7 +170,13 @@ public class HomeController {
         playlistListView.setVisible(!empty);
         playlistListView.setManaged(!empty);
     }
-
+    /**
+     * Calcola la durata totale di una playlist sommando la durata dei singoli brani
+     * e la formatta in una stringa  (minuti:secondi).
+     *
+     * @param playlist la playlist di cui calcolare la durata
+     * @return una stringa che rappresenta la durata totale nel formato "mm:ss"
+     */
     private String formatDuration(Playlist playlist) {
         int totalSeconds = playlist.getSongs().stream()
             .mapToInt(Song::getDuration)
@@ -172,6 +186,12 @@ public class HomeController {
         return String.format("%d:%02d", minutes, seconds);
     }
 
+    /**
+     * Gestisce il processo di eliminazione di una playlist dalla libreria.
+     * Richiede una conferma da parte dell'utente prima di effettuare l'operazione.
+     *
+     * @param playlist la playlist da eliminare definitivamente
+     */
     private void deletePlaylist(Playlist playlist) {
         boolean confirmed = AlertManager.showConfirmation(
             "Vuoi eliminare la playlist '" + playlist.getName() + "'?"
@@ -190,11 +210,24 @@ public class HomeController {
         }
     }
 
+    /**
+     * Naviga verso la schermata della playlist specificata.
+     * Memorizza la playlist selezionata nello stato globale dell'applicazione prima del cambio vista.
+     *
+     * @param playlist la playlist di cui visualizzare i dettagli
+     */
     private void openPlaylistView(Playlist playlist) {
         App.setSelectedPlaylist(playlist);
         ViewSwitcher.switchTo("PlaylistView.fxml");
     }
 
+    /**
+     * Apre la finestra relativa al form di gestione della playlist.
+     * Questo metodo viene utilizzato sia per creare una nuova playlist
+     * sia per rinominarne una esistente.
+     *
+     * @param playlist l'istanza della playlist da modificare, oppure null per una nuova creazione
+     */
     private void openPlaylistForm(Playlist playlist) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PlaylistFormView.fxml"));

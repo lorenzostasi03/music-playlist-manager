@@ -63,7 +63,7 @@ public class CatalogController {
     }
 
     /**
-     * Apre la finestra modale per l'inserimento di una nuova traccia nel catalogo.
+     * Apre la schermata del form per l'inserimento di una nuova traccia nel catalogo.
      */
     @FXML
     private void onAddTrack() {
@@ -93,7 +93,13 @@ public class CatalogController {
             catalogRows.getChildren().add(createSongRow(song));
         }
     }
-
+    /**
+     * Crea una riga grafica  per rappresentare visivamente una singola traccia nel catalogo,
+     * popolandola con i metadati della canzone e i pulsanti di modifica ed eliminazione.
+     *
+     * @param song la traccia musicale da visualizzare nella riga
+     * @return un oggetto HBox formattato contenente le informazioni e i comandi della traccia
+     */
     private HBox createSongRow(Song song) {
         Label titleLabel = new Label(song.getTitle());
         titleLabel.getStyleClass().add("row-title");
@@ -126,6 +132,13 @@ public class CatalogController {
         return row;
     }
 
+    /**
+     * Metodo  per creare una Label dedicata ai metadati della canzone.
+     *
+     * @param text il testo da visualizzare all'interno della Label
+     * @param width la larghezza preferita e minima da assegnare alla Label
+     * @return un oggetto Label formattato secondo le specifiche indicate
+     */
     private Label createMetaLabel(String text, double width) {
         Label label = new Label(text);
         label.getStyleClass().add("row-meta");
@@ -133,7 +146,10 @@ public class CatalogController {
         label.setMinWidth(width);
         return label;
     }
-
+    /**
+     * Gestisce il processo di eliminazione di una traccia dal catalogo.
+     * @param song la traccia musicale da eliminare definitivamente dal catalogo
+     */
     private void deleteSong(Song song) {
         boolean confirmed = AlertManager.showConfirmation(
             "Vuoi eliminare definitivamente la traccia '" + song.getTitle() + "'?"
@@ -151,7 +167,10 @@ public class CatalogController {
             AlertManager.showError(e.getMessage());
         }
     }
-
+    /**
+     * Apre la finestra  relativa al form di gestione della traccia.
+     * @param song l'istanza della traccia da modificare, oppure null se si tratta di un inserimento
+     */
     private void openSongForm(Song song) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SongFormView.fxml"));
@@ -172,6 +191,11 @@ public class CatalogController {
         }
     }
 
+    /**
+     * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei filtri
+     * relativi agli autori e agli anni di pubblicazione, basandosi sui brani effettivamente presenti.
+     * Mantiene la selezione utente precedente se ancora valida, altrimenti reimposta su "Tutti".
+     */
     private void refreshFilterValues() {
         String selectedAuthor = authorFilter.getValue();
         String selectedYear = yearFilter.getValue();
@@ -196,6 +220,13 @@ public class CatalogController {
         yearFilter.setValue(years.contains(selectedYear) ? selectedYear : "Tutti");
     }
 
+    /**
+     * Converte il valore costante dell'enumerazione nella corrispondente
+     * stringa testuale formattata.
+     *
+     * @param genre l'istanza dell'enumerazione Genre da convertire
+     * @return una stringa  che rappresenta il genere musicale, oppure "Altro" se il valore è nullo
+     */
     private String formatGenre(Genre genre) {
         if (genre == null) {
             return "Altro";

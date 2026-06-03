@@ -159,7 +159,12 @@ public class SongFormController {
             showGlobalError(e.getMessage());
         }
     }
-
+    /**
+     * Analizza e valida il testo inserito nel campo dell'anno di pubblicazione.
+     *
+     * @return l'anno di pubblicazione convertito in formato numerico intero
+     * @throws IllegalArgumentException se il testo inserito non è un numero valido
+     */
     private int parseYear() {
         try {
             return Integer.parseInt(yearField.getText().trim());
@@ -169,7 +174,13 @@ public class SongFormController {
             throw new IllegalArgumentException("L'anno deve essere un numero valido.");
         }
     }
-
+    /**
+     * Analizza e valida il testo inserito nel campo della durata.
+     * Supporta sia l'inserimento diretto in secondi, sia il formato classico "minuti:secondi".
+     *
+     * @return la durata totale calcolata in secondi
+     * @throws IllegalArgumentException se il formato della durata non è riconosciuto
+     */
     private int parseDuration() {
         String text = durationField.getText().trim();
 
@@ -190,6 +201,13 @@ public class SongFormController {
         }
     }
 
+    /**
+     * Converte la stringa selezionata dei generi nel corrispondente valore enumerato.
+     *
+     * @param value la stringa del genere selezionata dall'utente
+     * @return l'istanza dell'enumerazione corrispondente
+     * @throws IllegalArgumentException se nessun valore valido è stato selezionato
+     */
     private Genre parseGenre(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Seleziona un genere.");
@@ -213,6 +231,13 @@ public class SongFormController {
         };
     }
 
+    /**
+     * Converte un valore enumerato del genere nella corrispondente stringa formattata
+     * per essere visualizzata correttamente all'interno dell'interfaccia.
+     *
+     * @param genre l'istanza dell'enumerazione da formattare
+     * @return una stringa leggibile che rappresenta il genere, oppure null se inesistente
+     */
     private String toViewGenre(Genre genre) {
         if (genre == null) {
             return null;
@@ -236,6 +261,11 @@ public class SongFormController {
         };
     }
 
+    /**
+     * Applica i tag selezionati alla traccia.
+     *
+     * @param song la traccia a cui applicare i tag selezionati
+     */
     private void applyTags(Song song) {
         for (Tag tag : Tag.values()) {
             song.removeTag(tag);
