@@ -217,7 +217,7 @@ public class Song {
      * Incrementa di uno il contatore di riproduzioni della traccia.
      *
      */
-    private void incrementPlayCount(){
+    public void incrementPlayCount(){
     this.playCount++;
     }
 

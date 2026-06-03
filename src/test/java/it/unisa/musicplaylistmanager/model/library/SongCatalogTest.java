@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.library;
 
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,7 @@ class SongCatalogTest {
     @Test
     void testAggiuntaTracciaDuplicataLanciaEccezione() {
         catalog.addSong(song1);
-        assertThrows(IllegalArgumentException.class, () -> catalog.addSong(song1));
+        assertThrows(DuplicatedSongException.class, () -> catalog.addSong(song1));
     }
 
 
