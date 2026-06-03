@@ -50,8 +50,8 @@ public class App extends Application {
   }
 
   public static void initMusicLibrary() {
-      SongDAO songDAO = new SQLiteSongDAO();
-      PlaylistDAO playlistDAO = new SQLitePlaylistDAO();
+      SongDAO songDAO = new SQLiteSongDAO("jdbc:sqlite:database.db");
+      PlaylistDAO playlistDAO = new SQLitePlaylistDAO("jdbc:sqlite:database.db");
 
       MUSIC_LIBRARY = new MusicLibrary(songDAO, playlistDAO);
       MUSIC_LIBRARY.init();

@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
+
+    public SQLitePlaylistDAO(String DB_URL) {
+        super(DB_URL);
+    }
+
     @Override
     public void save(Playlist playlist) {
         String query = "INSERT INTO playlist (id, name) VALUES (?, ?)";

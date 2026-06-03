@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
+
+    public SQLiteSongDAO(String DB_URL) {
+        super(DB_URL);
+    }
+
     @Override
     public void save(Song song) {
         String query = """

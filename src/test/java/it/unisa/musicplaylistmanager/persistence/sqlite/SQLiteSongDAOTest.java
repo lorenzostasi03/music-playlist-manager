@@ -20,10 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class SQLiteSongDAOTest {
 
     private SongDAO songDAO;
+    private final String DB_URL = "jdbc:sqlite:test.db";
 
     @BeforeEach
     void setUp() {
-        songDAO = new SQLiteSongDAO();
+        songDAO = new SQLiteSongDAO(DB_URL);
     }
 
     @AfterEach

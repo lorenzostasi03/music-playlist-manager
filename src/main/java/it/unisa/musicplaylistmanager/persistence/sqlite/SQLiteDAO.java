@@ -5,7 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public abstract class SQLiteDAO {
-    protected static final String DB_URL = "jdbc:sqlite:test.db";
+    protected final String DB_URL;
+
+    public SQLiteDAO(String DB_URL) {
+        this.DB_URL = DB_URL;
+    }
 
     /**
      * Crea una conessione con il database.
