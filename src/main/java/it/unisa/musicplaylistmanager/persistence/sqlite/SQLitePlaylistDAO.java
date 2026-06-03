@@ -123,11 +123,12 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
         String query = "SELECT song_id FROM playlist_song WHERE playlist_id = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(query);) {
 
+            stmt.setString(1, playlistId.toString());
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                UUID id = UUID.fromString(rs.getString("id"));
+                UUID id = UUID.fromString(rs.getString("song_id"));
                 songIds.add(id);
             }
         } catch (SQLException | NullPointerException e) {

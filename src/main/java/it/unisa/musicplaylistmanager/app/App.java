@@ -12,83 +12,84 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+
 /**
  * Classe principale dell'applicazione Music Playlist Manager.
  * Gestisce l'avvio dell'interfaccia grafica e mantiene i dati di sessione globali
  * come la libreria musicale e la playlist correntemente selezionata.
  */
 public class App extends Application {
+    private final String DB_URL = "jdbc:sqlite:database.db";
+    private static MusicLibrary MUSIC_LIBRARY;
+    private static Playlist selectedPlaylist;
 
-  private static MusicLibrary MUSIC_LIBRARY;
-  private static Playlist selectedPlaylist;
+    /**
+     * Restituisce la libreria musicale condivisa dai controller JavaFX.
+     *
+     * @return libreria musicale dell'applicazione
+     */
+    public static MusicLibrary getMusicLibrary() {
+        return MUSIC_LIBRARY;
+    }
 
-  /**
-   * Restituisce la libreria musicale condivisa dai controller JavaFX.
-   *
-   * @return libreria musicale dell'applicazione
-   */
-  public static MusicLibrary getMusicLibrary() {
-      return MUSIC_LIBRARY;
-  }
+    /**
+     * Imposta la playlist selezionata nella Home.
+     *
+     * @param playlist playlist da visualizzare
+     */
+    public static void setSelectedPlaylist(Playlist playlist) {
+        selectedPlaylist = playlist;
+    }
 
-  /**
-   * Imposta la playlist selezionata nella Home.
-   *
-   * @param playlist playlist da visualizzare
-   */
-  public static void setSelectedPlaylist(Playlist playlist) {
-      selectedPlaylist = playlist;
-  }
+    /**
+     * Restituisce la playlist selezionata nella Home.
+     *
+     * @return playlist selezionata
+     */
+    public static Playlist getSelectedPlaylist() {
+        return selectedPlaylist;
+    }
 
-  /**
-   * Restituisce la playlist selezionata nella Home.
-   *
-   * @return playlist selezionata
-   */
-  public static Playlist getSelectedPlaylist() {
-      return selectedPlaylist;
-  }
+    public void initMusicLibrary() {
+        SongDAO songDAO = new SQLiteSongDAO(DB_URL);
+        PlaylistDAO playlistDAO = new SQLitePlaylistDAO(DB_URL);
 
-  public static void initMusicLibrary() {
-      SongDAO songDAO = new SQLiteSongDAO("jdbc:sqlite:database.db");
-      PlaylistDAO playlistDAO = new SQLitePlaylistDAO("jdbc:sqlite:database.db");
+        MUSIC_LIBRARY = new MusicLibrary(songDAO, playlistDAO);
+        MUSIC_LIBRARY.init();
+    }
 
-      MUSIC_LIBRARY = new MusicLibrary(songDAO, playlistDAO);
-      MUSIC_LIBRARY.init();
-  }
+    /**
+     * Avvia l'interfaccia grafica caricando la vista principale (MainView).
+     *
+     * @param stage la finestra principale dell'applicazione fornita dal framework JavaFX
+     */
+    @Override
+    public void start(Stage stage) {
+        initMusicLibrary();
 
-/**
- * Avvia l'interfaccia grafica caricando la vista principale (MainView).
- *
- * @param stage la finestra principale dell'applicazione fornita dal framework JavaFX
- */
-  @Override
-  public void start(Stage stage) {
-      initMusicLibrary();
+        Scene scene = null;
+        String path = "/views/MainView.fxml";
 
-      Scene scene = null;
-      String path = "/views/MainView.fxml";
+        try {
+            scene = new Scene(
+                FXMLLoader.load(getClass().getResource(path))
+            );
+        } catch (IOException e) {
+            System.err.println("File non trovato: " + path);
+        }
 
-      try {
-          scene = new Scene(
-              FXMLLoader.load(getClass().getResource(path))
-          );
-      } catch (IOException e) {
-          System.err.println("File non trovato: " + path);
-      }
-
-      stage.setTitle("Music Playlist Manager");
-      stage.setScene(scene);
-      stage.setResizable(false);
-      stage.show();
-  }
+        stage.setTitle("Music Playlist Manager");
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+    }
 
     /**
      * Metodo di ingresso (entry-point) per l'avvio dell'applicazione.
      *
      * @param args argomenti passati da riga di comando
      */
-  public static void main(String[] args) {
-    launch(args);
-  }
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

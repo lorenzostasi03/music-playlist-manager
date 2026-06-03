@@ -29,7 +29,7 @@ class SQLiteSongDAOTest {
 
     @AfterEach
     void cleanDb() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:test.db");
+        try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement()) {
 
             stmt.executeUpdate("DELETE FROM song");
@@ -76,7 +76,7 @@ class SQLiteSongDAOTest {
     }
 
     @Test
-    void addDuplicateSongs() {
+    void addDuplicatedSongs() {
         Song song1 = new Song("Brano 1", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
 
         songDAO.save(song1);

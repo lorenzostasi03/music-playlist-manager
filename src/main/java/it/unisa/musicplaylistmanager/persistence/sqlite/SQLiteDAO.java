@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.persistence.sqlite;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public abstract class SQLiteDAO {
     protected final String DB_URL;
@@ -17,6 +18,12 @@ public abstract class SQLiteDAO {
      * @throws SQLException se non riesce a connettersi.
      */
     protected Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
+        Connection conn = DriverManager.getConnection(DB_URL);
+
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
+        }
+
+        return conn;
     }
 }

@@ -2,7 +2,6 @@ package it.unisa.musicplaylistmanager.persistence.sqlite;
 
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
-import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
