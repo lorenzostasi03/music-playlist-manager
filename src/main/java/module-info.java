@@ -1,18 +1,19 @@
 module it.unisa.musicplaylistmanager {
+	requires javafx.controls;
+	requires javafx.fxml;
+	requires java.sql;
+	requires javafx.media;
+    requires transitive javafx.graphics;
 
-    requires javafx.controls;
-    requires javafx.fxml;
-    requires java.sql;
+	opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
+	opens it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
+	opens it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
 
-    opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
-    opens it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
-    opens it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
+	exports it.unisa.musicplaylistmanager.app;
 
-    exports it.unisa.musicplaylistmanager.app;
-
-    exports it.unisa.musicplaylistmanager.controller to javafx.fxml;
-    exports it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
-    exports it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
+	exports it.unisa.musicplaylistmanager.controller to javafx.fxml;
+	exports it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
+	exports it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
 
     exports it.unisa.musicplaylistmanager.model.entity;
     exports it.unisa.musicplaylistmanager.model.library;

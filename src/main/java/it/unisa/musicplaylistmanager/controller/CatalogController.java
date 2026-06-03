@@ -4,7 +4,9 @@ import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.controller.song.SongFormController;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.SongPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
+import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -15,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 /**
  * Controller responsabile della visualizzazione e gestione del catalogo musicale.
  * Consente all'utente di scorrere le tracce disponibili, filtrarle in base a
- * vari criteri, e accedere alle funzioni di aggiunta, modifica ed eliminazione.
+ * vari criteri, e accedere alle funzioni di aggiunta, modifica, eliminazione e
+ * riproduzione.
  */
 public class CatalogController {
 
@@ -93,49 +97,64 @@ public class CatalogController {
             catalogRows.getChildren().add(createSongRow(song));
         }
     }
+
     /**
-     * Crea una riga grafica  per rappresentare visivamente una singola traccia nel catalogo,
-     * popolandola con i metadati della canzone e i pulsanti di modifica ed eliminazione.
+     * Crea una riga grafica per rappresentare visivamente una singola traccia nel
+     * catalogo, popolandola con i metadati della canzone e i pulsanti di
+     * riproduzione, modifica ed eliminazione.
      *
      * @param song la traccia musicale da visualizzare nella riga
-     * @return un oggetto HBox formattato contenente le informazioni e i comandi della traccia
+     * @return un oggetto HBox formattato contenente le informazioni e i comandi
+     *         della traccia
      */
     private HBox createSongRow(Song song) {
+        Button playButton = new Button("▶");
+        playButton.getStyleClass().add("row-action");
+        playButton.setTooltip(new javafx.scene.control.Tooltip("Riproduci traccia"));
+        playButton.setMinWidth(32);
+        playButton.setPrefWidth(32);
+        playButton.setMaxWidth(32);
+        playButton.setOnAction(event -> playSong(song));
+
         Label titleLabel = new Label(song.getTitle());
         titleLabel.getStyleClass().add("row-title");
-        titleLabel.setPrefWidth(220);
-        titleLabel.setMinWidth(220);
+        titleLabel.setPrefWidth(190);
+        titleLabel.setMinWidth(190);
 
-        Label authorLabel = createMetaLabel(song.getAuthor(), 95);
-        Label genreLabel = createMetaLabel(formatGenre(song.getGenre()), 70);
-        Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 55);
-        Label durationLabel = createMetaLabel(song.getDurationFormatted(), 60);
+        Label authorLabel = createMetaLabel(song.getAuthor(), 85);
+        Label genreLabel = createMetaLabel(formatGenre(song.getGenre()), 65);
+        Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 50);
+        Label durationLabel = createMetaLabel(song.getDurationFormatted(), 55);
 
         Button editButton = new Button("✎");
         editButton.getStyleClass().add("row-action");
         editButton.setTooltip(new javafx.scene.control.Tooltip("Modifica traccia"));
-        editButton.setPrefWidth(28);
+        editButton.setMinWidth(32);
+        editButton.setPrefWidth(32);
+        editButton.setMaxWidth(32);
         editButton.setOnAction(event -> openSongForm(song));
 
         Button deleteButton = new Button("×");
         deleteButton.getStyleClass().add("row-action");
         deleteButton.setTooltip(new javafx.scene.control.Tooltip("Elimina traccia"));
-        deleteButton.setPrefWidth(28);
+        deleteButton.setMinWidth(32);
+        deleteButton.setPrefWidth(32);
+        deleteButton.setMaxWidth(32);
         deleteButton.setOnAction(event -> deleteSong(song));
 
         Region spacer = new Region();
-        spacer.setPrefWidth(5);
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox row = new HBox(10, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel,
-            spacer, editButton, deleteButton);
+        HBox row = new HBox(8, titleLabel, authorLabel, genreLabel, yearLabel,
+            durationLabel, spacer, playButton, editButton, deleteButton);
         row.getStyleClass().add("list-row");
         return row;
     }
 
     /**
-     * Metodo  per creare una Label dedicata ai metadati della canzone.
+     * Metodo per creare una Label dedicata ai metadati della canzone.
      *
-     * @param text il testo da visualizzare all'interno della Label
+     * @param text  il testo da visualizzare all'interno della Label
      * @param width la larghezza preferita e minima da assegnare alla Label
      * @return un oggetto Label formattato secondo le specifiche indicate
      */
@@ -146,8 +165,10 @@ public class CatalogController {
         label.setMinWidth(width);
         return label;
     }
+
     /**
      * Gestisce il processo di eliminazione di una traccia dal catalogo.
+     *
      * @param song la traccia musicale da eliminare definitivamente dal catalogo
      */
     private void deleteSong(Song song) {
@@ -167,9 +188,12 @@ public class CatalogController {
             AlertManager.showError(e.getMessage());
         }
     }
+
     /**
-     * Apre la finestra  relativa al form di gestione della traccia.
-     * @param song l'istanza della traccia da modificare, oppure null se si tratta di un inserimento
+     * Apre la finestra relativa al form di gestione della traccia.
+     *
+     * @param song l'istanza della traccia da modificare, oppure null se si tratta
+     *             di un inserimento
      */
     private void openSongForm(Song song) {
         try {
@@ -192,9 +216,10 @@ public class CatalogController {
     }
 
     /**
-     * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei filtri
-     * relativi agli autori e agli anni di pubblicazione, basandosi sui brani effettivamente presenti.
-     * Mantiene la selezione utente precedente se ancora valida, altrimenti reimposta su "Tutti".
+     * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei
+     * filtri relativi agli autori e agli anni di pubblicazione, basandosi sui
+     * brani effettivamente presenti. Mantiene la selezione utente precedente se
+     * ancora valida, altrimenti reimposta su "Tutti".
      */
     private void refreshFilterValues() {
         String selectedAuthor = authorFilter.getValue();
@@ -221,11 +246,12 @@ public class CatalogController {
     }
 
     /**
-     * Converte il valore costante dell'enumerazione nella corrispondente
-     * stringa testuale formattata.
+     * Converte il valore costante dell'enumerazione nella corrispondente stringa
+     * testuale formattata.
      *
      * @param genre l'istanza dell'enumerazione Genre da convertire
-     * @return una stringa  che rappresenta il genere musicale, oppure "Altro" se il valore è nullo
+     * @return una stringa che rappresenta il genere musicale, oppure "Altro" se
+     *         il valore è nullo
      */
     private String formatGenre(Genre genre) {
         if (genre == null) {
@@ -248,5 +274,21 @@ public class CatalogController {
             case BLUES -> "Blues";
             case ALTRO -> "Altro";
         };
+    }
+
+    /**
+     * Apre la schermata di riproduzione e avvia la traccia selezionata.
+     *
+     * @param song traccia da riprodurre
+     */
+    private void playSong(Song song) {
+        PlaybackController controller = ViewSwitcher.switchToAndGetController("PlaybackView.fxml");
+
+        if (controller == null) {
+            AlertManager.showError("Impossibile aprire la schermata di riproduzione.");
+            return;
+        }
+
+        controller.playPlayable(new SongPlayable(song));
     }
 }
