@@ -68,6 +68,9 @@ public class Song {
         this.duration = duration;
         this.filePath = filePath;
         this.playCount = playCount;
+
+        // carica una lista vuota di tag (da modificare quando si aggiungeranno i tag nel DB)
+        this.tags = EnumSet.noneOf(Tag.class);
     }
 
     /**
