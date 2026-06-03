@@ -6,6 +6,9 @@ import it.unisa.musicplaylistmanager.model.playback.EventType;
 import it.unisa.musicplaylistmanager.model.playback.Playable;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.model.playback.PlayerState;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -54,15 +57,28 @@ public class PlaybackController implements EventListener {
     private Playable currentPlayable;
     private boolean subscribedToCurrentPlayable;
 
+    private Timeline progressTimeline;
+    private int elapsedSeconds;
+    private int totalSeconds;
+
     @FXML
     private void initialize() {
         player = new Player();
         currentPlayable = null;
         subscribedToCurrentPlayable = false;
 
+        elapsedSeconds = 0;
+        totalSeconds = 0;
+
         currentTimeLabel.setText("0:00");
         totalTimeLabel.setText("0:00");
         playPauseButton.setText("Play");
+
+        progressSlider.setMin(0);
+        progressSlider.setValue(0);
+
+        progressSlider.setMouseTransparent(true);
+        progressSlider.setFocusTraversable(false);
     }
 
     public void playPlayable(Playable playable) {
@@ -78,6 +94,8 @@ public class PlaybackController implements EventListener {
         updatePlayableInfo(playable);
 
         player.play(playable);
+        startProgressTimeline();
+
         playPauseButton.setText("Pausa");
     }
 
@@ -90,25 +108,27 @@ public class PlaybackController implements EventListener {
         if (player.getState() == PlayerState.STOPPED) {
             subscribeToCurrentPlayable();
             player.play(currentPlayable);
+            startProgressTimeline();
             playPauseButton.setText("Pausa");
         } else if (player.getState() == PlayerState.PLAYING) {
             player.pause();
+            pauseProgressTimeline();
             playPauseButton.setText("Riprendi");
         } else if (player.getState() == PlayerState.PAUSED) {
             player.resume();
+            resumeProgressTimeline();
             playPauseButton.setText("Pausa");
         }
     }
 
     @Override
-    public void update(EventType eventType) {
-        if (eventType == EventType.PLAYABLE_COMPLETED) {
-            unsubscribeFromCurrentPlayable();
-            currentTimeLabel.setText("0:00");
-            progressSlider.setValue(0);
-            playPauseButton.setText("Play");
+        public void update(EventType eventType) {
+            if (eventType == EventType.PLAYABLE_COMPLETED) {
+                unsubscribeFromCurrentPlayable();
+                resetProgressTimeline();
+                playPauseButton.setText("Play");
+            }
         }
-    }
 
     private void updatePlayableInfo(Playable playable) {
         Song currentSong = playable.getCurrentSong();
@@ -118,14 +138,24 @@ public class PlaybackController implements EventListener {
             trackArtistLabel.setText("");
             totalTimeLabel.setText("0:00");
             currentTimeLabel.setText("0:00");
+
+            elapsedSeconds = 0;
+            totalSeconds = 0;
+            progressSlider.setMax(1);
             progressSlider.setValue(0);
             return;
         }
 
         trackTitleLabel.setText(currentSong.getTitle());
         trackArtistLabel.setText(currentSong.getAuthor());
+
+        elapsedSeconds = 0;
+        totalSeconds = currentSong.getDuration();
+
         totalTimeLabel.setText(currentSong.getDurationFormatted());
-        currentTimeLabel.setText("0:00");
+        currentTimeLabel.setText(formatTime(elapsedSeconds));
+
+        progressSlider.setMax(Math.max(totalSeconds, 1));
         progressSlider.setValue(0);
     }
 
@@ -141,6 +171,65 @@ public class PlaybackController implements EventListener {
             currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
             subscribedToCurrentPlayable = false;
         }
+    }
+
+    private void startProgressTimeline() {
+        stopProgressTimeline();
+
+        progressTimeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), event -> updateProgress())
+        );
+
+        progressTimeline.setCycleCount(Timeline.INDEFINITE);
+        progressTimeline.play();
+    }
+
+    private void updateProgress() {
+        if (totalSeconds <= 0) {
+            return;
+        }
+
+        elapsedSeconds++;
+
+        if (elapsedSeconds > totalSeconds) {
+            elapsedSeconds = totalSeconds;
+        }
+
+        progressSlider.setValue(elapsedSeconds);
+        currentTimeLabel.setText(formatTime(elapsedSeconds));
+    }
+
+    private void pauseProgressTimeline() {
+        if (progressTimeline != null) {
+            progressTimeline.pause();
+        }
+    }
+
+    private void resumeProgressTimeline() {
+        if (progressTimeline != null) {
+            progressTimeline.play();
+        }
+    }
+
+    private void stopProgressTimeline() {
+        if (progressTimeline != null) {
+            progressTimeline.stop();
+            progressTimeline = null;
+        }
+    }
+
+    private void resetProgressTimeline() {
+        stopProgressTimeline();
+
+        elapsedSeconds = 0;
+        progressSlider.setValue(0);
+        currentTimeLabel.setText("0:00");
+    }
+
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return String.format("%d:%02d", minutes, remainingSeconds);
     }
 
     @FXML
