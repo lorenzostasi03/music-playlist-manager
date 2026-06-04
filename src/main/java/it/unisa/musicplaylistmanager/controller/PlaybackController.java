@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.controller;
 
+import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.playback.EventListener;
 import it.unisa.musicplaylistmanager.model.playback.EventType;
@@ -8,13 +9,13 @@ import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.model.playback.PlayerState;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.util.Duration;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
@@ -63,8 +64,8 @@ public class PlaybackController implements EventListener {
 
     @FXML
     private void initialize() {
-        player = new Player();
-        currentPlayable = null;
+        player = App.getPlayer();
+        currentPlayable = App.getCurrentPlayable();
         subscribedToCurrentPlayable = false;
 
         elapsedSeconds = 0;
@@ -76,9 +77,18 @@ public class PlaybackController implements EventListener {
 
         progressSlider.setMin(0);
         progressSlider.setValue(0);
-
         progressSlider.setMouseTransparent(true);
         progressSlider.setFocusTraversable(false);
+
+        if (currentPlayable != null) {
+            subscribeToCurrentPlayable();
+            updatePlayableInfo(currentPlayable);
+            updatePlayPauseButton();
+
+            if (player.getState() == PlayerState.PLAYING) {
+                startProgressTimeline();
+            }
+        }
     }
 
     public void playPlayable(Playable playable) {
@@ -89,8 +99,9 @@ public class PlaybackController implements EventListener {
         unsubscribeFromCurrentPlayable();
 
         currentPlayable = playable;
-        subscribeToCurrentPlayable();
+        App.setCurrentPlayable(playable);
 
+        subscribeToCurrentPlayable();
         updatePlayableInfo(playable);
 
         player.play(playable);
@@ -122,13 +133,13 @@ public class PlaybackController implements EventListener {
     }
 
     @Override
-        public void update(EventType eventType) {
-            if (eventType == EventType.PLAYABLE_COMPLETED) {
-                unsubscribeFromCurrentPlayable();
-                resetProgressTimeline();
-                playPauseButton.setText("Play");
-            }
+    public void update(EventType eventType) {
+        if (eventType == EventType.PLAYABLE_COMPLETED) {
+            unsubscribeFromCurrentPlayable();
+            resetProgressTimeline();
+            playPauseButton.setText("Play");
         }
+    }
 
     private void updatePlayableInfo(Playable playable) {
         Song currentSong = playable.getCurrentSong();
@@ -159,6 +170,16 @@ public class PlaybackController implements EventListener {
         progressSlider.setValue(0);
     }
 
+    private void updatePlayPauseButton() {
+        if (player.getState() == PlayerState.PLAYING) {
+            playPauseButton.setText("Pausa");
+        } else if (player.getState() == PlayerState.PAUSED) {
+            playPauseButton.setText("Riprendi");
+        } else {
+            playPauseButton.setText("Play");
+        }
+    }
+
     private void subscribeToCurrentPlayable() {
         if (currentPlayable != null && !subscribedToCurrentPlayable) {
             currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
@@ -177,7 +198,7 @@ public class PlaybackController implements EventListener {
         stopProgressTimeline();
 
         progressTimeline = new Timeline(
-            new KeyFrame(Duration.seconds(1), event -> updateProgress())
+                new KeyFrame(Duration.seconds(1), event -> updateProgress())
         );
 
         progressTimeline.setCycleCount(Timeline.INDEFINITE);
