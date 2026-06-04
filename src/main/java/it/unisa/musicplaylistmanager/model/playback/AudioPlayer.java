@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.model.playback;
 import java.io.File;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 /**
  * Gestisce la riproduzione effettiva dei file audio.
@@ -111,5 +112,33 @@ public class AudioPlayer {
 			mediaPlayer.dispose();
 			mediaPlayer = null;
 		}
+	}
+
+	/**
+	 * Restituisce i secondi della traccia già riprodotti
+	 */
+	public double getCurrentTimeSeconds() {
+		if (mediaPlayer == null) {
+			return 0;
+		}
+
+		return mediaPlayer.getCurrentTime().toSeconds();
+	}
+
+	/**
+	 * Restituisce la durata totale della traccia
+	 */
+	public double getTotalDurationSeconds() {
+		if (mediaPlayer == null) {
+			return 0;
+		}
+
+		Duration duration = mediaPlayer.getTotalDuration();
+
+		if (duration == null || duration.isUnknown() || duration.isIndefinite()) {
+			return 0;
+		}
+
+		return duration.toSeconds();
 	}
 }

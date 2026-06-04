@@ -2,6 +2,7 @@ package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.EventListener;
 import it.unisa.musicplaylistmanager.model.playback.EventType;
 import it.unisa.musicplaylistmanager.model.playback.Playable;
@@ -55,27 +56,25 @@ public class PlaybackController implements EventListener {
     private VBox queueView;
 
     private Player player;
+    private AudioPlayer audioPlayer;
     private Playable currentPlayable;
     private boolean subscribedToCurrentPlayable;
 
     private Timeline progressTimeline;
-    private int elapsedSeconds;
-    private int totalSeconds;
 
     @FXML
     private void initialize() {
         player = App.getPlayer();
+        audioPlayer = AudioPlayer.getInstance();
         currentPlayable = App.getCurrentPlayable();
         subscribedToCurrentPlayable = false;
-
-        elapsedSeconds = 0;
-        totalSeconds = 0;
 
         currentTimeLabel.setText("0:00");
         totalTimeLabel.setText("0:00");
         playPauseButton.setText("Play");
 
         progressSlider.setMin(0);
+        progressSlider.setMax(1);
         progressSlider.setValue(0);
         progressSlider.setMouseTransparent(true);
         progressSlider.setFocusTraversable(false);
@@ -84,6 +83,8 @@ public class PlaybackController implements EventListener {
             subscribeToCurrentPlayable();
             updatePlayableInfo(currentPlayable);
             updatePlayPauseButton();
+
+            updateProgress();
 
             if (player.getState() == PlayerState.PLAYING) {
                 startProgressTimeline();
@@ -118,6 +119,7 @@ public class PlaybackController implements EventListener {
 
         if (player.getState() == PlayerState.STOPPED) {
             subscribeToCurrentPlayable();
+            resetProgressView();
             player.play(currentPlayable);
             startProgressTimeline();
             playPauseButton.setText("Pausa");
@@ -149,9 +151,6 @@ public class PlaybackController implements EventListener {
             trackArtistLabel.setText("");
             totalTimeLabel.setText("0:00");
             currentTimeLabel.setText("0:00");
-
-            elapsedSeconds = 0;
-            totalSeconds = 0;
             progressSlider.setMax(1);
             progressSlider.setValue(0);
             return;
@@ -160,13 +159,10 @@ public class PlaybackController implements EventListener {
         trackTitleLabel.setText(currentSong.getTitle());
         trackArtistLabel.setText(currentSong.getAuthor());
 
-        elapsedSeconds = 0;
-        totalSeconds = currentSong.getDuration();
+        currentTimeLabel.setText("0:00");
+        totalTimeLabel.setText("0:00");
 
-        totalTimeLabel.setText(currentSong.getDurationFormatted());
-        currentTimeLabel.setText(formatTime(elapsedSeconds));
-
-        progressSlider.setMax(Math.max(totalSeconds, 1));
+        progressSlider.setMax(1);
         progressSlider.setValue(0);
     }
 
@@ -198,7 +194,7 @@ public class PlaybackController implements EventListener {
         stopProgressTimeline();
 
         progressTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> updateProgress())
+                new KeyFrame(Duration.millis(250), event -> updateProgress())
         );
 
         progressTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -206,18 +202,18 @@ public class PlaybackController implements EventListener {
     }
 
     private void updateProgress() {
+        double currentSeconds = audioPlayer.getCurrentTimeSeconds();
+        double totalSeconds = audioPlayer.getTotalDurationSeconds();
+
         if (totalSeconds <= 0) {
             return;
         }
 
-        elapsedSeconds++;
+        progressSlider.setMax(totalSeconds);
+        progressSlider.setValue(currentSeconds);
 
-        if (elapsedSeconds > totalSeconds) {
-            elapsedSeconds = totalSeconds;
-        }
-
-        progressSlider.setValue(elapsedSeconds);
-        currentTimeLabel.setText(formatTime(elapsedSeconds));
+        currentTimeLabel.setText(formatTime((int) currentSeconds));
+        totalTimeLabel.setText(formatTime((int) totalSeconds));
     }
 
     private void pauseProgressTimeline() {
@@ -227,7 +223,9 @@ public class PlaybackController implements EventListener {
     }
 
     private void resumeProgressTimeline() {
-        if (progressTimeline != null) {
+        if (progressTimeline == null) {
+            startProgressTimeline();
+        } else {
             progressTimeline.play();
         }
     }
@@ -241,8 +239,10 @@ public class PlaybackController implements EventListener {
 
     private void resetProgressTimeline() {
         stopProgressTimeline();
+        resetProgressView();
+    }
 
-        elapsedSeconds = 0;
+    private void resetProgressView() {
         progressSlider.setValue(0);
         currentTimeLabel.setText("0:00");
     }
