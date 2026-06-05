@@ -1,16 +1,16 @@
 package it.unisa.musicplaylistmanager.controller;
 
-import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.song.SongFormController;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.model.playback.SongPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
+import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
-import javafx.fxml.FXMLLoader;
+
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -20,10 +20,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +47,10 @@ public class CatalogController {
 
     private final VBox catalogRows = new VBox(6);
 
+    private final AppContext appContext= AppContext.getInstance();
+
+    private final String ALL = "TUTTI";
+
     /**
      * Inizializza il controller configurando i filtri di ricerca e
      * caricando la lista completa delle tracce dal catalogo musicale.
@@ -56,12 +59,8 @@ public class CatalogController {
     private void initialize() {
         scrollPane.setContent(catalogRows);
 
-        genreFilter.getItems().setAll("Tutti", "Pop", "Rock", "Hip-Hop", "Jazz", "Classical",
-            "Electronic", "R&B", "Country", "Metal", "Indie", "Folk", "Reggae", "Blues", "Altro");
-        genreFilter.setValue("Tutti");
-
-        tagFilter.getItems().setAll("Tutti", "Preferito", "Esplicito", "Nuova uscita");
-        tagFilter.setValue("Tutti");
+        initGenreFilter();
+        initTagFilter();
 
         refreshCatalog();
     }
@@ -75,27 +74,48 @@ public class CatalogController {
     }
 
     /**
+     * Inizializza il combo box per il filtraggio per genere.
+     */
+    private void initGenreFilter() {
+        genreFilter.getItems().addFirst(ALL);
+        genreFilter.getItems().addAll(Arrays.stream(Genre.values()).map(Genre::name).toList());
+        genreFilter.setValue(ALL);
+    }
+
+    /**
+     * Inizializza il combo box per il filtraggio per tag.
+     */
+    private void initTagFilter() {
+        tagFilter.getItems().addFirst(ALL);
+        tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::name).toList());
+        tagFilter.setValue(ALL);
+    }
+
+    /**
      * Ricarica e ridisegna la lista delle tracce a schermo.
      * Aggiorna anche i menu a tendina dei filtri in base ai dati attuali.
      */
     private void refreshCatalog() {
         refreshFilterValues();
 
-        List<Song> songs = App.getMusicLibrary().getAllSongs().stream()
-            .toList();
+        List<Song> songs = getSongs();
 
         catalogRows.getChildren().clear();
 
         if (songs.isEmpty()) {
-            Label emptyLabel = new Label("Nessuna traccia presente nel catalogo.");
-            emptyLabel.getStyleClass().add("row-meta");
-            catalogRows.getChildren().add(emptyLabel);
+            catalogRows.getChildren().add(createEmptyLabel());
             return;
         }
 
         for (Song song : songs) {
             catalogRows.getChildren().add(createSongRow(song));
         }
+    }
+
+    private Label createEmptyLabel() {
+        Label label = new Label("Nessuna traccia presente nel catalogo.");
+        label.getStyleClass().add("row-meta");
+        return label;
     }
 
     /**
@@ -108,13 +128,14 @@ public class CatalogController {
      *         della traccia
      */
     private HBox createSongRow(Song song) {
-        Button playButton = new Button("▶");
-        playButton.getStyleClass().add("row-action");
-        playButton.setTooltip(new javafx.scene.control.Tooltip("Riproduci traccia"));
-        playButton.setMinWidth(32);
-        playButton.setPrefWidth(32);
-        playButton.setMaxWidth(32);
-        playButton.setOnAction(event -> playSong(song));
+        Button playButton = createButton("▶", "Riproduci traccia",
+            () -> playSong(song));
+
+        Button editButton = createButton("✎", "Modifica traccia",
+            () -> openSongForm(song));
+
+        Button deleteButton = createButton("×", "Elimina traccia",
+            () -> deleteSong(song));
 
         Label titleLabel = new Label(song.getTitle());
         titleLabel.getStyleClass().add("row-title");
@@ -122,33 +143,40 @@ public class CatalogController {
         titleLabel.setMinWidth(190);
 
         Label authorLabel = createMetaLabel(song.getAuthor(), 85);
-        Label genreLabel = createMetaLabel(formatGenre(song.getGenre()), 65);
+        Label genreLabel = createMetaLabel(song.getGenre().name(), 65);
         Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 50);
         Label durationLabel = createMetaLabel(song.getDurationFormatted(), 55);
-
-        Button editButton = new Button("✎");
-        editButton.getStyleClass().add("row-action");
-        editButton.setTooltip(new javafx.scene.control.Tooltip("Modifica traccia"));
-        editButton.setMinWidth(32);
-        editButton.setPrefWidth(32);
-        editButton.setMaxWidth(32);
-        editButton.setOnAction(event -> openSongForm(song));
-
-        Button deleteButton = new Button("×");
-        deleteButton.getStyleClass().add("row-action");
-        deleteButton.setTooltip(new javafx.scene.control.Tooltip("Elimina traccia"));
-        deleteButton.setMinWidth(32);
-        deleteButton.setPrefWidth(32);
-        deleteButton.setMaxWidth(32);
-        deleteButton.setOnAction(event -> deleteSong(song));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox row = new HBox(8, titleLabel, authorLabel, genreLabel, yearLabel,
-            durationLabel, spacer, playButton, editButton, deleteButton);
+        HBox row = new HBox(
+            8,
+            titleLabel,
+            authorLabel,
+            genreLabel,
+            yearLabel,
+            durationLabel,
+            spacer,
+            playButton,
+            editButton,
+            deleteButton
+        );
+
         row.getStyleClass().add("list-row");
         return row;
+    }
+
+    private Button createButton(String text, String tooltip, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("row-action");
+        button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
+        button.setMinWidth(32);
+        button.setPrefWidth(32);
+        button.setMaxWidth(32);
+        button.setOnAction(e -> action.run());
+        button.setFocusTraversable(false);
+        return button;
     }
 
     /**
@@ -181,7 +209,7 @@ public class CatalogController {
         }
 
         try {
-            App.getMusicLibrary().removeSongFromCatalog(song);
+            appContext.getMusicLibrary().removeSongFromCatalog(song);
             refreshCatalog();
             AlertManager.showInfo("Traccia eliminata correttamente.");
         } catch (IllegalArgumentException e) {
@@ -196,84 +224,66 @@ public class CatalogController {
      *             di un inserimento
      */
     private void openSongForm(Song song) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SongFormView.fxml"));
-            Parent root = loader.load();
-            SongFormController controller = loader.getController();
-            controller.setSongToEdit(song);
-            controller.setOnSave(this::refreshCatalog);
-
-            Stage stage = new Stage();
-            stage.setTitle(song == null ? "Nuova traccia" : "Modifica traccia");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(addTrackButton.getScene().getWindow());
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        } catch (IOException e) {
-            AlertManager.showError("Impossibile aprire il form traccia.");
-        }
+        DialogUtil.open(
+            "SongFormView.fxml",
+            song == null ? "Nuova traccia" : "Modifica traccia",
+            addTrackButton.getScene().getWindow(),
+            (SongFormController controller) -> {
+                controller.setSongToEdit(song);
+                controller.setOnSave(this::refreshCatalog);
+            }
+        );
     }
 
     /**
      * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei
      * filtri relativi agli autori e agli anni di pubblicazione, basandosi sui
      * brani effettivamente presenti. Mantiene la selezione utente precedente se
-     * ancora valida, altrimenti reimposta su "Tutti".
+     * ancora valida, altrimenti reimposta su "TUTTI".
      */
     private void refreshFilterValues() {
+        List<Song> songs = getSongs();
+
         String selectedAuthor = authorFilter.getValue();
         String selectedYear = yearFilter.getValue();
 
-        List<String> authors = App.getMusicLibrary().getAllSongs().stream()
+        List<String> authors = extractAuthors(songs);
+        List<String> years = extractYears(songs);
+
+        updateComboBox(authorFilter, authors, selectedAuthor);
+        updateComboBox(yearFilter, years, selectedYear);
+    }
+
+    private List<String> extractAuthors(List<Song> songs) {
+        List<String> result = songs.stream()
             .map(Song::getAuthor)
             .distinct()
             .sorted(String.CASE_INSENSITIVE_ORDER)
-            .collect(Collectors.toList());
-        authors.add(0, "Tutti");
+            .collect(Collectors.toCollection(ArrayList::new));
+        result.addFirst(ALL);
 
-        List<String> years = App.getMusicLibrary().getAllSongs().stream()
-            .map(song -> String.valueOf(song.getYear()))
-            .distinct()
-            .sorted()
-            .collect(Collectors.toList());
-        years.add(0, "Tutti");
-
-        authorFilter.getItems().setAll(authors);
-        yearFilter.getItems().setAll(years);
-        authorFilter.setValue(authors.contains(selectedAuthor) ? selectedAuthor : "Tutti");
-        yearFilter.setValue(years.contains(selectedYear) ? selectedYear : "Tutti");
+        return result;
     }
 
-    /**
-     * Converte il valore costante dell'enumerazione nella corrispondente stringa
-     * testuale formattata.
-     *
-     * @param genre l'istanza dell'enumerazione Genre da convertire
-     * @return una stringa che rappresenta il genere musicale, oppure "Altro" se
-     *         il valore è nullo
-     */
-    private String formatGenre(Genre genre) {
-        if (genre == null) {
-            return "Altro";
-        }
+    private List<String> extractYears(List<Song> songs) {
+        List<String> result = songs.stream()
+            .map(s -> String.valueOf(s.getYear()))
+            .distinct()
+            .sorted()
+            .collect(Collectors.toCollection(ArrayList::new));
+        result.addFirst(ALL);
 
-        return switch (genre) {
-            case POP -> "Pop";
-            case ROCK -> "Rock";
-            case HIP_HOP -> "Hip-Hop";
-            case JAZZ -> "Jazz";
-            case CLASSICAL -> "Classical";
-            case ELECTRONIC -> "Electronic";
-            case RNB -> "R&B";
-            case COUNTRY -> "Country";
-            case METAL -> "Metal";
-            case INDIE -> "Indie";
-            case FOLK -> "Folk";
-            case REGGAE -> "Reggae";
-            case BLUES -> "Blues";
-            case ALTRO -> "Altro";
-        };
+        return result;
+    }
+
+    private void updateComboBox(ComboBox<String> combo, List<String> values, String previousSelection) {
+        combo.getItems().setAll(values);
+
+        if (values.contains(previousSelection)) {
+            combo.setValue(previousSelection);
+        } else {
+            combo.setValue(ALL);
+        }
     }
 
     /**
@@ -282,13 +292,23 @@ public class CatalogController {
      * @param song traccia da riprodurre
      */
     private void playSong(Song song) {
-        PlaybackController controller = ViewSwitcher.switchToAndGetController("PlaybackView.fxml");
+        appContext.getPlayer().play(new SongPlayable(song));
+        ViewSwitcher.switchTo("PlaybackView.fxml");
+//        PlaybackController controller = ViewSwitcher.switchToAndGetController("PlaybackView.fxml");
+//
+//        if (controller == null) {
+//            AlertManager.showError("Impossibile aprire la schermata di riproduzione.");
+//            return;
+//        }
+//
+//        controller.playPlayable(new SongPlayable(song));
+    }
 
-        if (controller == null) {
-            AlertManager.showError("Impossibile aprire la schermata di riproduzione.");
-            return;
-        }
-
-        controller.playPlayable(new SongPlayable(song));
+    /**
+     * Recupera la lista dei brani dal catalogo.
+     * @return lista dei brani.
+     */
+    private List<Song> getSongs() {
+        return appContext.getMusicLibrary().getAllSongs();
     }
 }

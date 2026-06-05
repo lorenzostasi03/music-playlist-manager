@@ -99,7 +99,7 @@ public class App extends Application {
      */
     @Override
     public void start(Stage stage) {
-        initMusicLibrary();
+//        initMusicLibrary();
 
         Scene scene = null;
         String path = "/views/MainView.fxml";

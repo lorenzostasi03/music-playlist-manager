@@ -1,6 +1,6 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
-import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.fxml.FXML;
@@ -27,6 +27,7 @@ public class PlaylistFormController {
     private Playlist playlistToEdit;
     private Runnable onSave;
 
+    private final AppContext appContext= AppContext.getInstance();
     /**
      * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
      */
@@ -78,10 +79,10 @@ public class PlaylistFormController {
             String name = nameField.getText();
 
             if (playlistToEdit == null) {
-                App.getMusicLibrary().addPlaylist(new Playlist(name));
+                appContext.getMusicLibrary().addPlaylist(new Playlist(name));
                 AlertManager.showInfo("Playlist creata correttamente.");
             } else {
-                App.getMusicLibrary().renamePlaylist(playlistToEdit, name);
+                appContext.getMusicLibrary().renamePlaylist(playlistToEdit, name);
                 AlertManager.showInfo("Playlist rinominata correttamente.");
             }
 
