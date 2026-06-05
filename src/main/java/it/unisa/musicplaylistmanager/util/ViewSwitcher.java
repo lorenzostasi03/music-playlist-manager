@@ -56,31 +56,4 @@ public final class ViewSwitcher {
 			System.err.println("File non trovato: " + path);
 		}
 	}
-
-    /**
-     * @deprecated DA ELIMINARE
-     * @param fxml
-     * @return
-     * @param <T>
-     */
-	public static <T> T switchToAndGetController(String fxml) {
-		if (mainRoot == null || fxml == null || fxml.isBlank()) {
-			return null;
-		}
-
-		String path = "/views/" + fxml;
-
-		try {
-			FXMLLoader loader = new FXMLLoader(ViewSwitcher.class.getResource(path));
-			Parent view = loader.load();
-			mainRoot.setCenter(view);
-
-			return loader.getController();
-
-		} catch (IOException e) {
-			System.err.println("File non trovato: " + path);
-			return null;
-		}
-	}
-
 }
