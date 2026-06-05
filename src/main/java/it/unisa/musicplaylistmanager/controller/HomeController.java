@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -44,6 +45,8 @@ public class HomeController {
     @FXML private Button emptyCreateBtn;
 
     @FXML private ListView<Playlist> playlistListView;
+
+    private final AppContext appContext= AppContext.getInstance();
 
     /**
      * Inizializza il controller configurando la lista delle playlist
@@ -159,7 +162,7 @@ public class HomeController {
      * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
      */
     private void refreshPlaylists() {
-        List<Playlist> playlists = App.getMusicLibrary().getAllPlaylists();
+        List<Playlist> playlists = appContext.getMusicLibrary().getAllPlaylists();
 
         playlistListView.getItems().setAll(playlists);
         countLabel.setText(playlists.size() + " playlist");
@@ -202,7 +205,7 @@ public class HomeController {
         }
 
         try {
-            App.getMusicLibrary().removePlaylist(playlist);
+            appContext.getMusicLibrary().removePlaylist(playlist);
             refreshPlaylists();
             AlertManager.showInfo("Playlist eliminata correttamente.");
         } catch (IllegalArgumentException e) {
