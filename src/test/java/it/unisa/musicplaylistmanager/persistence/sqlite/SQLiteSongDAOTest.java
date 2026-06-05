@@ -34,8 +34,8 @@ class SQLiteSongDAOTest {
 
             stmt.executeUpdate("DELETE FROM song");
 
-        } catch (SQLException sqle) {
-            return;
+        } catch (SQLException ignored) {
+            // cleanup best effort
         }
     }
 
@@ -66,13 +66,8 @@ class SQLiteSongDAOTest {
 
     @Test
     void addNullSong() {
-        Song song = null;
-
-        assertThrows(PersistenceException.class, () -> songDAO.save(song));
-
-        List<Song> songs = songDAO.getSongs();
-
-        assertEquals(0, songs.size());
+        assertThrows(PersistenceException.class, () -> songDAO.save(null));
+        assertTrue(songDAO.getSongs().isEmpty());
     }
 
     @Test
@@ -91,9 +86,6 @@ class SQLiteSongDAOTest {
 
         songDAO.save(song);
 
-        List<Song> songs = songDAO.getSongs();
-        assertEquals(1, songs.size());
-
         song.setTitle("Test");
         song.setAuthor("A");
         song.setGenre(Genre.POP);
@@ -103,18 +95,19 @@ class SQLiteSongDAOTest {
 
         songDAO.update(song);
 
-        songs = songDAO.getSongs();
+        List<Song> songs = songDAO.getSongs();
 
         assertEquals(1, songs.size());
 
-        assertEquals(song.getTitle(), songs.getFirst().getTitle());
-        assertEquals(song.getAuthor(), songs.getFirst().getAuthor());
-        assertEquals(song.getGenre(), songs.getFirst().getGenre());
-        assertEquals(song.getYear(), songs.getFirst().getYear());
-        assertEquals(song.getDuration(), songs.getFirst().getDuration());
-        assertEquals(song.getFilePath(), songs.getFirst().getFilePath());
+        Song dbSong = songs.getFirst();
 
-        assertEquals(song.getId(), songs.getFirst().getId());
+        assertEquals(song.getTitle(), dbSong.getTitle());
+        assertEquals(song.getAuthor(), dbSong.getAuthor());
+        assertEquals(song.getGenre(), dbSong.getGenre());
+        assertEquals(song.getYear(), dbSong.getYear());
+        assertEquals(song.getDuration(), dbSong.getDuration());
+        assertEquals(song.getFilePath(), dbSong.getFilePath());
+        assertEquals(song.getId(), dbSong.getId());
     }
 
     @Test
@@ -123,7 +116,6 @@ class SQLiteSongDAOTest {
         Song song2 = new Song("Test", "Arty", Genre.ELECTRONIC, 1995, 155, "pluto.mp3");
 
         songDAO.save(song1);
-
         songDAO.update(song2);
 
         List<Song> songs = songDAO.getSongs();
@@ -187,8 +179,7 @@ class SQLiteSongDAOTest {
 
         songDAO.delete(song2.getId());
 
-        songs = songDAO.getSongs();
-        assertEquals(0, songs.size());
+        assertTrue(songDAO.getSongs().isEmpty());
     }
 
     @Test
@@ -204,9 +195,7 @@ class SQLiteSongDAOTest {
 
         songDAO.delete(UUID.randomUUID());
 
-        List<Song> songs = songDAO.getSongs();
-
-        assertEquals(1, songs.size());
+        assertEquals(1, songDAO.getSongs().size());
     }
 
     @Test
@@ -219,25 +208,15 @@ class SQLiteSongDAOTest {
         songDAO.save(song2);
         songDAO.save(song3);
 
-        List<Song> songs = songDAO.getSongs();
+        assertEquals(List.of("Prova", "Test", "Test"),
+            songDAO.getSongs().stream().map(Song::getTitle).toList());
 
-        List<String> titles = songs.stream()
-            .map(Song::getTitle)
-            .toList();
-
-        assertEquals(List.of("Prova", "Test", "Test"), titles);
-
-        List<String> authors = songs.stream()
-            .map(Song::getAuthor)
-            .toList();
-
-        assertEquals(List.of("Boh", "Arty", "Ciao"), authors);
+        assertEquals(List.of("Boh", "Arty", "Ciao"),
+            songDAO.getSongs().stream().map(Song::getAuthor).toList());
     }
 
     @Test
     void getSongsFromEmptyDatabase() {
-        List<Song> songs = songDAO.getSongs();
-
-        assertTrue(songs.isEmpty());
+        assertTrue(songDAO.getSongs().isEmpty());
     }
 }
