@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.song.SongPickerController;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
@@ -61,6 +62,8 @@ public class PlaylistController {
     @FXML private Button removeTrackButton;
 
     private Playlist playlist;
+
+    private final AppContext appContext = AppContext.getInstance();
 
     /**
      * Inizializza il controller recuperando la playlist selezionata dallo stato globale
@@ -156,7 +159,7 @@ public class PlaylistController {
         }
 
         try {
-            App.getMusicLibrary().removeSongFromPlaylist(selectedSong, playlist);
+            appContext.getMusicLibrary().removeSongFromPlaylist(selectedSong, playlist);
             refreshPlaylist();
             AlertManager.showInfo("Traccia rimossa dalla playlist.");
         } catch (IllegalArgumentException e) {
