@@ -1,6 +1,6 @@
 package it.unisa.musicplaylistmanager.controller.song;
 
-import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -9,15 +9,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller per la finestra modale che permette di visualizzare i brani del catalogo
@@ -47,13 +43,36 @@ public class SongPickerController {
     private Playlist playlist;
     private Runnable onSave;
 
+    private final AppContext appContext = AppContext.getInstance();
+
+    private final BooleanProperty hasSelection = new SimpleBooleanProperty(false);
+
+    private static final Map<Genre, String> GENRE_LABELS = Map.ofEntries(
+        Map.entry(Genre.POP,        "Pop"),
+        Map.entry(Genre.ROCK,       "Rock"),
+        Map.entry(Genre.HIP_HOP,    "Hip-Hop"),
+        Map.entry(Genre.JAZZ,       "Jazz"),
+        Map.entry(Genre.CLASSICAL,  "Classical"),
+        Map.entry(Genre.ELECTRONIC, "Electronic"),
+        Map.entry(Genre.RNB,        "R&B"),
+        Map.entry(Genre.COUNTRY,    "Country"),
+        Map.entry(Genre.METAL,      "Metal"),
+        Map.entry(Genre.INDIE,      "Indie"),
+        Map.entry(Genre.FOLK,       "Folk"),
+        Map.entry(Genre.REGGAE,     "Reggae"),
+        Map.entry(Genre.BLUES,      "Blues"),
+        Map.entry(Genre.ALTRO,      "Altro")
+    );
+
     /**
      * Inizializza il controller configurando le colonne della tabella,
      * inclusa la colonna personalizzata con le CheckBox per la selezione.
      */
     @FXML
     private void initialize() {
-        configureTable();
+        configureCheckColumn();
+        configureTextColumns();
+        confirmButton.disableProperty().bind(hasSelection.not());
     }
 
     /**
@@ -81,18 +100,19 @@ public class SongPickerController {
     /**
      * Seleziona automaticamente tutte le tracce attualmente caricate nella tabella.
      */
-    @FXML private void onSelectAll() {
-        tracksTable.getItems().forEach(selectableSong -> selectableSong.setSelected(true));
-        updateConfirmButton();
+    @FXML
+    private void onSelectAll() {
+        setAllSelected(true);
     }
 
     /**
      * Deseleziona tutte le tracce attualmente presenti nella tabella.
      */
-    @FXML private void onDeselectAll() {
-        tracksTable.getItems().forEach(selectableSong -> selectableSong.setSelected(false));
-        updateConfirmButton();
+    @FXML
+    private void onDeselectAll() {
+        setAllSelected(false);
     }
+
 
     @FXML private void onCancel() {
         closeWindow();
@@ -102,7 +122,8 @@ public class SongPickerController {
      * Recupera tutte le tracce selezionate dall'utente e le aggiunge
      * alla playlist di destinazione, chiudendo infine la finestra.
      */
-    @FXML private void onConfirm() {
+    @FXML
+    private void onConfirm() {
         if (playlist == null) {
             return;
         }
@@ -113,36 +134,39 @@ public class SongPickerController {
             .toList();
 
         try {
-            for (Song song : selectedSongs) {
-                App.getMusicLibrary().addSongToPlaylist(song, playlist);
-            }
+            addSongsToPlaylist(selectedSongs);
 
             if (onSave != null) {
                 onSave.run();
             }
+
             AlertManager.showInfo("Tracce aggiunte alla playlist.");
             closeWindow();
+
         } catch (IllegalArgumentException e) {
             AlertManager.showError(e.getMessage());
         }
     }
 
     /**
-     * Configura le proprietà della {@link TableView} e le relative colonne.
+     * Configura la colonna checkbox, incluso il comportamento di selezione
+     * e l'aggiornamento dello stato del pulsante di conferma.
      */
-    private void configureTable() {
+    private void configureCheckColumn() {
         checkColumn.setCellValueFactory(cellData ->
             cellData.getValue().selectedProperty()
         );
-        checkColumn.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+
+        checkColumn.setCellFactory(column -> new TableCell<>() {
+
             private final CheckBox checkBox = new CheckBox();
 
             {
                 checkBox.setOnAction(event -> {
-                    SelectableSong selectableSong = getTableRow().getItem();
-                    if (selectableSong != null) {
-                        selectableSong.setSelected(checkBox.isSelected());
-                        updateConfirmButton();
+                    SelectableSong item = getTableRow().getItem();
+                    if (item != null) {
+                        item.setSelected(checkBox.isSelected());
+                        updateSelectionState();
                     }
                 });
             }
@@ -150,16 +174,18 @@ public class SongPickerController {
             @Override
             protected void updateItem(Boolean selected, boolean empty) {
                 super.updateItem(selected, empty);
-
-                if (empty) {
+                if (empty || getTableRow().getItem() == null) {
                     setGraphic(null);
                     return;
                 }
-
                 checkBox.setSelected(Boolean.TRUE.equals(selected));
                 setGraphic(checkBox);
             }
         });
+    }
+
+    /** Configura le colonne testuali (titolo, autore, genere, anno). */
+    private void configureTextColumns() {
         titleColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(cellData.getValue().getSong().getTitle())
         );
@@ -174,39 +200,44 @@ public class SongPickerController {
         );
     }
 
+    private void updateSelectionState() {
+        boolean hasAnySelected = tracksTable.getItems().stream()
+            .anyMatch(SelectableSong::isSelected);
+
+        hasSelection.set(hasAnySelected);
+    }
+
+    private void setAllSelected(boolean value) {
+        tracksTable.getItems().forEach(s -> s.setSelected(value));
+        updateSelectionState();
+    }
     /**
-     * Recupera dal catalogo  tutte le canzoni disponibili, escludendo quelle
+     * Recupera dal catalogo tutte le canzoni disponibili, escludendo quelle
      * già presenti nella playlist di destinazione. Popola la tabella con i risultati
      * o mostra lo stato vuoto se non ci sono tracce disponibili per l'aggiunta.
      */
     private void refreshSongs() {
-        if (playlist == null) {
-            return;
-        }
+        if (playlist == null) return;
 
-        List<SelectableSong> availableSongs = App.getMusicLibrary().getAllSongs().stream()
+        List<SelectableSong> available = appContext.getMusicLibrary().getAllSongs().stream()
             .filter(song -> !playlist.contains(song))
             .map(SelectableSong::new)
             .toList();
 
-        tracksTable.getItems().setAll(availableSongs);
-        boolean empty = availableSongs.isEmpty();
+        tracksTable.getItems().setAll(available);
+        updateSelectionState();
+
+        boolean empty = available.isEmpty();
         emptyStateBox.setVisible(empty);
         emptyStateBox.setManaged(empty);
         tracksTable.setVisible(!empty);
         tracksTable.setManaged(!empty);
-        confirmButton.setDisable(true);
     }
 
-    /**
-     * Valuta lo stato di selezione degli elementi nella tabella.
-     * Se almeno un elemento è selezionato, abilita il pulsante di conferma;
-     * in caso contrario, lo disabilita per prevenire inserimenti a vuoto.
-     */
-    private void updateConfirmButton() {
-        boolean hasSelection = tracksTable.getItems().stream()
-            .anyMatch(SelectableSong::isSelected);
-        confirmButton.setDisable(!hasSelection);
+    private void addSongsToPlaylist(List<Song> songs) {
+        for (Song song : songs) {
+            appContext.getMusicLibrary().addSongToPlaylist(song, playlist);
+        }
     }
 
     /**
@@ -216,27 +247,8 @@ public class SongPickerController {
      * @param genre il genere musicale da formattare
      * @return una stringa leggibile rappresentante il genere, o "Altro" se nullo
      */
-    private String formatGenre(Genre genre) {
-        if (genre == null) {
-            return "Altro";
-        }
-
-        return switch (genre) {
-            case POP -> "Pop";
-            case ROCK -> "Rock";
-            case HIP_HOP -> "Hip-Hop";
-            case JAZZ -> "Jazz";
-            case CLASSICAL -> "Classical";
-            case ELECTRONIC -> "Electronic";
-            case RNB -> "R&B";
-            case COUNTRY -> "Country";
-            case METAL -> "Metal";
-            case INDIE -> "Indie";
-            case FOLK -> "Folk";
-            case REGGAE -> "Reggae";
-            case BLUES -> "Blues";
-            case ALTRO -> "Altro";
-        };
+    private static String formatGenre(Genre genre) {
+        return GENRE_LABELS.getOrDefault(genre, "Altro");
     }
 
     private void closeWindow() {
@@ -245,32 +257,22 @@ public class SongPickerController {
 
 
     /**
-     * Classe wrapper interna che incapsula un oggetto {@link Song} aggiungendo
-     * una proprietà booleana osservabile.
+     * Wrapper di {@link Song} che aggiunge una proprietà booleana osservabile
+     * per tracciare lo stato di selezione nella tabella.
      */
     private static final class SelectableSong {
+
         private final Song song;
-        private final BooleanProperty selected;
+        private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
         private SelectableSong(Song song) {
             this.song = song;
-            this.selected = new SimpleBooleanProperty(false);
         }
 
-        private Song getSong() {
-            return song;
-        }
-
-        private boolean isSelected() {
-            return selected.get();
-        }
-
-        private void setSelected(boolean selected) {
-            this.selected.set(selected);
-        }
-
-        private BooleanProperty selectedProperty() {
-            return selected;
-        }
+        private Song getSong()                     { return song; }
+        private boolean isSelected()               { return selected.get(); }
+        private void setSelected(boolean value)    { selected.set(value); }
+        private BooleanProperty selectedProperty() { return selected; }
     }
 }
+
