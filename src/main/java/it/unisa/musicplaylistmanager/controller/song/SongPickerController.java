@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller.song;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -46,23 +47,6 @@ public class SongPickerController {
     private final AppContext appContext = AppContext.getInstance();
 
     private final BooleanProperty hasSelection = new SimpleBooleanProperty(false);
-
-    private static final Map<Genre, String> GENRE_LABELS = Map.ofEntries(
-        Map.entry(Genre.POP,        "Pop"),
-        Map.entry(Genre.ROCK,       "Rock"),
-        Map.entry(Genre.HIP_HOP,    "Hip-Hop"),
-        Map.entry(Genre.JAZZ,       "Jazz"),
-        Map.entry(Genre.CLASSICAL,  "Classical"),
-        Map.entry(Genre.ELECTRONIC, "Electronic"),
-        Map.entry(Genre.RNB,        "R&B"),
-        Map.entry(Genre.COUNTRY,    "Country"),
-        Map.entry(Genre.METAL,      "Metal"),
-        Map.entry(Genre.INDIE,      "Indie"),
-        Map.entry(Genre.FOLK,       "Folk"),
-        Map.entry(Genre.REGGAE,     "Reggae"),
-        Map.entry(Genre.BLUES,      "Blues"),
-        Map.entry(Genre.ALTRO,      "Altro")
-    );
 
     /**
      * Inizializza il controller configurando le colonne della tabella,
@@ -235,9 +219,13 @@ public class SongPickerController {
     }
 
     private void addSongsToPlaylist(List<Song> songs) {
-        for (Song song : songs) {
-            appContext.getMusicLibrary().addSongToPlaylist(song, playlist);
+        try {
+            for (Song song : songs)
+                appContext.getMusicLibrary().addSongToPlaylist(song, playlist);
+        } catch (PersistenceException | IllegalArgumentException e) {
+            AlertManager.showError(e.getMessage());
         }
+
     }
 
     /**
@@ -248,7 +236,7 @@ public class SongPickerController {
      * @return una stringa leggibile rappresentante il genere, o "Altro" se nullo
      */
     private static String formatGenre(Genre genre) {
-        return GENRE_LABELS.getOrDefault(genre, "Altro");
+        return genre != null ? genre.getLabel() : "Altro";
     }
 
     private void closeWindow() {

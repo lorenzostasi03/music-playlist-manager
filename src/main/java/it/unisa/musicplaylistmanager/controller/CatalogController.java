@@ -2,6 +2,7 @@ package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.song.SongFormController;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
@@ -212,7 +213,7 @@ public class CatalogController {
             appContext.getMusicLibrary().removeSongFromCatalog(song);
             refreshCatalog();
             AlertManager.showInfo("Traccia eliminata correttamente.");
-        } catch (IllegalArgumentException e) {
+        } catch (PersistenceException | IllegalArgumentException e) {
             AlertManager.showError(e.getMessage());
         }
     }
