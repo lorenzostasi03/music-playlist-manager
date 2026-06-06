@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.controller.playlist;
 import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.song.SongPickerController;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -72,7 +73,7 @@ public class PlaylistController {
 
     @FXML
     private void initialize() {
-        playlist = App.getSelectedPlaylist();
+        playlist = appContext.getSelectedPlaylist();
 
         configureTable();
         tracksTable.getSelectionModel().selectedItemProperty().addListener(
@@ -96,6 +97,22 @@ public class PlaylistController {
         openPlaylistForm();
     }
 
+    private void updateEmptyState() {
+        boolean empty = playlist.isEmpty();
+
+        emptyStateBox.setVisible(empty);
+        emptyStateBox.setManaged(empty);
+
+        tracksTable.setVisible(!empty);
+        tracksTable.setManaged(!empty);
+    }
+
+    private void updateButtons() {
+        removeTrackButton.setDisable(
+            tracksTable.getSelectionModel().getSelectedItem() == null
+        );
+    }
+
     /**
      * Gestisce l'eliminazione della playlist corrente, richiedendo prima una conferma all'utente.
      * In caso di successo, reindirizza l'utente alla schermata Home.
@@ -114,11 +131,11 @@ public class PlaylistController {
         }
 
         try {
-            App.getMusicLibrary().removePlaylist(playlist);
-            App.setSelectedPlaylist(null);
+            appContext.getMusicLibrary().removePlaylist(playlist);
+            appContext.setSelectedPlaylist(null);
             ViewSwitcher.switchTo("HomeView.fxml");
             AlertManager.showInfo("Playlist eliminata correttamente.");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | PersistenceException e) {
             AlertManager.showError(e.getMessage());
         }
     }
@@ -170,6 +187,11 @@ public class PlaylistController {
      * Configura le proprietà della TableView.
      */
     private void configureTable() {
+        configureColumnProperties();
+        configureCellFactories();
+    }
+
+    private void configureColumnProperties() {
         indexColumn.setSortable(false);
         titleColumn.setSortable(false);
         authorColumn.setSortable(false);
@@ -179,25 +201,33 @@ public class PlaylistController {
         tagsColumn.setSortable(false);
 
         tagsColumn.setPrefWidth(250);
+    }
 
+    private void configureCellFactories() {
         indexColumn.setCellValueFactory(cellData ->
             new ReadOnlyObjectWrapper<>(tracksTable.getItems().indexOf(cellData.getValue()) + 1)
         );
+
         titleColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(cellData.getValue().getTitle())
         );
+
         authorColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(cellData.getValue().getAuthor())
         );
+
         durationColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(cellData.getValue().getDurationFormatted())
         );
+
         genreColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(formatGenre(cellData.getValue().getGenre()))
         );
+
         yearColumn.setCellValueFactory(cellData ->
             new ReadOnlyObjectWrapper<>(cellData.getValue().getYear())
         );
+
         tagsColumn.setCellValueFactory(cellData ->
             new ReadOnlyStringWrapper(formatTags(cellData.getValue()))
         );
@@ -210,24 +240,31 @@ public class PlaylistController {
      */
     private void refreshPlaylist() {
         if (playlist == null) {
-            playlistNameLabel.setText("Nessuna playlist selezionata");
-            trackCountLabel.setText("0 brani");
-            tracksTable.getItems().clear();
-            addTrackButton.setDisable(true);
-            removeTrackButton.setDisable(true);
+            showNoPlaylistSelectedState();
             return;
         }
 
+        updatePlaylistInfo();
+        updateTracksTable();
+        updateEmptyState();
+        updateButtons();
+    }
+
+    private void showNoPlaylistSelectedState() {
+        playlistNameLabel.setText("Nessuna playlist selezionata");
+        trackCountLabel.setText("0 brani");
+        tracksTable.getItems().clear();
+        addTrackButton.setDisable(true);
+        removeTrackButton.setDisable(true);
+    }
+
+    private void updatePlaylistInfo() {
         playlistNameLabel.setText(playlist.getName());
         trackCountLabel.setText(playlist.size() + " brani");
-        tracksTable.getItems().setAll(playlist.getSongs());
+    }
 
-        boolean empty = playlist.isEmpty();
-        emptyStateBox.setVisible(empty);
-        emptyStateBox.setManaged(empty);
-        tracksTable.setVisible(!empty);
-        tracksTable.setManaged(!empty);
-        removeTrackButton.setDisable(tracksTable.getSelectionModel().getSelectedItem() == null);
+    private void updateTracksTable() {
+        tracksTable.getItems().setAll(playlist.getSongs());
     }
 
     /**
@@ -281,26 +318,9 @@ public class PlaylistController {
     }
 
     private String formatGenre(Genre genre) {
-        if (genre == null) {
-            return "Altro";
-        }
-
-        return switch (genre) {
-            case POP -> "Pop";
-            case ROCK -> "Rock";
-            case HIP_HOP -> "Hip-Hop";
-            case JAZZ -> "Jazz";
-            case CLASSICAL -> "Classical";
-            case ELECTRONIC -> "Electronic";
-            case RNB -> "R&B";
-            case COUNTRY -> "Country";
-            case METAL -> "Metal";
-            case INDIE -> "Indie";
-            case FOLK -> "Folk";
-            case REGGAE -> "Reggae";
-            case BLUES -> "Blues";
-            case ALTRO -> "Altro";
-        };
+        return genre != null
+            ? genre.getDisplayName()
+            : "Altro";
     }
 
     private String formatTags(Song song) {
@@ -309,6 +329,8 @@ public class PlaylistController {
             .collect(Collectors.joining(", "));
     }
 
+
+    // TO DO: da rivedere quando implementeremo i Tags
     private String formatTag(Tag tag) {
         return switch (tag) {
             case FAVOURITE -> "Preferito";

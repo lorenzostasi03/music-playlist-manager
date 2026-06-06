@@ -220,7 +220,7 @@ public class HomeController {
      * @param playlist la playlist di cui visualizzare i dettagli
      */
     private void openPlaylistView(Playlist playlist) {
-        App.setSelectedPlaylist(playlist);
+        appContext.setSelectedPlaylist(playlist);
         ViewSwitcher.switchTo("PlaylistView.fxml");
     }
 

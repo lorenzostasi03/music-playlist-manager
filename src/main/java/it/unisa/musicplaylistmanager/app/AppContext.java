@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.app;
 
+import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
@@ -19,8 +20,11 @@ public class AppContext {
     private static AppContext instance;
 
     private final String DB_URL = "jdbc:sqlite:database.db";
+
     private final MusicLibrary musicLibrary;
     private final Player player;
+
+    private Playlist selectedPlaylist;
 
     private AppContext() {
         musicLibrary = new MusicLibrary(new SQLiteSongDAO(DB_URL), new SQLitePlaylistDAO(DB_URL));
@@ -36,4 +40,7 @@ public class AppContext {
 
     public MusicLibrary getMusicLibrary() { return this.musicLibrary; }
     public Player getPlayer() { return this.player; }
+
+    public Playlist getSelectedPlaylist() { return this.selectedPlaylist; }
+    public void setSelectedPlaylist(Playlist playlist) { this.selectedPlaylist = playlist; }
 }
