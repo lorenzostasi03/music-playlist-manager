@@ -18,13 +18,27 @@ public enum Genre {
     BLUES("Blues"),
     ALTRO("Altro");
 
-    private final String displayName;
+    private final String label;
 
-    Genre(String displayName) {
-        this.displayName = displayName;
+    Genre(String label) {
+        this.label = label;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public static Genre fromLabel(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Genere nullo");
+        }
+
+        for (Genre g : values()) {
+            if (g.label.equals(value)) {
+                return g;
+            }
+        }
+
+        throw new IllegalArgumentException("Genere non valido: " + value);
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

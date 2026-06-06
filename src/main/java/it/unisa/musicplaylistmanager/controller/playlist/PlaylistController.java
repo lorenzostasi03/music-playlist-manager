@@ -1,6 +1,5 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
-import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.song.SongPickerController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
@@ -9,24 +8,18 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.util.AlertManager;
+import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 /**
@@ -58,8 +51,6 @@ public class PlaylistController {
     @FXML private TableColumn<Song, Integer> yearColumn;
     @FXML private TableColumn<Song, String> tagsColumn;
 
-    @FXML private VBox emptyStateBox;
-
     @FXML private Button removeTrackButton;
 
     private Playlist playlist;
@@ -79,6 +70,7 @@ public class PlaylistController {
         tracksTable.getSelectionModel().selectedItemProperty().addListener(
             (observable, oldValue, selectedSong) -> removeTrackButton.setDisable(selectedSong == null)
         );
+        addTrackButton.setDisable(playlist == null);
 
         refreshPlaylist();
     }
@@ -95,22 +87,6 @@ public class PlaylistController {
             return;
         }
         openPlaylistForm();
-    }
-
-    private void updateEmptyState() {
-        boolean empty = playlist.isEmpty();
-
-        emptyStateBox.setVisible(empty);
-        emptyStateBox.setManaged(empty);
-
-        tracksTable.setVisible(!empty);
-        tracksTable.setManaged(!empty);
-    }
-
-    private void updateButtons() {
-        removeTrackButton.setDisable(
-            tracksTable.getSelectionModel().getSelectedItem() == null
-        );
     }
 
     /**
@@ -153,10 +129,6 @@ public class PlaylistController {
         openSongPicker();
     }
 
-    @FXML private void onAddTrackClicked() {
-        openSongPicker();
-    }
-
     /**
      * Rimuove il brano attualmente selezionato nella tabella dalla playlist corrente,
      * previa conferma da parte dell'utente.
@@ -179,7 +151,7 @@ public class PlaylistController {
             appContext.getMusicLibrary().removeSongFromPlaylist(selectedSong, playlist);
             refreshPlaylist();
             AlertManager.showInfo("Traccia rimossa dalla playlist.");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | PersistenceException e) {
             AlertManager.showError(e.getMessage());
         }
     }
@@ -246,8 +218,6 @@ public class PlaylistController {
 
         updatePlaylistInfo();
         updateTracksTable();
-        updateEmptyState();
-        updateButtons();
     }
 
     private void showNoPlaylistSelectedState() {
@@ -275,51 +245,39 @@ public class PlaylistController {
             return;
         }
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/SongPickerView.fxml"));
-            Parent root = loader.load();
-            SongPickerController controller = loader.getController();
-            controller.setPlaylist(playlist);
-            controller.setOnSave(this::refreshPlaylist);
-
-            Stage stage = new Stage();
-            stage.setTitle("Aggiungi tracce");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(addTrackButton.getScene().getWindow());
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        } catch (IOException e) {
-            AlertManager.showError("Impossibile aprire la selezione tracce.");
-        }
+        DialogUtil.open(
+            "SongPickerView.fxml",
+            "Aggiungi tracce",
+            addTrackButton.getScene().getWindow(),
+            (SongPickerController c) -> {
+                c.setPlaylist(playlist);
+                c.setOnSave(this::refreshPlaylist);
+            }
+        );
     }
 
     /**
-     * Instanzia e visualizza la finestra  per la modifica della playlist.
+     * Instanzia e visualizza la finestra per la modifica della playlist.
      */
     private void openPlaylistForm() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/PlaylistFormView.fxml"));
-            Parent root = loader.load();
-            PlaylistFormController controller = loader.getController();
-            controller.setPlaylistToEdit(playlist);
-            controller.setOnSave(this::refreshPlaylist);
-
-            Stage stage = new Stage();
-            stage.setTitle("Rinomina playlist");
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.initOwner(editNameButton.getScene().getWindow());
-            stage.setResizable(false);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-        } catch (IOException e) {
-            AlertManager.showError("Impossibile aprire il form playlist.");
+        if (playlist == null) {
+            return;
         }
+
+        DialogUtil.<PlaylistFormController>open(
+            "PlaylistFormView.fxml",
+            "Rinomina playlist",
+            editNameButton.getScene().getWindow(),
+            (PlaylistFormController c) -> {
+                c.setPlaylistToEdit(playlist);
+                c.setOnSave(this::refreshPlaylist);
+            }
+        );
     }
 
     private String formatGenre(Genre genre) {
         return genre != null
-            ? genre.getDisplayName()
+            ? genre.getLabel()
             : "Altro";
     }
 

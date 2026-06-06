@@ -19,7 +19,7 @@ import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 public class AppContext {
     private static AppContext instance;
 
-    private final String DB_URL = "jdbc:sqlite:database.db";
+    private final String DB_URL = "jdbc:sqlite:test.db";
 
     private final MusicLibrary musicLibrary;
     private final Player player;

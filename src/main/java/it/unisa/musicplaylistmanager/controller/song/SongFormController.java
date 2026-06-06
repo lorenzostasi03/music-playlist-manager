@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.song;
 
-import it.unisa.musicplaylistmanager.app.App;
+
+import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
@@ -50,12 +53,20 @@ public class SongFormController {
     private Runnable onSave;
     private String selectedFilePath;
 
+    private final AppContext appContext= AppContext.getInstance();
+
     /**
      * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
      */
     @FXML
     private void initialize() {
         hideErrors();
+
+        genreComboBox.getItems().setAll(
+            java.util.Arrays.stream(Genre.values())
+                .map(Genre::getLabel)
+                .toList()
+        );
     }
 
     /**
@@ -74,7 +85,7 @@ public class SongFormController {
         confirmButton.setText("Salva modifiche");
         titleField.setText(song.getTitle());
         authorField.setText(song.getAuthor());
-        genreComboBox.setValue(toViewGenre(song.getGenre()));
+        genreComboBox.setValue(song.getGenre().getLabel());
         yearField.setText(String.valueOf(song.getYear()));
         durationField.setText(String.valueOf(song.getDuration()));
         favouriteCheckBox.setSelected(song.hasTag(Tag.FAVOURITE));
@@ -138,7 +149,7 @@ public class SongFormController {
             if (songToEdit == null) {
                 Song song = new Song(title, author, genre, year, duration, selectedFilePath);
                 applyTags(song);
-                App.getMusicLibrary().addSongToCatalog(song);
+                appContext.getMusicLibrary().addSongToCatalog(song);
                 AlertManager.showInfo("Traccia aggiunta al catalogo.");
             } else {
                 songToEdit.setTitle(title);
@@ -157,6 +168,8 @@ public class SongFormController {
             closeWindow();
         } catch (IllegalArgumentException e) {
             showGlobalError(e.getMessage());
+        } catch (DuplicatedSongException | PersistenceException e) {
+            AlertManager.showError(e.getMessage());
         }
     }
     /**
@@ -212,53 +225,7 @@ public class SongFormController {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Seleziona un genere.");
         }
-
-        return switch (value) {
-            case "Pop" -> Genre.POP;
-            case "Rock" -> Genre.ROCK;
-            case "Hip-Hop" -> Genre.HIP_HOP;
-            case "Jazz" -> Genre.JAZZ;
-            case "Classical" -> Genre.CLASSICAL;
-            case "Electronic" -> Genre.ELECTRONIC;
-            case "R&B" -> Genre.RNB;
-            case "Country" -> Genre.COUNTRY;
-            case "Metal" -> Genre.METAL;
-            case "Indie" -> Genre.INDIE;
-            case "Folk" -> Genre.FOLK;
-            case "Reggae" -> Genre.REGGAE;
-            case "Blues" -> Genre.BLUES;
-            default -> Genre.ALTRO;
-        };
-    }
-
-    /**
-     * Converte un valore enumerato del genere nella corrispondente stringa formattata
-     * per essere visualizzata correttamente all'interno dell'interfaccia.
-     *
-     * @param genre l'istanza dell'enumerazione da formattare
-     * @return una stringa leggibile che rappresenta il genere, oppure null se inesistente
-     */
-    private String toViewGenre(Genre genre) {
-        if (genre == null) {
-            return null;
-        }
-
-        return switch (genre) {
-            case POP -> "Pop";
-            case ROCK -> "Rock";
-            case HIP_HOP -> "Hip-Hop";
-            case JAZZ -> "Jazz";
-            case CLASSICAL -> "Classical";
-            case ELECTRONIC -> "Electronic";
-            case RNB -> "R&B";
-            case COUNTRY -> "Country";
-            case METAL -> "Metal";
-            case INDIE -> "Indie";
-            case FOLK -> "Folk";
-            case REGGAE -> "Reggae";
-            case BLUES -> "Blues";
-            case ALTRO -> "Altro";
-        };
+        return Genre.fromLabel(value);
     }
 
     /**

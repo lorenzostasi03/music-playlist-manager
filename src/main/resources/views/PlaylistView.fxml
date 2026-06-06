@@ -48,13 +48,6 @@
                 <TableColumn fx:id="tagsColumn" prefWidth="120" text="Tag" />
             </columns>
         </TableView>
-        <VBox fx:id="emptyStateBox" alignment="CENTER" managed="false" spacing="12" visible="false">
-            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;" text="La playlist è vuota" />
-            <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Aggiungi qualche traccia per iniziare" />
-            <Button onAction="#onAddTrackClicked" styleClass="spotify-btn" text="+ Aggiungi traccia">
-                <VBox.margin><Insets top="10" /></VBox.margin>
-            </Button>
-        </VBox>
     </StackPane>
     <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-border-color: #282828; -fx-border-width: 1 0 0 0;">
         <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
