@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.controller;
 import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.util.AlertManager;
@@ -208,7 +209,7 @@ public class HomeController {
             appContext.getMusicLibrary().removePlaylist(playlist);
             refreshPlaylists();
             AlertManager.showInfo("Playlist eliminata correttamente.");
-        } catch (IllegalArgumentException e) {
+        } catch (PersistenceException | IllegalArgumentException e) {
             AlertManager.showError(e.getMessage());
         }
     }

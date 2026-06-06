@@ -1,6 +1,6 @@
 package it.unisa.musicplaylistmanager.controller;
 
-import it.unisa.musicplaylistmanager.app.App;
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.playback.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.EventListener;
@@ -62,11 +62,13 @@ public class PlaybackController implements EventListener {
 
     private Timeline progressTimeline;
 
+    private AppContext appContext =  AppContext.getInstance();
+
     @FXML
     private void initialize() {
-        player = App.getPlayer();
+        player = appContext.getPlayer();
         audioPlayer = AudioPlayer.getInstance();
-        currentPlayable = App.getCurrentPlayable();
+        currentPlayable = appContext.getCurrentPlayable();
         subscribedToCurrentPlayable = false;
 
         currentTimeLabel.setText("0:00");
@@ -100,7 +102,7 @@ public class PlaybackController implements EventListener {
         unsubscribeFromCurrentPlayable();
 
         currentPlayable = playable;
-        App.setCurrentPlayable(playable);
+        appContext.setCurrentPlayable(playable);
 
         subscribeToCurrentPlayable();
         updatePlayableInfo(playable);
@@ -194,7 +196,7 @@ public class PlaybackController implements EventListener {
         stopProgressTimeline();
 
         progressTimeline = new Timeline(
-                new KeyFrame(Duration.millis(250), event -> updateProgress())
+            new KeyFrame(Duration.millis(250), event -> updateProgress())
         );
 
         progressTimeline.setCycleCount(Timeline.INDEFINITE);

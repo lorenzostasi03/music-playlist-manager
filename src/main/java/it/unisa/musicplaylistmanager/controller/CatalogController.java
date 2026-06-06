@@ -293,16 +293,8 @@ public class CatalogController {
      * @param song traccia da riprodurre
      */
     private void playSong(Song song) {
-        appContext.getPlayer().play(new SongPlayable(song));
+        appContext.setCurrentPlayable(new SongPlayable(song));
         ViewSwitcher.switchTo("PlaybackView.fxml");
-//        PlaybackController controller = ViewSwitcher.switchToAndGetController("PlaybackView.fxml");
-//
-//        if (controller == null) {
-//            AlertManager.showError("Impossibile aprire la schermata di riproduzione.");
-//            return;
-//        }
-//
-//        controller.playPlayable(new SongPlayable(song));
     }
 
     /**

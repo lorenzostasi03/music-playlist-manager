@@ -14,7 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller per la finestra modale che permette di visualizzare i brani del catalogo
