@@ -2,6 +2,7 @@ package it.unisa.musicplaylistmanager.app;
 
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
+import it.unisa.musicplaylistmanager.model.playback.Playable;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
@@ -25,6 +26,7 @@ public class AppContext {
     private final Player player;
 
     private Playlist selectedPlaylist;
+    private Playable currentPlayable;
 
     private AppContext() {
         musicLibrary = new MusicLibrary(new SQLiteSongDAO(DB_URL), new SQLitePlaylistDAO(DB_URL));
@@ -43,4 +45,8 @@ public class AppContext {
 
     public Playlist getSelectedPlaylist() { return this.selectedPlaylist; }
     public void setSelectedPlaylist(Playlist playlist) { this.selectedPlaylist = playlist; }
+
+    public Playable getCurrentPlayable() { return currentPlayable; }
+
+    public void setCurrentPlayable(Playable playable) { this.currentPlayable = playable; }
 }
