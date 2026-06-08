@@ -21,104 +21,101 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SQLitePlaylistDAOTest {
 
-    private PlaylistDAO playlistDAO;
-    private SongDAO songDAO;
-    private final String DB_URL = "jdbc:sqlite:test.db";
+	private PlaylistDAO playlistDAO;
+	private SongDAO songDAO;
+	private final String DB_URL = "jdbc:sqlite:test.db";
 
-    @BeforeEach
-    void setUp() {
-        playlistDAO = new SQLitePlaylistDAO(DB_URL);
-        songDAO = new SQLiteSongDAO(DB_URL);
-    }
+	@BeforeEach
+	void setUp() {
+		playlistDAO = new SQLitePlaylistDAO(DB_URL);
+		songDAO = new SQLiteSongDAO(DB_URL);
+	}
 
-    @AfterEach
-    void cleanDb() {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-             Statement stmt = conn.createStatement()) {
+	@AfterEach
+	void cleanDb() {
+		try (Connection conn = DriverManager.getConnection(DB_URL); Statement stmt = conn.createStatement()) {
 
-            stmt.execute("PRAGMA foreign_keys = ON");
-            stmt.executeUpdate("DELETE FROM playlist_song");
-            stmt.executeUpdate("DELETE FROM playlist");
-            stmt.executeUpdate("DELETE FROM song");
+			stmt.execute("PRAGMA foreign_keys = ON");
+			stmt.executeUpdate("DELETE FROM playlist_song");
+			stmt.executeUpdate("DELETE FROM playlist");
+			stmt.executeUpdate("DELETE FROM song");
 
-        } catch (SQLException ignored) {}
-    }
+		} catch (SQLException ignored) {
+		}
+	}
 
-    @Test
-    void addValidPlaylists() {
-        Playlist playlist1 = new Playlist("A");
-        Playlist playlist2 = new Playlist("B");
+	@Test
+	void addValidPlaylists() {
+		Playlist playlist1 = new Playlist("A");
+		Playlist playlist2 = new Playlist("B");
 
-        playlistDAO.save(playlist1);
-        playlistDAO.save(playlist2);
+		playlistDAO.save(playlist1);
+		playlistDAO.save(playlist2);
 
-        List<Playlist> playlists = playlistDAO.getPlaylists();
+		List<Playlist> playlists = playlistDAO.getPlaylists();
 
-        assertEquals(2, playlists.size());
-    }
+		assertEquals(2, playlists.size());
+	}
 
-    @Test
-    void addNullPlaylist() {
-        assertThrows(PersistenceException.class, () -> playlistDAO.save(null));
-    }
+	@Test
+	void addNullPlaylist() {
+		assertThrows(PersistenceException.class, () -> playlistDAO.save(null));
+	}
 
-    @Test
-    void addDuplicatedPlaylists() {
-        Playlist playlist = new Playlist("A");
+	@Test
+	void addDuplicatedPlaylists() {
+		Playlist playlist = new Playlist("A");
 
-        playlistDAO.save(playlist);
+		playlistDAO.save(playlist);
 
-        assertThrows(PersistenceException.class, () -> playlistDAO.save(playlist));
-    }
+		assertThrows(PersistenceException.class, () -> playlistDAO.save(playlist));
+	}
 
-    @Test
-    void updateNullPlaylist() {
-        assertThrows(PersistenceException.class, () -> playlistDAO.update(null));
-    }
+	@Test
+	void updateNullPlaylist() {
+		assertThrows(PersistenceException.class, () -> playlistDAO.update(null));
+	}
 
-    @Test
-    void deleteNullPlaylist() {
-        assertThrows(PersistenceException.class, () -> playlistDAO.delete(null));
-    }
+	@Test
+	void deleteNullPlaylist() {
+		assertThrows(PersistenceException.class, () -> playlistDAO.delete(null));
+	}
 
-    @Test
-    void addValidSongs() {
-        Playlist playlist = new Playlist("A");
-        Song song = new Song("Prova", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
+	@Test
+	void addValidSongs() {
+		Playlist playlist = new Playlist("A");
+		Song song = new Song("Prova", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
 
-        playlistDAO.save(playlist);
-        songDAO.save(song);
+		playlistDAO.save(playlist);
+		songDAO.save(song);
 
-        playlistDAO.addSong(playlist.getId(), song.getId());
+		playlistDAO.addSong(playlist.getId(), song.getId());
 
-        List<UUID> songIds = playlistDAO.getSongIds(playlist.getId());
+		List<UUID> songIds = playlistDAO.getSongIds(playlist.getId());
 
-        assertEquals(1, songIds.size());
-    }
+		assertEquals(1, songIds.size());
+	}
 
-    @Test
-    void addSongToNullPlaylist() {
-        Song song = new Song("Prova", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
+	@Test
+	void addSongToNullPlaylist() {
+		Song song = new Song("Prova", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
 
-        songDAO.save(song);
+		songDAO.save(song);
 
-        assertThrows(PersistenceException.class,
-            () -> playlistDAO.addSong(null, song.getId()));
-    }
+		assertThrows(PersistenceException.class, () -> playlistDAO.addSong(null, song.getId()));
+	}
 
-    @Test
-    void addNullSongToPlaylist() {
-        Playlist playlist = new Playlist("A");
+	@Test
+	void addNullSongToPlaylist() {
+		Playlist playlist = new Playlist("A");
 
-        playlistDAO.save(playlist);
+		playlistDAO.save(playlist);
 
-        assertThrows(PersistenceException.class,
-            () -> playlistDAO.addSong(playlist.getId(), null));
-    }
+		assertThrows(PersistenceException.class, () -> playlistDAO.addSong(playlist.getId(), null));
+	}
 
-    @Test
-    void getSongIdsFromNullPlaylist() {
-        assertThrows(PersistenceException.class,
-            () -> playlistDAO.getSongIds(null));
-    }
+	@Test
+	void getSongIdsFromNullPlaylist() {
+		assertThrows(PersistenceException.class, () -> playlistDAO.getSongIds(null));
+	}
 }

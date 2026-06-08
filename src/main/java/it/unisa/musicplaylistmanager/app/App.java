@@ -20,37 +20,39 @@ import javafx.stage.Stage;
  * libreria musicale e la playlist correntemente selezionata.
  */
 public class App extends Application {
-    /**
-     * Avvia l'interfaccia grafica caricando la vista principale (MainView).
-     *
-     * @param stage la finestra principale dell'applicazione fornita dal framework
-     *        JavaFX
-     */
-    @Override
-    public void start(Stage stage) {
-        Scene scene = null;
-        String path = "/views/MainView.fxml";
+	/**
+	 * Avvia l'interfaccia grafica caricando la vista principale (MainView).
+	 *
+	 * @param stage
+	 *            la finestra principale dell'applicazione fornita dal framework
+	 *            JavaFX
+	 */
+	@Override
+	public void start(Stage stage) {
+		Scene scene = null;
+		String path = "/views/MainView.fxml";
 
-        AppContext.getInstance();
+		AppContext.getInstance();
 
-        try {
-            scene = new Scene(FXMLLoader.load(getClass().getResource(path)));
-        } catch (IOException e) {
-            System.err.println("File non trovato: " + path);
-        }
+		try {
+			scene = new Scene(FXMLLoader.load(getClass().getResource(path)));
+		} catch (IOException e) {
+			System.err.println("File non trovato: " + path);
+		}
 
-        stage.setTitle("Music Playlist Manager");
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
-    }
+		stage.setTitle("Music Playlist Manager");
+		stage.setScene(scene);
+		stage.setResizable(false);
+		stage.show();
+	}
 
-    /**
-     * Metodo di ingresso (entry-point) per l'avvio dell'applicazione.
-     *
-     * @param args argomenti passati da riga di comando
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
+	/**
+	 * Metodo di ingresso (entry-point) per l'avvio dell'applicazione.
+	 *
+	 * @param args
+	 *            argomenti passati da riga di comando
+	 */
+	public static void main(String[] args) {
+		launch(args);
+	}
 }

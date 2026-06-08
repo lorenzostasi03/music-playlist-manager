@@ -3,7 +3,7 @@ module it.unisa.musicplaylistmanager {
 	requires javafx.fxml;
 	requires java.sql;
 	requires javafx.media;
-    requires transitive javafx.graphics;
+	requires transitive javafx.graphics;
 
 	opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
 	opens it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
@@ -15,14 +15,14 @@ module it.unisa.musicplaylistmanager {
 	exports it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
 	exports it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
 
-    exports it.unisa.musicplaylistmanager.model.entity;
-    exports it.unisa.musicplaylistmanager.model.library;
-    exports it.unisa.musicplaylistmanager.model.playback;
+	exports it.unisa.musicplaylistmanager.model.entity;
+	exports it.unisa.musicplaylistmanager.model.library;
+	exports it.unisa.musicplaylistmanager.model.playback;
 
-    exports it.unisa.musicplaylistmanager.persistence.dao;
-    exports it.unisa.musicplaylistmanager.persistence.sqlite;
+	exports it.unisa.musicplaylistmanager.persistence.dao;
+	exports it.unisa.musicplaylistmanager.persistence.sqlite;
 
-    exports it.unisa.musicplaylistmanager.util;
+	exports it.unisa.musicplaylistmanager.util;
 
-    exports it.unisa.musicplaylistmanager.exceptions;
+	exports it.unisa.musicplaylistmanager.exceptions;
 }
