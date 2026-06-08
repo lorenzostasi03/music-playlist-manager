@@ -1,15 +1,6 @@
 package it.unisa.musicplaylistmanager.app;
 
-import it.unisa.musicplaylistmanager.model.entity.Playlist;
-import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
-import it.unisa.musicplaylistmanager.model.playback.Playable;
-import it.unisa.musicplaylistmanager.model.playback.Player;
-import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
-import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
-import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseConfig;
 import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseInitializer;
-import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
-import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

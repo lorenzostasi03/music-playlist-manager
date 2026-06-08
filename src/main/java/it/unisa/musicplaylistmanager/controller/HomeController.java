@@ -1,6 +1,5 @@
 package it.unisa.musicplaylistmanager.controller;
 
-import it.unisa.musicplaylistmanager.app.App;
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;

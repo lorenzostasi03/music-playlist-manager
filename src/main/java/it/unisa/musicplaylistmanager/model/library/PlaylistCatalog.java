@@ -3,7 +3,6 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Collezione di tutte le playlist dell'utente.

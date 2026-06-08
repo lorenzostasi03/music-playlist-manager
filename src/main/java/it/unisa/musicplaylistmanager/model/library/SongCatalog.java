@@ -4,7 +4,6 @@ import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Catalogo globale delle tracce musicali del sistema.

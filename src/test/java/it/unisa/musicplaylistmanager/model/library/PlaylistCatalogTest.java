@@ -4,7 +4,6 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
