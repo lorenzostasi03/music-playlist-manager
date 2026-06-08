@@ -4,14 +4,12 @@ import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,22 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class SQLiteSongDAOTest {
 
 	private SongDAO songDAO;
-	private final String DB_URL = "jdbc:sqlite:test.db";
 
 	@BeforeEach
-	void setUp() {
-		songDAO = new SQLiteSongDAO(DB_URL);
-	}
+	void setUp() throws IOException {
+		Files.deleteIfExists(Path.of(TestDatabaseConfig.DB_PATH));
 
-	@AfterEach
-	void cleanDb() {
-		try (Connection conn = DriverManager.getConnection(DB_URL); Statement stmt = conn.createStatement()) {
+		DatabaseInitializer.initialize(TestDatabaseConfig.DB_URL);
 
-			stmt.executeUpdate("DELETE FROM song");
-
-		} catch (SQLException ignored) {
-			// cleanup best effort
-		}
+		songDAO = new SQLiteSongDAO(TestDatabaseConfig.DB_URL);
 	}
 
 	@Test
@@ -169,8 +159,8 @@ class SQLiteSongDAOTest {
 		songDAO.delete(song1.getId());
 
 		List<Song> songs = songDAO.getSongs();
-		assertEquals(1, songs.size());
 
+		assertEquals(1, songs.size());
 		assertFalse(songs.stream().anyMatch(s -> s.getId().equals(song1.getId())));
 
 		songDAO.delete(song2.getId());

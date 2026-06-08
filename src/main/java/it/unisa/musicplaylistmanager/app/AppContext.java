@@ -4,6 +4,7 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
 import it.unisa.musicplaylistmanager.model.playback.Playable;
 import it.unisa.musicplaylistmanager.model.playback.Player;
+import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseConfig;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 
@@ -23,8 +24,6 @@ import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 public class AppContext {
 	private static AppContext instance;
 
-	private final String DB_URL = "jdbc:sqlite:database.db";
-
 	private final MusicLibrary musicLibrary;
 	private final Player player;
 
@@ -32,7 +31,8 @@ public class AppContext {
 	private Playable currentPlayable;
 
 	private AppContext() {
-		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DB_URL), new SQLitePlaylistDAO(DB_URL));
+		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DatabaseConfig.DB_URL),
+				new SQLitePlaylistDAO(DatabaseConfig.DB_URL));
 		musicLibrary.init();
 		player = new Player();
 	}

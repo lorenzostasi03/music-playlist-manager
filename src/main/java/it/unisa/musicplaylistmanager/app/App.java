@@ -6,6 +6,8 @@ import it.unisa.musicplaylistmanager.model.playback.Playable;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
+import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseConfig;
+import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseInitializer;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 import java.io.IOException;
@@ -53,6 +55,7 @@ public class App extends Application {
 	 *            argomenti passati da riga di comando
 	 */
 	public static void main(String[] args) {
+		DatabaseInitializer.initialize();
 		launch(args);
 	}
 }

@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE song (
+CREATE TABLE IF NOT EXISTS song (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
@@ -11,13 +11,13 @@ CREATE TABLE song (
     play_count INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE playlist (
+CREATE TABLE IF NOT EXISTS playlist (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     play_count INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE playlist_song (
+CREATE TABLE IF NOT EXISTS playlist_song (
     playlist_id TEXT NOT NULL,
     song_id TEXT NOT NULL,
 

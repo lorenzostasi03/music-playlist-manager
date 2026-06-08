@@ -6,14 +6,12 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,25 +21,15 @@ class SQLitePlaylistDAOTest {
 
 	private PlaylistDAO playlistDAO;
 	private SongDAO songDAO;
-	private final String DB_URL = "jdbc:sqlite:test.db";
 
 	@BeforeEach
-	void setUp() {
-		playlistDAO = new SQLitePlaylistDAO(DB_URL);
-		songDAO = new SQLiteSongDAO(DB_URL);
-	}
+	void setUp() throws IOException {
+		Files.deleteIfExists(Path.of(TestDatabaseConfig.DB_PATH));
 
-	@AfterEach
-	void cleanDb() {
-		try (Connection conn = DriverManager.getConnection(DB_URL); Statement stmt = conn.createStatement()) {
+		DatabaseInitializer.initialize(TestDatabaseConfig.DB_URL);
 
-			stmt.execute("PRAGMA foreign_keys = ON");
-			stmt.executeUpdate("DELETE FROM playlist_song");
-			stmt.executeUpdate("DELETE FROM playlist");
-			stmt.executeUpdate("DELETE FROM song");
-
-		} catch (SQLException ignored) {
-		}
+		playlistDAO = new SQLitePlaylistDAO(TestDatabaseConfig.DB_URL);
+		songDAO = new SQLiteSongDAO(TestDatabaseConfig.DB_URL);
 	}
 
 	@Test
