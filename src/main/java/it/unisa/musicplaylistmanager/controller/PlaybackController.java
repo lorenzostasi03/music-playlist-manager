@@ -20,262 +20,260 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-    @FXML
-    private Label trackTitleLabel;
-    @FXML
-    private Label trackArtistLabel;
+	@FXML
+	private Label trackTitleLabel;
+	@FXML
+	private Label trackArtistLabel;
 
-    @FXML
-    private Slider progressSlider;
+	@FXML
+	private Slider progressSlider;
 
-    @FXML
-    private Label currentTimeLabel;
-    @FXML
-    private Label totalTimeLabel;
+	@FXML
+	private Label currentTimeLabel;
+	@FXML
+	private Label totalTimeLabel;
 
-    @FXML
-    private Button previousButton;
-    @FXML
-    private Button playPauseButton;
-    @FXML
-    private Button nextButton;
+	@FXML
+	private Button previousButton;
+	@FXML
+	private Button playPauseButton;
+	@FXML
+	private Button nextButton;
 
-    @FXML
-    private ToggleButton sequentialModeButton;
-    @FXML
-    private ToggleButton shuffleModeButton;
-    @FXML
-    private ToggleButton loopTrackButton;
-    @FXML
-    private ToggleButton loopPlaylistButton;
+	@FXML
+	private ToggleButton sequentialModeButton;
+	@FXML
+	private ToggleButton shuffleModeButton;
+	@FXML
+	private ToggleButton loopTrackButton;
+	@FXML
+	private ToggleButton loopPlaylistButton;
 
-    @FXML
-    private Label playCountLabel;
+	@FXML
+	private Label playCountLabel;
 
-    @FXML
-    private VBox queueView;
+	@FXML
+	private VBox queueView;
 
-    private Player player;
-    private AudioPlayer audioPlayer;
-    private Playable currentPlayable;
-    private boolean subscribedToCurrentPlayable;
+	private Player player;
+	private AudioPlayer audioPlayer;
+	private Playable currentPlayable;
+	private boolean subscribedToCurrentPlayable;
 
-    private Timeline progressTimeline;
+	private Timeline progressTimeline;
 
-    private AppContext appContext =  AppContext.getInstance();
+	private AppContext appContext = AppContext.getInstance();
 
-    @FXML
-    private void initialize() {
-        player = appContext.getPlayer();
-        audioPlayer = AudioPlayer.getInstance();
-        currentPlayable = appContext.getCurrentPlayable();
-        subscribedToCurrentPlayable = false;
+	@FXML
+	private void initialize() {
+		player = appContext.getPlayer();
+		audioPlayer = AudioPlayer.getInstance();
+		currentPlayable = appContext.getCurrentPlayable();
+		subscribedToCurrentPlayable = false;
 
-        currentTimeLabel.setText("0:00");
-        totalTimeLabel.setText("0:00");
-        playPauseButton.setText("Play");
+		currentTimeLabel.setText("0:00");
+		totalTimeLabel.setText("0:00");
+		playPauseButton.setText("Play");
 
-        progressSlider.setMin(0);
-        progressSlider.setMax(1);
-        progressSlider.setValue(0);
-        progressSlider.setMouseTransparent(true);
-        progressSlider.setFocusTraversable(false);
+		progressSlider.setMin(0);
+		progressSlider.setMax(1);
+		progressSlider.setValue(0);
+		progressSlider.setMouseTransparent(true);
+		progressSlider.setFocusTraversable(false);
 
-        if (currentPlayable != null) {
-            subscribeToCurrentPlayable();
-            updatePlayableInfo(currentPlayable);
-            updatePlayPauseButton();
+		if (currentPlayable != null) {
+			subscribeToCurrentPlayable();
+			updatePlayableInfo(currentPlayable);
+			updatePlayPauseButton();
 
-            updateProgress();
+			updateProgress();
 
-            if (player.getState() == PlayerState.PLAYING) {
-                startProgressTimeline();
-            }
-        }
-    }
+			if (player.getState() == PlayerState.PLAYING) {
+				startProgressTimeline();
+			}
+		}
+	}
 
-    public void playPlayable(Playable playable) {
-        if (playable == null) {
-            throw new IllegalArgumentException("Playable cannot be null.");
-        }
+	public void playPlayable(Playable playable) {
+		if (playable == null) {
+			throw new IllegalArgumentException("Playable cannot be null.");
+		}
 
-        unsubscribeFromCurrentPlayable();
+		unsubscribeFromCurrentPlayable();
 
-        currentPlayable = playable;
-        appContext.setCurrentPlayable(playable);
+		currentPlayable = playable;
+		appContext.setCurrentPlayable(playable);
 
-        subscribeToCurrentPlayable();
-        updatePlayableInfo(playable);
+		subscribeToCurrentPlayable();
+		updatePlayableInfo(playable);
 
-        player.play(playable);
-        startProgressTimeline();
+		player.play(playable);
+		startProgressTimeline();
 
-        playPauseButton.setText("Pausa");
-    }
+		playPauseButton.setText("Pausa");
+	}
 
-    @FXML
-    private void onPlayPause() {
-        if (currentPlayable == null) {
-            return;
-        }
+	@FXML
+	private void onPlayPause() {
+		if (currentPlayable == null) {
+			return;
+		}
 
-        if (player.getState() == PlayerState.STOPPED) {
-            subscribeToCurrentPlayable();
-            resetProgressView();
-            player.play(currentPlayable);
-            startProgressTimeline();
-            playPauseButton.setText("Pausa");
-        } else if (player.getState() == PlayerState.PLAYING) {
-            player.pause();
-            pauseProgressTimeline();
-            playPauseButton.setText("Riprendi");
-        } else if (player.getState() == PlayerState.PAUSED) {
-            player.resume();
-            resumeProgressTimeline();
-            playPauseButton.setText("Pausa");
-        }
-    }
+		if (player.getState() == PlayerState.STOPPED) {
+			subscribeToCurrentPlayable();
+			resetProgressView();
+			player.play(currentPlayable);
+			startProgressTimeline();
+			playPauseButton.setText("Pausa");
+		} else if (player.getState() == PlayerState.PLAYING) {
+			player.pause();
+			pauseProgressTimeline();
+			playPauseButton.setText("Riprendi");
+		} else if (player.getState() == PlayerState.PAUSED) {
+			player.resume();
+			resumeProgressTimeline();
+			playPauseButton.setText("Pausa");
+		}
+	}
 
-    @Override
-    public void update(EventType eventType) {
-        if (eventType == EventType.PLAYABLE_COMPLETED) {
-            unsubscribeFromCurrentPlayable();
-            resetProgressTimeline();
-            playPauseButton.setText("Play");
-        }
-    }
+	@Override
+	public void update(EventType eventType) {
+		if (eventType == EventType.PLAYABLE_COMPLETED) {
+			unsubscribeFromCurrentPlayable();
+			resetProgressTimeline();
+			playPauseButton.setText("Play");
+		}
+	}
 
-    private void updatePlayableInfo(Playable playable) {
-        Song currentSong = playable.getCurrentSong();
+	private void updatePlayableInfo(Playable playable) {
+		Song currentSong = playable.getCurrentSong();
 
-        if (currentSong == null) {
-            trackTitleLabel.setText("Nessuna traccia");
-            trackArtistLabel.setText("");
-            totalTimeLabel.setText("0:00");
-            currentTimeLabel.setText("0:00");
-            progressSlider.setMax(1);
-            progressSlider.setValue(0);
-            return;
-        }
+		if (currentSong == null) {
+			trackTitleLabel.setText("Nessuna traccia");
+			trackArtistLabel.setText("");
+			totalTimeLabel.setText("0:00");
+			currentTimeLabel.setText("0:00");
+			progressSlider.setMax(1);
+			progressSlider.setValue(0);
+			return;
+		}
 
-        trackTitleLabel.setText(currentSong.getTitle());
-        trackArtistLabel.setText(currentSong.getAuthor());
+		trackTitleLabel.setText(currentSong.getTitle());
+		trackArtistLabel.setText(currentSong.getAuthor());
 
-        currentTimeLabel.setText("0:00");
-        totalTimeLabel.setText("0:00");
+		currentTimeLabel.setText("0:00");
+		totalTimeLabel.setText("0:00");
 
-        progressSlider.setMax(1);
-        progressSlider.setValue(0);
-    }
+		progressSlider.setMax(1);
+		progressSlider.setValue(0);
+	}
 
-    private void updatePlayPauseButton() {
-        if (player.getState() == PlayerState.PLAYING) {
-            playPauseButton.setText("Pausa");
-        } else if (player.getState() == PlayerState.PAUSED) {
-            playPauseButton.setText("Riprendi");
-        } else {
-            playPauseButton.setText("Play");
-        }
-    }
+	private void updatePlayPauseButton() {
+		if (player.getState() == PlayerState.PLAYING) {
+			playPauseButton.setText("Pausa");
+		} else if (player.getState() == PlayerState.PAUSED) {
+			playPauseButton.setText("Riprendi");
+		} else {
+			playPauseButton.setText("Play");
+		}
+	}
 
-    private void subscribeToCurrentPlayable() {
-        if (currentPlayable != null && !subscribedToCurrentPlayable) {
-            currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
-            subscribedToCurrentPlayable = true;
-        }
-    }
+	private void subscribeToCurrentPlayable() {
+		if (currentPlayable != null && !subscribedToCurrentPlayable) {
+			currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
+			subscribedToCurrentPlayable = true;
+		}
+	}
 
-    private void unsubscribeFromCurrentPlayable() {
-        if (currentPlayable != null && subscribedToCurrentPlayable) {
-            currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
-            subscribedToCurrentPlayable = false;
-        }
-    }
+	private void unsubscribeFromCurrentPlayable() {
+		if (currentPlayable != null && subscribedToCurrentPlayable) {
+			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
+			subscribedToCurrentPlayable = false;
+		}
+	}
 
-    private void startProgressTimeline() {
-        stopProgressTimeline();
+	private void startProgressTimeline() {
+		stopProgressTimeline();
 
-        progressTimeline = new Timeline(
-            new KeyFrame(Duration.millis(250), event -> updateProgress())
-        );
+		progressTimeline = new Timeline(new KeyFrame(Duration.millis(250), event -> updateProgress()));
 
-        progressTimeline.setCycleCount(Timeline.INDEFINITE);
-        progressTimeline.play();
-    }
+		progressTimeline.setCycleCount(Timeline.INDEFINITE);
+		progressTimeline.play();
+	}
 
-    private void updateProgress() {
-        double currentSeconds = audioPlayer.getCurrentTimeSeconds();
-        double totalSeconds = audioPlayer.getTotalDurationSeconds();
+	private void updateProgress() {
+		double currentSeconds = audioPlayer.getCurrentTimeSeconds();
+		double totalSeconds = audioPlayer.getTotalDurationSeconds();
 
-        if (totalSeconds <= 0) {
-            return;
-        }
+		if (totalSeconds <= 0) {
+			return;
+		}
 
-        progressSlider.setMax(totalSeconds);
-        progressSlider.setValue(currentSeconds);
+		progressSlider.setMax(totalSeconds);
+		progressSlider.setValue(currentSeconds);
 
-        currentTimeLabel.setText(formatTime((int) currentSeconds));
-        totalTimeLabel.setText(formatTime((int) totalSeconds));
-    }
+		currentTimeLabel.setText(formatTime((int) currentSeconds));
+		totalTimeLabel.setText(formatTime((int) totalSeconds));
+	}
 
-    private void pauseProgressTimeline() {
-        if (progressTimeline != null) {
-            progressTimeline.pause();
-        }
-    }
+	private void pauseProgressTimeline() {
+		if (progressTimeline != null) {
+			progressTimeline.pause();
+		}
+	}
 
-    private void resumeProgressTimeline() {
-        if (progressTimeline == null) {
-            startProgressTimeline();
-        } else {
-            progressTimeline.play();
-        }
-    }
+	private void resumeProgressTimeline() {
+		if (progressTimeline == null) {
+			startProgressTimeline();
+		} else {
+			progressTimeline.play();
+		}
+	}
 
-    private void stopProgressTimeline() {
-        if (progressTimeline != null) {
-            progressTimeline.stop();
-            progressTimeline = null;
-        }
-    }
+	private void stopProgressTimeline() {
+		if (progressTimeline != null) {
+			progressTimeline.stop();
+			progressTimeline = null;
+		}
+	}
 
-    private void resetProgressTimeline() {
-        stopProgressTimeline();
-        resetProgressView();
-    }
+	private void resetProgressTimeline() {
+		stopProgressTimeline();
+		resetProgressView();
+	}
 
-    private void resetProgressView() {
-        progressSlider.setValue(0);
-        currentTimeLabel.setText("0:00");
-    }
+	private void resetProgressView() {
+		progressSlider.setValue(0);
+		currentTimeLabel.setText("0:00");
+	}
 
-    private String formatTime(int seconds) {
-        int minutes = seconds / 60;
-        int remainingSeconds = seconds % 60;
-        return String.format("%d:%02d", minutes, remainingSeconds);
-    }
+	private String formatTime(int seconds) {
+		int minutes = seconds / 60;
+		int remainingSeconds = seconds % 60;
+		return String.format("%d:%02d", minutes, remainingSeconds);
+	}
 
-    @FXML
-    private void onPrevious() {
-    }
+	@FXML
+	private void onPrevious() {
+	}
 
-    @FXML
-    private void onNext() {
-    }
+	@FXML
+	private void onNext() {
+	}
 
-    @FXML
-    private void onSequential() {
-    }
+	@FXML
+	private void onSequential() {
+	}
 
-    @FXML
-    private void onShuffle() {
-    }
+	@FXML
+	private void onShuffle() {
+	}
 
-    @FXML
-    private void onLoopTrack() {
-    }
+	@FXML
+	private void onLoopTrack() {
+	}
 
-    @FXML
-    private void onLoopPlaylist() {
-    }
+	@FXML
+	private void onLoopPlaylist() {
+	}
 }

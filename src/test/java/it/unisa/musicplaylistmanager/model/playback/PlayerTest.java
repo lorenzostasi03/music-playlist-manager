@@ -11,118 +11,118 @@ import org.junit.jupiter.api.Test;
 
 class PlayerTest {
 
-    @Test
-    void newPlayerShouldBeStopped() {
-        Player player = new Player();
+	@Test
+	void newPlayerShouldBeStopped() {
+		Player player = new Player();
 
-        assertEquals(PlayerState.STOPPED, player.getState());
-        assertNull(player.getCurrentPlayable());
-    }
+		assertEquals(PlayerState.STOPPED, player.getState());
+		assertNull(player.getCurrentPlayable());
+	}
 
-    @Test
-    void playShouldStartPlayableAndSetStateToPlaying() {
-        Player player = new Player();
-        FakePlayable playable = new FakePlayable();
+	@Test
+	void playShouldStartPlayableAndSetStateToPlaying() {
+		Player player = new Player();
+		FakePlayable playable = new FakePlayable();
 
-        player.play(playable);
+		player.play(playable);
 
-        assertTrue(playable.playCalled);
-        assertEquals(PlayerState.PLAYING, player.getState());
-        assertSame(playable, player.getCurrentPlayable());
-    }
+		assertTrue(playable.playCalled);
+		assertEquals(PlayerState.PLAYING, player.getState());
+		assertSame(playable, player.getCurrentPlayable());
+	}
 
-    @Test
-    void playShouldRejectNullPlayable() {
-        Player player = new Player();
+	@Test
+	void playShouldRejectNullPlayable() {
+		Player player = new Player();
 
-        assertThrows(IllegalArgumentException.class, () -> player.play(null));
-    }
+		assertThrows(IllegalArgumentException.class, () -> player.play(null));
+	}
 
-    @Test
-    void pauseShouldPauseCurrentPlayableAndSetStateToPaused() {
-        Player player = new Player();
-        FakePlayable playable = new FakePlayable();
+	@Test
+	void pauseShouldPauseCurrentPlayableAndSetStateToPaused() {
+		Player player = new Player();
+		FakePlayable playable = new FakePlayable();
 
-        player.play(playable);
-        player.pause();
+		player.play(playable);
+		player.pause();
 
-        assertTrue(playable.pauseCalled);
-        assertEquals(PlayerState.PAUSED, player.getState());
-    }
+		assertTrue(playable.pauseCalled);
+		assertEquals(PlayerState.PAUSED, player.getState());
+	}
 
-    @Test
-    void resumeShouldResumeCurrentPlayableAndSetStateToPlaying() {
-        Player player = new Player();
-        FakePlayable playable = new FakePlayable();
+	@Test
+	void resumeShouldResumeCurrentPlayableAndSetStateToPlaying() {
+		Player player = new Player();
+		FakePlayable playable = new FakePlayable();
 
-        player.play(playable);
-        player.pause();
-        player.resume();
+		player.play(playable);
+		player.pause();
+		player.resume();
 
-        assertTrue(playable.resumeCalled);
-        assertEquals(PlayerState.PLAYING, player.getState());
-    }
+		assertTrue(playable.resumeCalled);
+		assertEquals(PlayerState.PLAYING, player.getState());
+	}
 
-    @Test
-    void stopShouldStopCurrentPlayableAndClearCurrentPlayable() {
-        Player player = new Player();
-        FakePlayable playable = new FakePlayable();
+	@Test
+	void stopShouldStopCurrentPlayableAndClearCurrentPlayable() {
+		Player player = new Player();
+		FakePlayable playable = new FakePlayable();
 
-        player.play(playable);
-        player.stop();
+		player.play(playable);
+		player.stop();
 
-        assertTrue(playable.stopCalled);
-        assertEquals(PlayerState.STOPPED, player.getState());
-        assertNull(player.getCurrentPlayable());
-    }
+		assertTrue(playable.stopCalled);
+		assertEquals(PlayerState.STOPPED, player.getState());
+		assertNull(player.getCurrentPlayable());
+	}
 
-    @Test
-    void playerShouldStopWhenPlayableCompletedEventIsReceived() {
-        Player player = new Player();
-        FakePlayable playable = new FakePlayable();
+	@Test
+	void playerShouldStopWhenPlayableCompletedEventIsReceived() {
+		Player player = new Player();
+		FakePlayable playable = new FakePlayable();
 
-        player.play(playable);
-        playable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+		player.play(playable);
+		playable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 
-        assertTrue(playable.stopCalled);
-        assertEquals(PlayerState.STOPPED, player.getState());
-        assertNull(player.getCurrentPlayable());
-    }
+		assertTrue(playable.stopCalled);
+		assertEquals(PlayerState.STOPPED, player.getState());
+		assertNull(player.getCurrentPlayable());
+	}
 
-    private static class FakePlayable extends Playable {
+	private static class FakePlayable extends Playable {
 
-        private boolean playCalled;
-        private boolean pauseCalled;
-        private boolean resumeCalled;
-        private boolean stopCalled;
+		private boolean playCalled;
+		private boolean pauseCalled;
+		private boolean resumeCalled;
+		private boolean stopCalled;
 
-        @Override
-        public void play() {
-            playCalled = true;
-        }
+		@Override
+		public void play() {
+			playCalled = true;
+		}
 
-        @Override
-        public void pause() {
-            pauseCalled = true;
-        }
+		@Override
+		public void pause() {
+			pauseCalled = true;
+		}
 
-        @Override
-        public void resume() {
-            resumeCalled = true;
-        }
+		@Override
+		public void resume() {
+			resumeCalled = true;
+		}
 
-        @Override
-        public void stop() {
-            stopCalled = true;
-        }
+		@Override
+		public void stop() {
+			stopCalled = true;
+		}
 
-        @Override
-        public Song getCurrentSong() {
-            return null;
-        }
+		@Override
+		public Song getCurrentSong() {
+			return null;
+		}
 
-        @Override
-        public void update(EventType eventType) {
-        }
-    }
+		@Override
+		public void update(EventType eventType) {
+		}
+	}
 }

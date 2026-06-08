@@ -27,7 +27,8 @@ public final class ViewSwitcher {
 	 * Questo metodo deve essere invocato prima di effettuare qualsiasi operazione
 	 * di navigazione.
 	 *
-	 * @param root BorderPane principale dell'applicazione
+	 * @param root
+	 *            BorderPane principale dell'applicazione
 	 */
 	public static void setMainRoot(BorderPane root) {
 		mainRoot = root;
@@ -37,7 +38,8 @@ public final class ViewSwitcher {
 	 * Carica la view specificata e la visualizza nella regione centrale del layout
 	 * principale dell'applicazione.
 	 *
-	 * @param fxml nome del file FXML da visualizzare
+	 * @param fxml
+	 *            nome del file FXML da visualizzare
 	 */
 	public static void switchTo(String fxml) {
 		if (mainRoot == null || fxml == null || fxml.isBlank()) {

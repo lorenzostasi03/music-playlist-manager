@@ -28,280 +28,271 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Controller responsabile della visualizzazione e gestione del catalogo musicale.
- * Consente all'utente di scorrere le tracce disponibili, filtrarle in base a
- * vari criteri, e accedere alle funzioni di aggiunta, modifica, eliminazione e
- * riproduzione.
+ * Controller responsabile della visualizzazione e gestione del catalogo
+ * musicale. Consente all'utente di scorrere le tracce disponibili, filtrarle in
+ * base a vari criteri, e accedere alle funzioni di aggiunta, modifica,
+ * eliminazione e riproduzione.
  */
 public class CatalogController {
 
-    @FXML private TextField searchField;
+	@FXML
+	private TextField searchField;
 
-    @FXML private ComboBox<String> genreFilter;
-    @FXML private ComboBox<String> authorFilter;
-    @FXML private ComboBox<String> yearFilter;
-    @FXML private ComboBox<String> tagFilter;
+	@FXML
+	private ComboBox<String> genreFilter;
+	@FXML
+	private ComboBox<String> authorFilter;
+	@FXML
+	private ComboBox<String> yearFilter;
+	@FXML
+	private ComboBox<String> tagFilter;
 
-    @FXML private Button addTrackButton;
+	@FXML
+	private Button addTrackButton;
 
-    @FXML private ScrollPane scrollPane;
+	@FXML
+	private ScrollPane scrollPane;
 
-    private final VBox catalogRows = new VBox(6);
+	private final VBox catalogRows = new VBox(6);
 
-    private final AppContext appContext= AppContext.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
 
-    private final String ALL = "TUTTI";
+	private final String ALL = "TUTTI";
 
-    /**
-     * Inizializza il controller configurando i filtri di ricerca e
-     * caricando la lista completa delle tracce dal catalogo musicale.
-     */
-    @FXML
-    private void initialize() {
-        scrollPane.setContent(catalogRows);
+	/**
+	 * Inizializza il controller configurando i filtri di ricerca e caricando la
+	 * lista completa delle tracce dal catalogo musicale.
+	 */
+	@FXML
+	private void initialize() {
+		scrollPane.setContent(catalogRows);
 
-        initGenreFilter();
-        initTagFilter();
+		initGenreFilter();
+		initTagFilter();
 
-        refreshCatalog();
-    }
+		refreshCatalog();
+	}
 
-    /**
-     * Apre la schermata del form per l'inserimento di una nuova traccia nel catalogo.
-     */
-    @FXML
-    private void onAddTrack() {
-        openSongForm(null);
-    }
+	/**
+	 * Apre la schermata del form per l'inserimento di una nuova traccia nel
+	 * catalogo.
+	 */
+	@FXML
+	private void onAddTrack() {
+		openSongForm(null);
+	}
 
-    /**
-     * Inizializza il combo box per il filtraggio per genere.
-     */
-    private void initGenreFilter() {
-        genreFilter.getItems().addFirst(ALL);
-        genreFilter.getItems().addAll(Arrays.stream(Genre.values()).map(Genre::name).toList());
-        genreFilter.setValue(ALL);
-    }
+	/**
+	 * Inizializza il combo box per il filtraggio per genere.
+	 */
+	private void initGenreFilter() {
+		genreFilter.getItems().addFirst(ALL);
+		genreFilter.getItems().addAll(Arrays.stream(Genre.values()).map(Genre::name).toList());
+		genreFilter.setValue(ALL);
+	}
 
-    /**
-     * Inizializza il combo box per il filtraggio per tag.
-     */
-    private void initTagFilter() {
-        tagFilter.getItems().addFirst(ALL);
-        tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::name).toList());
-        tagFilter.setValue(ALL);
-    }
+	/**
+	 * Inizializza il combo box per il filtraggio per tag.
+	 */
+	private void initTagFilter() {
+		tagFilter.getItems().addFirst(ALL);
+		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::name).toList());
+		tagFilter.setValue(ALL);
+	}
 
-    /**
-     * Ricarica e ridisegna la lista delle tracce a schermo.
-     * Aggiorna anche i menu a tendina dei filtri in base ai dati attuali.
-     */
-    private void refreshCatalog() {
-        refreshFilterValues();
+	/**
+	 * Ricarica e ridisegna la lista delle tracce a schermo. Aggiorna anche i menu a
+	 * tendina dei filtri in base ai dati attuali.
+	 */
+	private void refreshCatalog() {
+		refreshFilterValues();
 
-        List<Song> songs = getSongs();
+		List<Song> songs = getSongs();
 
-        catalogRows.getChildren().clear();
+		catalogRows.getChildren().clear();
 
-        if (songs.isEmpty()) {
-            catalogRows.getChildren().add(createEmptyLabel());
-            return;
-        }
+		if (songs.isEmpty()) {
+			catalogRows.getChildren().add(createEmptyLabel());
+			return;
+		}
 
-        for (Song song : songs) {
-            catalogRows.getChildren().add(createSongRow(song));
-        }
-    }
+		for (Song song : songs) {
+			catalogRows.getChildren().add(createSongRow(song));
+		}
+	}
 
-    private Label createEmptyLabel() {
-        Label label = new Label("Nessuna traccia presente nel catalogo.");
-        label.getStyleClass().add("row-meta");
-        return label;
-    }
+	private Label createEmptyLabel() {
+		Label label = new Label("Nessuna traccia presente nel catalogo.");
+		label.getStyleClass().add("row-meta");
+		return label;
+	}
 
-    /**
-     * Crea una riga grafica per rappresentare visivamente una singola traccia nel
-     * catalogo, popolandola con i metadati della canzone e i pulsanti di
-     * riproduzione, modifica ed eliminazione.
-     *
-     * @param song la traccia musicale da visualizzare nella riga
-     * @return un oggetto HBox formattato contenente le informazioni e i comandi
-     *         della traccia
-     */
-    private HBox createSongRow(Song song) {
-        Button playButton = createButton("▶", "Riproduci traccia",
-            () -> playSong(song));
+	/**
+	 * Crea una riga grafica per rappresentare visivamente una singola traccia nel
+	 * catalogo, popolandola con i metadati della canzone e i pulsanti di
+	 * riproduzione, modifica ed eliminazione.
+	 *
+	 * @param song
+	 *            la traccia musicale da visualizzare nella riga
+	 * @return un oggetto HBox formattato contenente le informazioni e i comandi
+	 *         della traccia
+	 */
+	private HBox createSongRow(Song song) {
+		Button playButton = createButton("▶", "Riproduci traccia", () -> playSong(song));
 
-        Button editButton = createButton("✎", "Modifica traccia",
-            () -> openSongForm(song));
+		Button editButton = createButton("✎", "Modifica traccia", () -> openSongForm(song));
 
-        Button deleteButton = createButton("×", "Elimina traccia",
-            () -> deleteSong(song));
+		Button deleteButton = createButton("×", "Elimina traccia", () -> deleteSong(song));
 
-        Label titleLabel = new Label(song.getTitle());
-        titleLabel.getStyleClass().add("row-title");
-        titleLabel.setPrefWidth(190);
-        titleLabel.setMinWidth(190);
+		Label titleLabel = new Label(song.getTitle());
+		titleLabel.getStyleClass().add("row-title");
+		titleLabel.setPrefWidth(190);
+		titleLabel.setMinWidth(190);
 
-        Label authorLabel = createMetaLabel(song.getAuthor(), 85);
-        Label genreLabel = createMetaLabel(song.getGenre().name(), 65);
-        Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 50);
-        Label durationLabel = createMetaLabel(song.getDurationFormatted(), 55);
+		Label authorLabel = createMetaLabel(song.getAuthor(), 85);
+		Label genreLabel = createMetaLabel(song.getGenre().name(), 65);
+		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 50);
+		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 55);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+		Region spacer = new Region();
+		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        HBox row = new HBox(
-            8,
-            titleLabel,
-            authorLabel,
-            genreLabel,
-            yearLabel,
-            durationLabel,
-            spacer,
-            playButton,
-            editButton,
-            deleteButton
-        );
+		HBox row = new HBox(8, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
+				editButton, deleteButton);
 
-        row.getStyleClass().add("list-row");
-        return row;
-    }
+		row.getStyleClass().add("list-row");
+		return row;
+	}
 
-    private Button createButton(String text, String tooltip, Runnable action) {
-        Button button = new Button(text);
-        button.getStyleClass().add("row-action");
-        button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
-        button.setMinWidth(32);
-        button.setPrefWidth(32);
-        button.setMaxWidth(32);
-        button.setOnAction(e -> action.run());
-        button.setFocusTraversable(false);
-        return button;
-    }
+	private Button createButton(String text, String tooltip, Runnable action) {
+		Button button = new Button(text);
+		button.getStyleClass().add("row-action");
+		button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
+		button.setMinWidth(32);
+		button.setPrefWidth(32);
+		button.setMaxWidth(32);
+		button.setOnAction(e -> action.run());
+		button.setFocusTraversable(false);
+		return button;
+	}
 
-    /**
-     * Metodo per creare una Label dedicata ai metadati della canzone.
-     *
-     * @param text  il testo da visualizzare all'interno della Label
-     * @param width la larghezza preferita e minima da assegnare alla Label
-     * @return un oggetto Label formattato secondo le specifiche indicate
-     */
-    private Label createMetaLabel(String text, double width) {
-        Label label = new Label(text);
-        label.getStyleClass().add("row-meta");
-        label.setPrefWidth(width);
-        label.setMinWidth(width);
-        return label;
-    }
+	/**
+	 * Metodo per creare una Label dedicata ai metadati della canzone.
+	 *
+	 * @param text
+	 *            il testo da visualizzare all'interno della Label
+	 * @param width
+	 *            la larghezza preferita e minima da assegnare alla Label
+	 * @return un oggetto Label formattato secondo le specifiche indicate
+	 */
+	private Label createMetaLabel(String text, double width) {
+		Label label = new Label(text);
+		label.getStyleClass().add("row-meta");
+		label.setPrefWidth(width);
+		label.setMinWidth(width);
+		return label;
+	}
 
-    /**
-     * Gestisce il processo di eliminazione di una traccia dal catalogo.
-     *
-     * @param song la traccia musicale da eliminare definitivamente dal catalogo
-     */
-    private void deleteSong(Song song) {
-        boolean confirmed = AlertManager.showConfirmation(
-            "Vuoi eliminare definitivamente la traccia '" + song.getTitle() + "'?"
-        );
+	/**
+	 * Gestisce il processo di eliminazione di una traccia dal catalogo.
+	 *
+	 * @param song
+	 *            la traccia musicale da eliminare definitivamente dal catalogo
+	 */
+	private void deleteSong(Song song) {
+		boolean confirmed = AlertManager
+				.showConfirmation("Vuoi eliminare definitivamente la traccia '" + song.getTitle() + "'?");
 
-        if (!confirmed) {
-            return;
-        }
+		if (!confirmed) {
+			return;
+		}
 
-        try {
-            appContext.getMusicLibrary().removeSongFromCatalog(song);
-            refreshCatalog();
-            AlertManager.showInfo("Traccia eliminata correttamente.");
-        } catch (PersistenceException | IllegalArgumentException e) {
-            AlertManager.showError(e.getMessage());
-        }
-    }
+		try {
+			appContext.getMusicLibrary().removeSongFromCatalog(song);
+			refreshCatalog();
+			AlertManager.showInfo("Traccia eliminata correttamente.");
+		} catch (PersistenceException | IllegalArgumentException e) {
+			AlertManager.showError(e.getMessage());
+		}
+	}
 
-    /**
-     * Apre la finestra relativa al form di gestione della traccia.
-     *
-     * @param song l'istanza della traccia da modificare, oppure null se si tratta
-     *             di un inserimento
-     */
-    private void openSongForm(Song song) {
-        DialogUtil.open(
-            "SongFormView.fxml",
-            song == null ? "Nuova traccia" : "Modifica traccia",
-            addTrackButton.getScene().getWindow(),
-            (SongFormController controller) -> {
-                controller.setSongToEdit(song);
-                controller.setOnSave(this::refreshCatalog);
-            }
-        );
-    }
+	/**
+	 * Apre la finestra relativa al form di gestione della traccia.
+	 *
+	 * @param song
+	 *            l'istanza della traccia da modificare, oppure null se si tratta di
+	 *            un inserimento
+	 */
+	private void openSongForm(Song song) {
+		DialogUtil.open("SongFormView.fxml", song == null ? "Nuova traccia" : "Modifica traccia",
+				addTrackButton.getScene().getWindow(), (SongFormController controller) -> {
+					controller.setSongToEdit(song);
+					controller.setOnSave(this::refreshCatalog);
+				});
+	}
 
-    /**
-     * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei
-     * filtri relativi agli autori e agli anni di pubblicazione, basandosi sui
-     * brani effettivamente presenti. Mantiene la selezione utente precedente se
-     * ancora valida, altrimenti reimposta su "TUTTI".
-     */
-    private void refreshFilterValues() {
-        List<Song> songs = getSongs();
+	/**
+	 * Aggiorna dinamicamente i valori selezionabili all'interno dei ComboBox dei
+	 * filtri relativi agli autori e agli anni di pubblicazione, basandosi sui brani
+	 * effettivamente presenti. Mantiene la selezione utente precedente se ancora
+	 * valida, altrimenti reimposta su "TUTTI".
+	 */
+	private void refreshFilterValues() {
+		List<Song> songs = getSongs();
 
-        String selectedAuthor = authorFilter.getValue();
-        String selectedYear = yearFilter.getValue();
+		String selectedAuthor = authorFilter.getValue();
+		String selectedYear = yearFilter.getValue();
 
-        List<String> authors = extractAuthors(songs);
-        List<String> years = extractYears(songs);
+		List<String> authors = extractAuthors(songs);
+		List<String> years = extractYears(songs);
 
-        updateComboBox(authorFilter, authors, selectedAuthor);
-        updateComboBox(yearFilter, years, selectedYear);
-    }
+		updateComboBox(authorFilter, authors, selectedAuthor);
+		updateComboBox(yearFilter, years, selectedYear);
+	}
 
-    private List<String> extractAuthors(List<Song> songs) {
-        List<String> result = songs.stream()
-            .map(Song::getAuthor)
-            .distinct()
-            .sorted(String.CASE_INSENSITIVE_ORDER)
-            .collect(Collectors.toCollection(ArrayList::new));
-        result.addFirst(ALL);
+	private List<String> extractAuthors(List<Song> songs) {
+		List<String> result = songs.stream().map(Song::getAuthor).distinct().sorted(String.CASE_INSENSITIVE_ORDER)
+				.collect(Collectors.toCollection(ArrayList::new));
+		result.addFirst(ALL);
 
-        return result;
-    }
+		return result;
+	}
 
-    private List<String> extractYears(List<Song> songs) {
-        List<String> result = songs.stream()
-            .map(s -> String.valueOf(s.getYear()))
-            .distinct()
-            .sorted()
-            .collect(Collectors.toCollection(ArrayList::new));
-        result.addFirst(ALL);
+	private List<String> extractYears(List<Song> songs) {
+		List<String> result = songs.stream().map(s -> String.valueOf(s.getYear())).distinct().sorted()
+				.collect(Collectors.toCollection(ArrayList::new));
+		result.addFirst(ALL);
 
-        return result;
-    }
+		return result;
+	}
 
-    private void updateComboBox(ComboBox<String> combo, List<String> values, String previousSelection) {
-        combo.getItems().setAll(values);
+	private void updateComboBox(ComboBox<String> combo, List<String> values, String previousSelection) {
+		combo.getItems().setAll(values);
 
-        if (values.contains(previousSelection)) {
-            combo.setValue(previousSelection);
-        } else {
-            combo.setValue(ALL);
-        }
-    }
+		if (values.contains(previousSelection)) {
+			combo.setValue(previousSelection);
+		} else {
+			combo.setValue(ALL);
+		}
+	}
 
-    /**
-     * Apre la schermata di riproduzione e avvia la traccia selezionata.
-     *
-     * @param song traccia da riprodurre
-     */
-    private void playSong(Song song) {
-        appContext.setCurrentPlayable(new SongPlayable(song));
-        ViewSwitcher.switchTo("PlaybackView.fxml");
-    }
+	/**
+	 * Apre la schermata di riproduzione e avvia la traccia selezionata.
+	 *
+	 * @param song
+	 *            traccia da riprodurre
+	 */
+	private void playSong(Song song) {
+		appContext.playPlayable(new SongPlayable(song));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
+	}
 
-    /**
-     * Recupera la lista dei brani dal catalogo.
-     * @return lista dei brani.
-     */
-    private List<Song> getSongs() {
-        return appContext.getMusicLibrary().getAllSongs();
-    }
+	/**
+	 * Recupera la lista dei brani dal catalogo.
+	 *
+	 * @return lista dei brani.
+	 */
+	private List<Song> getSongs() {
+		return appContext.getMusicLibrary().getAllSongs();
+	}
 }

@@ -10,43 +10,68 @@ import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
 /**
  * Contesto globale dell'applicazione.
  *
- * <p>Questa classe fornisce un punto di accesso centralizzato ai
- * componenti condivisi dell'applicazione, come la libreria musicale
- * e il player audio.</p>
+ * <p>
+ * Questa classe fornisce un punto di accesso centralizzato ai componenti
+ * condivisi dell'applicazione, come la libreria musicale e il player audio.
+ * </p>
  *
- * <p>Il contesto è implementato come singleton e viene inizializzato
- * una sola volta durante il ciclo di vita dell'applicazione.</p>
+ * <p>
+ * Il contesto è implementato come singleton e viene inizializzato una sola
+ * volta durante il ciclo di vita dell'applicazione.
+ * </p>
  */
 public class AppContext {
-    private static AppContext instance;
+	private static AppContext instance;
 
-    private final String DB_URL = "jdbc:sqlite:test.db";
+	private final String DB_URL = "jdbc:sqlite:database.db";
 
-    private final MusicLibrary musicLibrary;
-    private final Player player;
+	private final MusicLibrary musicLibrary;
+	private final Player player;
 
-    private Playlist selectedPlaylist;
-    private Playable currentPlayable;
+	private Playlist selectedPlaylist;
+	private Playable currentPlayable;
 
-    private AppContext() {
-        musicLibrary = new MusicLibrary(new SQLiteSongDAO(DB_URL), new SQLitePlaylistDAO(DB_URL));
-        musicLibrary.init();
-        player = new Player();
-    }
+	private AppContext() {
+		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DB_URL), new SQLitePlaylistDAO(DB_URL));
+		musicLibrary.init();
+		player = new Player();
+	}
 
-    public static AppContext getInstance() {
-        if (instance == null) instance = new  AppContext();
+	public static AppContext getInstance() {
+		if (instance == null)
+			instance = new AppContext();
 
-        return instance;
-    }
+		return instance;
+	}
 
-    public MusicLibrary getMusicLibrary() { return this.musicLibrary; }
-    public Player getPlayer() { return this.player; }
+	public MusicLibrary getMusicLibrary() {
+		return this.musicLibrary;
+	}
+	public Player getPlayer() {
+		return this.player;
+	}
 
-    public Playlist getSelectedPlaylist() { return this.selectedPlaylist; }
-    public void setSelectedPlaylist(Playlist playlist) { this.selectedPlaylist = playlist; }
+	public Playlist getSelectedPlaylist() {
+		return this.selectedPlaylist;
+	}
+	public void setSelectedPlaylist(Playlist playlist) {
+		this.selectedPlaylist = playlist;
+	}
 
-    public Playable getCurrentPlayable() { return currentPlayable; }
+	public Playable getCurrentPlayable() {
+		return currentPlayable;
+	}
 
-    public void setCurrentPlayable(Playable playable) { this.currentPlayable = playable; }
+	public void setCurrentPlayable(Playable playable) {
+		this.currentPlayable = playable;
+	}
+
+	public void playPlayable(Playable playable) {
+		if (playable == null) {
+			throw new IllegalArgumentException("Playable cannot be null.");
+		}
+
+		currentPlayable = playable;
+		player.play(playable);
+	}
 }

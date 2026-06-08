@@ -9,58 +9,50 @@ import org.junit.jupiter.api.Test;
 
 class EventManagerTest {
 
-    @Test
-    void subscribeAndNotifyListenersShouldCallListener() {
-        EventManager eventManager = new EventManager();
-        AtomicBoolean notified = new AtomicBoolean(false);
+	@Test
+	void subscribeAndNotifyListenersShouldCallListener() {
+		EventManager eventManager = new EventManager();
+		AtomicBoolean notified = new AtomicBoolean(false);
 
-        eventManager.subscribe(EventType.AUDIO_COMPLETED, eventType -> notified.set(true));
-        eventManager.notifyListeners(EventType.AUDIO_COMPLETED);
+		eventManager.subscribe(EventType.AUDIO_COMPLETED, eventType -> notified.set(true));
+		eventManager.notifyListeners(EventType.AUDIO_COMPLETED);
 
-        assertTrue(notified.get());
-    }
+		assertTrue(notified.get());
+	}
 
-    @Test
-    void unsubscribeShouldRemoveListener() {
-        EventManager eventManager = new EventManager();
-        AtomicBoolean notified = new AtomicBoolean(false);
+	@Test
+	void unsubscribeShouldRemoveListener() {
+		EventManager eventManager = new EventManager();
+		AtomicBoolean notified = new AtomicBoolean(false);
 
-        EventListener listener = eventType -> notified.set(true);
+		EventListener listener = eventType -> notified.set(true);
 
-        eventManager.subscribe(EventType.AUDIO_COMPLETED, listener);
-        eventManager.unsubscribe(EventType.AUDIO_COMPLETED, listener);
-        eventManager.notifyListeners(EventType.AUDIO_COMPLETED);
+		eventManager.subscribe(EventType.AUDIO_COMPLETED, listener);
+		eventManager.unsubscribe(EventType.AUDIO_COMPLETED, listener);
+		eventManager.notifyListeners(EventType.AUDIO_COMPLETED);
 
-        assertFalse(notified.get());
-    }
+		assertFalse(notified.get());
+	}
 
-    @Test
-    void subscribeShouldRejectNullEventType() {
-        EventManager eventManager = new EventManager();
+	@Test
+	void subscribeShouldRejectNullEventType() {
+		EventManager eventManager = new EventManager();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> eventManager.subscribe(null, eventType -> {})
-        );
-    }
+		assertThrows(IllegalArgumentException.class, () -> eventManager.subscribe(null, eventType -> {
+		}));
+	}
 
-    @Test
-    void subscribeShouldRejectNullListener() {
-        EventManager eventManager = new EventManager();
+	@Test
+	void subscribeShouldRejectNullListener() {
+		EventManager eventManager = new EventManager();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> eventManager.subscribe(EventType.AUDIO_COMPLETED, null)
-        );
-    }
+		assertThrows(IllegalArgumentException.class, () -> eventManager.subscribe(EventType.AUDIO_COMPLETED, null));
+	}
 
-    @Test
-    void notifyListenersShouldRejectNullEventType() {
-        EventManager eventManager = new EventManager();
+	@Test
+	void notifyListenersShouldRejectNullEventType() {
+		EventManager eventManager = new EventManager();
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> eventManager.notifyListeners(null)
-        );
-    }
+		assertThrows(IllegalArgumentException.class, () -> eventManager.notifyListeners(null));
+	}
 }

@@ -11,44 +11,34 @@ import org.junit.jupiter.api.Test;
 
 class SongPlayableTest {
 
-    @Test
-    void constructorShouldRejectNullSong() {
-        assertThrows(IllegalArgumentException.class, () -> new SongPlayable(null));
-    }
+	@Test
+	void constructorShouldRejectNullSong() {
+		assertThrows(IllegalArgumentException.class, () -> new SongPlayable(null));
+	}
 
-    @Test
-    void getCurrentSongShouldReturnWrappedSong() {
-        Song song = createTestSong();
-        SongPlayable playable = new SongPlayable(song);
+	@Test
+	void getCurrentSongShouldReturnWrappedSong() {
+		Song song = createTestSong();
+		SongPlayable playable = new SongPlayable(song);
 
-        assertSame(song, playable.getCurrentSong());
-    }
+		assertSame(song, playable.getCurrentSong());
+	}
 
-    @Test
-    void audioCompletedShouldNotifyPlayableCompleted() {
-        Song song = createTestSong();
-        SongPlayable playable = new SongPlayable(song);
+	@Test
+	void audioCompletedShouldNotifyPlayableCompleted() {
+		Song song = createTestSong();
+		SongPlayable playable = new SongPlayable(song);
 
-        AtomicBoolean completed = new AtomicBoolean(false);
+		AtomicBoolean completed = new AtomicBoolean(false);
 
-        playable.getEvents().subscribe(
-                EventType.PLAYABLE_COMPLETED,
-                eventType -> completed.set(true)
-        );
+		playable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, eventType -> completed.set(true));
 
-        playable.update(EventType.AUDIO_COMPLETED);
+		playable.update(EventType.AUDIO_COMPLETED);
 
-        assertTrue(completed.get());
-    }
+		assertTrue(completed.get());
+	}
 
-    private Song createTestSong() {
-        return new Song(
-                "Test Song",
-                "Test Author",
-                Genre.POP,
-                2024,
-                180,
-                "fake/path/test.wav"
-        );
-    }
+	private Song createTestSong() {
+		return new Song("Test Song", "Test Author", Genre.POP, 2024, 180, "fake/path/test.wav");
+	}
 }
