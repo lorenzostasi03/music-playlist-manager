@@ -176,6 +176,7 @@ public class SongFormController {
 				songToEdit.setDuration(duration);
 				songToEdit.setFilePath(selectedFilePath);
 				applyTags(songToEdit);
+                appContext.getMusicLibrary().updateSong(songToEdit);
 				AlertManager.showInfo("Traccia modificata correttamente.");
 			}
 

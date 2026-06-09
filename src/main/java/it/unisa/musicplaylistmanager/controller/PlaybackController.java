@@ -94,25 +94,6 @@ public class PlaybackController implements EventListener {
 		}
 	}
 
-	public void playPlayable(Playable playable) {
-		if (playable == null) {
-			throw new IllegalArgumentException("Playable cannot be null.");
-		}
-
-		unsubscribeFromCurrentPlayable();
-
-		currentPlayable = playable;
-		appContext.setCurrentPlayable(playable);
-
-		subscribeToCurrentPlayable();
-		updatePlayableInfo(playable);
-
-		player.play(playable);
-		startProgressTimeline();
-
-		playPauseButton.setText("Pausa");
-	}
-
 	@FXML
 	private void onPlayPause() {
 		if (currentPlayable == null) {
