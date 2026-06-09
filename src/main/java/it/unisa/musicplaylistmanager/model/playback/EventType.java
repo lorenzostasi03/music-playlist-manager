@@ -11,6 +11,11 @@ public enum EventType {
 	AUDIO_COMPLETED,
 
 	/**
+	 * Indica che la canzone corrente dell'oggetto riproducibile è cambiata.
+	 */
+	CURRENT_SONG_CHANGED,
+
+	/**
 	 * Indica che l'oggetto riproducibile corrente ha completato la riproduzione.
 	 */
 	PLAYABLE_COMPLETED

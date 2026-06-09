@@ -5,6 +5,7 @@ import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -132,42 +135,56 @@ public class HomeController {
 	private HBox createPlaylistRow(Playlist playlist) {
 		Label nameLabel = new Label(playlist.getName());
 		nameLabel.getStyleClass().add("row-title");
-		nameLabel.setPrefWidth(300);
+		nameLabel.setMinWidth(0);
+		nameLabel.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
 		Label songsLabel = new Label(String.valueOf(playlist.size()));
 		songsLabel.getStyleClass().add("row-meta");
+		songsLabel.setMinWidth(60);
 		songsLabel.setPrefWidth(60);
+		songsLabel.setMaxWidth(60);
 
 		Label durationLabel = new Label(formatDuration(playlist));
 		durationLabel.getStyleClass().add("row-meta");
+		durationLabel.setMinWidth(80);
 		durationLabel.setPrefWidth(80);
+		durationLabel.setMaxWidth(80);
 
 		Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
 		playCountLabel.getStyleClass().add("row-meta");
+		playCountLabel.setMinWidth(90);
 		playCountLabel.setPrefWidth(90);
+		playCountLabel.setMaxWidth(90);
 
-		Button renameButton = new Button("✎");
-		renameButton.getStyleClass().add("row-action");
-		renameButton.setTooltip(new Tooltip("Rinomina playlist"));
-		renameButton.setPrefWidth(28);
-		renameButton.setOnAction(event -> {
-			event.consume();
-			openPlaylistForm(playlist);
-		});
+		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
+		Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
+		Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
 
-		Button deleteButton = new Button("×");
-		deleteButton.getStyleClass().add("row-action");
-		deleteButton.setTooltip(new Tooltip("Elimina playlist"));
-		deleteButton.setPrefWidth(28);
-		deleteButton.setOnAction(event -> {
-			event.consume();
-			deletePlaylist(playlist);
-		});
+		HBox row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, renameButton,
+				deleteButton);
 
-		HBox row = new HBox(0, nameLabel, songsLabel, durationLabel, playCountLabel, renameButton, deleteButton);
 		row.getStyleClass().add("list-row");
+		row.setMaxWidth(Double.MAX_VALUE);
 		row.setOnMouseClicked(event -> openPlaylistView(playlist));
+
 		return row;
+	}
+
+	private Button createButton(String text, String tooltip, Runnable action) {
+		Button button = new Button(text);
+		button.getStyleClass().add("row-action");
+		button.setTooltip(new Tooltip(tooltip));
+		button.setMinWidth(32);
+		button.setPrefWidth(32);
+		button.setMaxWidth(32);
+		button.setOnAction(event -> {
+			event.consume();
+			action.run();
+		});
+		button.setFocusTraversable(false);
+
+		return button;
 	}
 	/**
 	 * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
@@ -261,5 +278,15 @@ public class HomeController {
 		} catch (IOException e) {
 			AlertManager.showError("Impossibile aprire il form playlist.");
 		}
+	}
+
+	private void playPlaylist(Playlist playlist) {
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
+
+		appContext.playPlayable(new PlaylistPlayable(playlist));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 }

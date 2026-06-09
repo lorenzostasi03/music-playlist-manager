@@ -272,8 +272,8 @@ public class PlaylistController {
 			return;
 		}
 
-		DialogUtil.open("PlaylistFormView.fxml", "Rinomina playlist",
-				editNameButton.getScene().getWindow(), (PlaylistFormController c) -> {
+		DialogUtil.open("PlaylistFormView.fxml", "Rinomina playlist", editNameButton.getScene().getWindow(),
+				(PlaylistFormController c) -> {
 					c.setPlaylistToEdit(playlist);
 					c.setOnSave(this::refreshPlaylist);
 				});

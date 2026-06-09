@@ -119,6 +119,12 @@ public class PlaybackController implements EventListener {
 
 	@Override
 	public void update(EventType eventType) {
+		if (eventType == EventType.CURRENT_SONG_CHANGED) {
+			updatePlayableInfo(currentPlayable);
+			updateProgress();
+			return;
+		}
+
 		if (eventType == EventType.PLAYABLE_COMPLETED) {
 			unsubscribeFromCurrentPlayable();
 			resetProgressTimeline();
@@ -162,6 +168,7 @@ public class PlaybackController implements EventListener {
 	private void subscribeToCurrentPlayable() {
 		if (currentPlayable != null && !subscribedToCurrentPlayable) {
 			currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
+			currentPlayable.getEvents().subscribe(EventType.CURRENT_SONG_CHANGED, this);
 			subscribedToCurrentPlayable = true;
 		}
 	}
@@ -169,6 +176,7 @@ public class PlaybackController implements EventListener {
 	private void unsubscribeFromCurrentPlayable() {
 		if (currentPlayable != null && subscribedToCurrentPlayable) {
 			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
+			currentPlayable.getEvents().unsubscribe(EventType.CURRENT_SONG_CHANGED, this);
 			subscribedToCurrentPlayable = false;
 		}
 	}
