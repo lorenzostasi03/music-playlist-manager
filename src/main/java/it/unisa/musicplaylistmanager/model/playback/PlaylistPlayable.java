@@ -8,7 +8,9 @@ public class PlaylistPlayable extends Playable {
 	private final Playlist playlist;
 	private final AudioPlayer audioPlayer;
 
-	private int currentIndex;
+	private PlaylistIterator iterator;
+	private PlaylistIteratorStrategy iteratorStrategy;
+	private Song currentSong;
 	private boolean subscribed;
 
 	public PlaylistPlayable(Playlist playlist) {
@@ -22,7 +24,9 @@ public class PlaylistPlayable extends Playable {
 
 		this.playlist = playlist;
 		this.audioPlayer = AudioPlayer.getInstance();
-		this.currentIndex = 0;
+		this.iteratorStrategy = new SequentialIteratorStrategy();
+		this.iterator = null;
+		this.currentSong = null;
 		this.subscribed = false;
 	}
 
@@ -30,8 +34,8 @@ public class PlaylistPlayable extends Playable {
 	public void play() {
 		subscribeToAudioPlayer();
 
-		currentIndex = 0;
-		playCurrentSong();
+		iterator = new ConfigurablePlaylistIterator(playlist.getSongs(), iteratorStrategy);
+		playNextSong();
 	}
 
 	@Override
@@ -48,16 +52,13 @@ public class PlaylistPlayable extends Playable {
 	public void stop() {
 		audioPlayer.stop();
 		unsubscribeFromAudioPlayer();
-		currentIndex = 0;
+		iterator = null;
+		currentSong = null;
 	}
 
 	@Override
 	public Song getCurrentSong() {
-		if (playlist.size() == 0 || currentIndex < 0 || currentIndex >= playlist.size()) {
-			return null;
-		}
-
-		return playlist.getSongAt(currentIndex);
+		return currentSong;
 	}
 
 	@Override
@@ -66,18 +67,27 @@ public class PlaylistPlayable extends Playable {
 			return;
 		}
 
-		if (hasNextSong()) {
-			currentIndex++;
-			playCurrentSong();
-			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
-		} else {
-			unsubscribeFromAudioPlayer();
-			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+		playNextSong();
+	}
+
+	public void setIteratorStrategy(PlaylistIteratorStrategy strategy) {
+		if (strategy == null) {
+			throw new IllegalArgumentException("Playlist iterator strategy cannot be null.");
+		}
+
+		this.iteratorStrategy = strategy;
+
+		if (iterator != null) {
+			iterator.setStrategy(strategy);
 		}
 	}
 
-	private void playCurrentSong() {
-		Song currentSong = getCurrentSong();
+	private void playNextSong() {
+		if (iterator == null) {
+			iterator = new ConfigurablePlaylistIterator(playlist.getSongs(), iteratorStrategy);
+		}
+
+		currentSong = iterator.next();
 
 		if (currentSong == null) {
 			unsubscribeFromAudioPlayer();
@@ -86,10 +96,7 @@ public class PlaylistPlayable extends Playable {
 		}
 
 		audioPlayer.play(currentSong.getFilePath());
-	}
-
-	private boolean hasNextSong() {
-		return currentIndex + 1 < playlist.size();
+		getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
 	}
 
 	private void subscribeToAudioPlayer() {
