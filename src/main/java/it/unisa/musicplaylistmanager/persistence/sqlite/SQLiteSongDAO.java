@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.persistence.sqlite;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
 import java.sql.Connection;
@@ -37,6 +38,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			stmt.setString(7, song.getFilePath());
 
 			stmt.executeUpdate();
+			saveTags(conn, song);
 		} catch (SQLException | NullPointerException e) {
 			throw new PersistenceException("Si è verificato un errore durante il salvataggio del brano!");
 		}
@@ -62,6 +64,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			stmt.setString(8, song.getId().toString());
 
 			stmt.executeUpdate();
+			deleteTags(conn, song.getId());
+			saveTags(conn, song);
 		} catch (SQLException | NullPointerException e) {
 			throw new PersistenceException("Si è verificato un errore durante la modifica del brano!");
 		}
@@ -73,6 +77,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 
 		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
+			deleteTags(conn, songId);
 			stmt.setString(1, songId.toString());
 
 			stmt.executeUpdate();
@@ -99,12 +104,50 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 				int duration = rs.getInt("duration");
 				String filePath = rs.getString("file_path");
 				int playCount = rs.getInt("play_count");
-				songs.add(new Song(id, title, author, Genre.valueOf(genre), year, duration, filePath, playCount));
+				Song song = new Song(id, title, author, Genre.valueOf(genre), year, duration, filePath, playCount);
+				loadTags(conn, song);
+				songs.add(song);
 			}
 		} catch (SQLException | NullPointerException e) {
 			throw new PersistenceException("Si è verificato un errore durante il caricamento dei brani!");
 		}
 
 		return songs;
+	}
+
+	private void saveTags(Connection conn, Song song) throws SQLException {
+		String query = "INSERT INTO song_tag (song_id, tag) VALUES (?, ?)";
+
+		try (PreparedStatement stmt = conn.prepareStatement(query)) {
+			for (Tag tag : song.getTags()) {
+				stmt.setString(1, song.getId().toString());
+				stmt.setString(2, tag.name());
+				stmt.addBatch();
+			}
+			stmt.executeBatch();
+		}
+	}
+
+	private void deleteTags(Connection conn, UUID songId) throws SQLException {
+		String query = "DELETE FROM song_tag WHERE song_id = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(query)) {
+			stmt.setString(1, songId.toString());
+			stmt.executeUpdate();
+		}
+	}
+
+	private void loadTags(Connection conn, Song song) throws SQLException {
+		String query = "SELECT tag FROM song_tag WHERE song_id = ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(query)) {
+			stmt.setString(1, song.getId().toString());
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					song.addTag(Tag.valueOf(rs.getString("tag")));
+				}
+			}
+		}
 	}
 }

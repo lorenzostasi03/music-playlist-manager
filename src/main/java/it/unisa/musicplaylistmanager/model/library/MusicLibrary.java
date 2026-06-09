@@ -3,8 +3,10 @@ package it.unisa.musicplaylistmanager.model.library;
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedPlaylistException;
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
+import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
@@ -119,6 +121,25 @@ public class MusicLibrary {
 	 */
 	public List<Song> searchSong(String query) {
 		return songCatalog.searchSong(query);
+	}
+
+	/**
+	 * Filtra le tracce del catalogo globale.
+	 *
+	 * @param query
+	 *            testo da cercare nel titolo
+	 * @param genre
+	 *            genere richiesto
+	 * @param author
+	 *            autore richiesto
+	 * @param year
+	 *            anno richiesto
+	 * @param tag
+	 *            tag richiesto
+	 * @return lista delle tracce compatibili con i criteri indicati
+	 */
+	public List<Song> filterSongs(String query, Genre genre, String author, Integer year, Tag tag) {
+		return songCatalog.filterSongs(query, genre, author, year, tag);
 	}
 
 	/**
