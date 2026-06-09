@@ -192,6 +192,25 @@ public class Playlist {
 	}
 
 	/**
+	 * Cerca le tracce della playlist in base al titolo.
+	 *
+	 * @param query
+	 *            testo da cercare nel titolo; se vuoto restituisce tutte le tracce
+	 * @return lista delle tracce compatibili con la ricerca
+	 */
+	public List<Song> searchSongs(String query) {
+		String normalizedQuery = query == null ? "" : query.trim().toLowerCase();
+
+		if (normalizedQuery.isEmpty()) {
+			return getSongs();
+		}
+
+		return songs.stream()
+				.filter(song -> song.getTitle().toLowerCase().contains(normalizedQuery))
+				.toList();
+	}
+
+	/**
 	 * Incrementa il contatore di riproduzioni della playlist.
 	 */
 	public void incrementPlayCount() {

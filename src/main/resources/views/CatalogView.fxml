@@ -18,23 +18,36 @@
         </HBox>
         <VBox spacing="10">
             <HBox alignment="CENTER_LEFT" spacing="12">
-                <ComboBox fx:id="genreFilter" promptText="Genere" prefWidth="112" styleClass="dark-combo" />
-                <ComboBox fx:id="authorFilter" promptText="Autore" prefWidth="112" styleClass="dark-combo" />
-                <ComboBox fx:id="yearFilter" promptText="Anno" prefWidth="112" styleClass="dark-combo" />
-                <ComboBox fx:id="tagFilter" promptText="Tag" prefWidth="132" styleClass="dark-combo" />
+                <VBox spacing="4">
+                    <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Genere" />
+                    <ComboBox fx:id="genreFilter" promptText="Genere" prefWidth="112" styleClass="dark-combo" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Autore" />
+                    <ComboBox fx:id="authorFilter" promptText="Autore" prefWidth="112" styleClass="dark-combo" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Anno" />
+                    <ComboBox fx:id="yearFilter" promptText="Anno" prefWidth="112" styleClass="dark-combo" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Tag" />
+                    <ComboBox fx:id="tagFilter" promptText="Tag" prefWidth="132" styleClass="dark-combo" />
+                </VBox>
             </HBox>
             <HBox alignment="CENTER_LEFT">
                 <Button fx:id="addTrackButton" onAction="#onAddTrack" prefWidth="170" styleClass="spotify-btn" text="+ Aggiungi traccia" wrapText="true" />
             </HBox>
         </VBox>
     </VBox>
-    <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
+    <HBox alignment="CENTER_LEFT" spacing="6" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="10" left="25" right="25" top="10" /></padding>
-        <Label prefWidth="190" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="TITOLO" />
-        <Label alignment="CENTER_LEFT" prefWidth="85" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="AUTORE" />
-        <Label alignment="CENTER_LEFT" prefWidth="65" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="GENERE" />
-        <Label alignment="CENTER_LEFT" prefWidth="50" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="ANNO" />
-        <Label alignment="CENTER_LEFT" prefWidth="55" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="DURATA" />
+        <Label prefWidth="125" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="TITOLO" />
+        <Label alignment="CENTER_LEFT" prefWidth="60" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="AUTORE" />
+        <Label alignment="CENTER_LEFT" prefWidth="55" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="GENERE" />
+        <Label alignment="CENTER_LEFT" prefWidth="40" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="ANNO" />
+        <Label alignment="CENTER_LEFT" prefWidth="60" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="DURATA" />
+        <Label alignment="CENTER_LEFT" prefWidth="153" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="TAG" />
         <Region HBox.hgrow="ALWAYS" />
     </HBox>
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #000000; -fx-background-color: transparent; -fx-control-inner-background: #000000; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">

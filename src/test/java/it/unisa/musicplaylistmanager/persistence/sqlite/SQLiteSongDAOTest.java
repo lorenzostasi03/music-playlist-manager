@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.persistence.sqlite;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -202,5 +203,35 @@ class SQLiteSongDAOTest {
 	@Test
 	void getSongsFromEmptyDatabase() {
 		assertTrue(songDAO.getSongs().isEmpty());
+	}
+	@Test
+	void saveAndLoadTags() {
+		Song song = new Song("Tagged", "Artist", Genre.POP, 2020, 180, "tagged.mp3");
+		song.addTag(Tag.FAVOURITE);
+		song.addTag(Tag.EXPLICIT);
+
+		songDAO.save(song);
+
+		Song loadedSong = songDAO.getSongs().getFirst();
+
+		assertTrue(loadedSong.hasTag(Tag.FAVOURITE));
+		assertTrue(loadedSong.hasTag(Tag.EXPLICIT));
+		assertFalse(loadedSong.hasTag(Tag.NEW_RELEASE));
+	}
+
+	@Test
+	void updateTags() {
+		Song song = new Song("Tagged", "Artist", Genre.POP, 2020, 180, "tagged.mp3");
+		song.addTag(Tag.FAVOURITE);
+		songDAO.save(song);
+
+		song.removeTag(Tag.FAVOURITE);
+		song.addTag(Tag.NEW_RELEASE);
+		songDAO.update(song);
+
+		Song loadedSong = songDAO.getSongs().getFirst();
+
+		assertFalse(loadedSong.hasTag(Tag.FAVOURITE));
+		assertTrue(loadedSong.hasTag(Tag.NEW_RELEASE));
 	}
 }

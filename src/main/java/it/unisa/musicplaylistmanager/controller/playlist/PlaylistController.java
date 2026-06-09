@@ -16,6 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -137,6 +138,7 @@ public class PlaylistController {
 
 	@FXML
 	private void onSearchChanged() {
+		refreshPlaylist();
 	}
 
 	@FXML
@@ -195,7 +197,15 @@ public class PlaylistController {
 		yearColumn.setSortable(false);
 		tagsColumn.setSortable(false);
 
-		tagsColumn.setPrefWidth(250);
+		tracksTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+		indexColumn.setPrefWidth(35);
+		titleColumn.setPrefWidth(120);
+		authorColumn.setPrefWidth(100);
+		durationColumn.setPrefWidth(60);
+		genreColumn.setPrefWidth(80);
+		yearColumn.setPrefWidth(45);
+		tagsColumn.setPrefWidth(220);
 	}
 
 	private void configureCellFactories() {
@@ -215,6 +225,27 @@ public class PlaylistController {
 		yearColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getYear()));
 
 		tagsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(formatTags(cellData.getValue())));
+		tagsColumn.setCellFactory(column -> new TableCell<>() {
+			private final Label label = new Label();
+
+			{
+				label.setWrapText(true);
+			}
+
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+
+				if (empty || item == null) {
+					setGraphic(null);
+					return;
+				}
+
+				label.setText(item);
+				label.setMaxWidth(tagsColumn.getWidth() - 12);
+				setGraphic(label);
+			}
+		});
 	}
 
 	/**
@@ -246,7 +277,7 @@ public class PlaylistController {
 	}
 
 	private void updateTracksTable() {
-		tracksTable.getItems().setAll(playlist.getSongs());
+		tracksTable.getItems().setAll(playlist.searchSongs(searchField.getText()));
 	}
 
 	/**

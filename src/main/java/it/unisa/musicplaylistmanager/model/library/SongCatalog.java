@@ -1,7 +1,9 @@
 package it.unisa.musicplaylistmanager.model.library;
 
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
+import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 
 import java.util.*;
 
@@ -68,6 +70,36 @@ public class SongCatalog {
 	}
 
 	/**
+	 * Filtra le tracce del catalogo combinando testo, autore, genere, anno e tag.
+	 *
+	 * @param query
+	 *            testo da cercare nel titolo; se vuoto non viene applicato
+	 * @param genre
+	 *            genere richiesto; se null non viene applicato
+	 * @param author
+	 *            autore richiesto; se vuoto non viene applicato
+	 * @param year
+	 *            anno richiesto; se null non viene applicato
+	 * @param tag
+	 *            tag richiesto; se null non viene applicato
+	 * @return lista delle tracce compatibili con i criteri indicati
+	 */
+	public List<Song> filterSongs(String query, Genre genre, String author, Integer year, Tag tag) {
+		String normalizedQuery = query == null ? "" : query.trim().toLowerCase();
+		String normalizedAuthor = author == null ? "" : author.trim().toLowerCase();
+
+		return songs.values().stream()
+				.filter(song -> normalizedQuery.isEmpty()
+						|| song.getTitle().toLowerCase().contains(normalizedQuery))
+				.filter(song -> genre == null || song.getGenre() == genre)
+				.filter(song -> normalizedAuthor.isEmpty()
+						|| song.getAuthor().toLowerCase().equals(normalizedAuthor))
+				.filter(song -> year == null || song.getYear() == year)
+				.filter(song -> tag == null || song.hasTag(tag))
+				.toList();
+	}
+
+	/**
 	 * Verifica se una traccia è presente nel catalogo.
 	 *
 	 * @param song
@@ -87,7 +119,7 @@ public class SongCatalog {
 	 */
 	public List<Song> getAllSongs() {
 
-		return Collections.unmodifiableList(songs.values().stream().toList());
+		return songs.values().stream().toList();
 	}
 
 	public Song getSongById(UUID id) {
