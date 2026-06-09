@@ -81,6 +81,8 @@ public class PlaybackController implements EventListener {
 		progressSlider.setMouseTransparent(true);
 		progressSlider.setFocusTraversable(false);
 
+        playCountLabel.setText("0 riproduzioni totali");
+
 		if (currentPlayable != null) {
 			subscribeToCurrentPlayable();
 			updatePlayableInfo(currentPlayable);
@@ -136,6 +138,7 @@ public class PlaybackController implements EventListener {
 			currentTimeLabel.setText("0:00");
 			progressSlider.setMax(1);
 			progressSlider.setValue(0);
+            playCountLabel.setText("0 riproduzioni totali");
 			return;
 		}
 
@@ -147,6 +150,8 @@ public class PlaybackController implements EventListener {
 
 		progressSlider.setMax(1);
 		progressSlider.setValue(0);
+
+        playCountLabel.setText(currentSong.getPlayCount() + " riproduzioni totali.");
 	}
 
 	private void updatePlayPauseButton() {

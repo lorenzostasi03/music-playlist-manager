@@ -45,6 +45,7 @@ public class SongPlayable extends Playable {
 	public void play() {
 		subscribeToAudioCompleted();
 		audioPlayer.play(song.getFilePath());
+        song.incrementPlayCount();
 	}
 
 	/**
