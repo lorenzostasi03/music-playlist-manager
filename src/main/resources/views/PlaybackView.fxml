@@ -63,7 +63,7 @@
 
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0A0A0A; -fx-background-color: transparent; -fx-control-inner-background: #0A0A0A; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
             <content>
-                <VBox fx:id="queueView" style="-fx-padding: 0 10 0 10;" />
+                <VBox fx:id="queueView" style="-fx-padding: 0 5 0 5;" />
             </content>
         </ScrollPane>
     </VBox>
