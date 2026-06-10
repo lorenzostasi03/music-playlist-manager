@@ -58,6 +58,7 @@ public class CatalogController {
 	private final AppContext appContext = AppContext.getInstance();
 
 	private final String ALL = "TUTTI";
+	private boolean updatingFilters;
 
 	/**
 	 * Inizializza il controller configurando i filtri di ricerca e caricando la
@@ -69,6 +70,12 @@ public class CatalogController {
 
 		initGenreFilter();
 		initTagFilter();
+
+		searchField.textProperty().addListener((observable, oldValue, newValue) -> refreshCatalog());
+		genreFilter.setOnAction(event -> refreshCatalogIfReady());
+		authorFilter.setOnAction(event -> refreshCatalogIfReady());
+		yearFilter.setOnAction(event -> refreshCatalogIfReady());
+		tagFilter.setOnAction(event -> refreshCatalogIfReady());
 
 		refreshCatalog();
 	}
@@ -87,7 +94,7 @@ public class CatalogController {
 	 */
 	private void initGenreFilter() {
 		genreFilter.getItems().addFirst(ALL);
-		genreFilter.getItems().addAll(Arrays.stream(Genre.values()).map(Genre::name).toList());
+		genreFilter.getItems().addAll(Arrays.stream(Genre.values()).map(Genre::getLabel).toList());
 		genreFilter.setValue(ALL);
 	}
 
@@ -96,7 +103,7 @@ public class CatalogController {
 	 */
 	private void initTagFilter() {
 		tagFilter.getItems().addFirst(ALL);
-		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::name).toList());
+		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getDisplayName).toList());
 		tagFilter.setValue(ALL);
 	}
 
@@ -137,7 +144,7 @@ public class CatalogController {
 	 * @return un oggetto HBox formattato contenente le informazioni e i comandi
 	 *         della traccia
 	 */
-	private HBox createSongRow(Song song) {
+	private VBox createSongRow(Song song) {
 		Button playButton = createButton("▶", "Riproduci traccia", () -> playSong(song));
 
 		Button enqueueButton = createButton("+", "Aggiungi traccia alla coda", () -> enqueueSong(song));
@@ -148,23 +155,34 @@ public class CatalogController {
 
 		Label titleLabel = new Label(song.getTitle());
 		titleLabel.getStyleClass().add("row-title");
-		titleLabel.setMinWidth(160);
-		titleLabel.setPrefWidth(160);
-		titleLabel.setMaxWidth(160);
+		titleLabel.setMinWidth(125);
+		titleLabel.setPrefWidth(125);
+		titleLabel.setMaxWidth(125);
 		titleLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
 
-		Label authorLabel = createMetaLabel(song.getAuthor(), 85);
-		Label genreLabel = createMetaLabel(song.getGenre().name(), 65);
-		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 50);
-		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 55);
+		Label authorLabel = createMetaLabel(song.getAuthor(), 60);
+		Label genreLabel = createMetaLabel(song.getGenre().getLabel(), 55);
+		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 40);
+		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 60);
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-		HBox row = new HBox(8, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
-		enqueueButton, editButton, deleteButton);
+		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
+				enqueueButton, editButton, deleteButton);
 
+		mainRow.setMaxWidth(Double.MAX_VALUE);
+
+		Label tagsLabel = new Label("Tag: " + formatTags(song));
+		tagsLabel.getStyleClass().add("row-meta");
+		tagsLabel.setWrapText(true);
+		tagsLabel.setMaxWidth(Double.MAX_VALUE);
+		tagsLabel.setStyle("-fx-text-fill: #1DB954; -fx-font-size: 11px; -fx-padding: 0 0 0 0;");
+
+		VBox row = new VBox(4, mainRow, tagsLabel);
 		row.getStyleClass().add("list-row");
+		row.setMaxWidth(Double.MAX_VALUE);
+
 		return row;
 	}
 
@@ -172,9 +190,9 @@ public class CatalogController {
 		Button button = new Button(text);
 		button.getStyleClass().add("row-action");
 		button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
-		button.setMinWidth(32);
-		button.setPrefWidth(32);
-		button.setMaxWidth(32);
+		button.setMinWidth(24);
+		button.setPrefWidth(24);
+		button.setMaxWidth(24);
 		button.setOnAction(event -> {
 			event.consume();
 			action.run();
@@ -200,6 +218,7 @@ public class CatalogController {
 		label.setPrefWidth(width);
 		label.setMaxWidth(width);
 		label.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+
 		return label;
 	}
 
@@ -248,7 +267,9 @@ public class CatalogController {
 	 * valida, altrimenti reimposta su "TUTTI".
 	 */
 	private void refreshFilterValues() {
-		List<Song> songs = getSongs();
+		updatingFilters = true;
+
+		List<Song> songs = appContext.getMusicLibrary().getAllSongs();
 
 		String selectedAuthor = authorFilter.getValue();
 		String selectedYear = yearFilter.getValue();
@@ -258,6 +279,8 @@ public class CatalogController {
 
 		updateComboBox(authorFilter, authors, selectedAuthor);
 		updateComboBox(yearFilter, years, selectedYear);
+
+		updatingFilters = false;
 	}
 
 	private List<String> extractAuthors(List<Song> songs) {
@@ -286,6 +309,12 @@ public class CatalogController {
 		}
 	}
 
+	private void refreshCatalogIfReady() {
+		if (!updatingFilters) {
+			refreshCatalog();
+		}
+	}
+
 	/**
 	 * Apre la schermata di riproduzione e avvia la traccia selezionata.
 	 *
@@ -308,6 +337,52 @@ public class CatalogController {
 	 * @return lista dei brani.
 	 */
 	private List<Song> getSongs() {
-		return appContext.getMusicLibrary().getAllSongs();
+		return appContext.getMusicLibrary().filterSongs(searchField.getText(), parseSelectedGenre(),
+				parseSelectedAuthor(), parseSelectedYear(), parseSelectedTag());
+	}
+
+	private Genre parseSelectedGenre() {
+		String value = genreFilter.getValue();
+		if (value == null || ALL.equals(value)) {
+			return null;
+		}
+
+		return Genre.fromLabel(value);
+	}
+
+	private String parseSelectedAuthor() {
+		String value = authorFilter.getValue();
+		if (value == null || ALL.equals(value)) {
+			return null;
+		}
+
+		return value;
+	}
+
+	private Integer parseSelectedYear() {
+		String value = yearFilter.getValue();
+		if (value == null || ALL.equals(value)) {
+			return null;
+		}
+
+		return Integer.parseInt(value);
+	}
+
+	private Tag parseSelectedTag() {
+		String value = tagFilter.getValue();
+		if (value == null || ALL.equals(value)) {
+			return null;
+		}
+
+		return Arrays.stream(Tag.values()).filter(tag -> tag.getDisplayName().equals(value)).findFirst()
+				.orElseThrow(() -> new IllegalArgumentException("Tag non valido: " + value));
+	}
+
+	private String formatTags(Song song) {
+		if (song.getTags().isEmpty()) {
+			return "-";
+		}
+
+		return song.getTags().stream().map(Tag::getDisplayName).collect(Collectors.joining(", "));
 	}
 }

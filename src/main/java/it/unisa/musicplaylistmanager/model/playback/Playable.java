@@ -23,10 +23,9 @@ public abstract class Playable implements EventListener {
 		this.events = new EventManager();
 	}
 
-
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public abstract String getTitle();
 
@@ -71,4 +70,6 @@ public abstract class Playable implements EventListener {
 	public abstract void setPlaybackMode(PlaybackMode mode);
 
 	public abstract PlaybackMode getPlaybackMode();
+
+	protected abstract void updatePlayCount();
 }

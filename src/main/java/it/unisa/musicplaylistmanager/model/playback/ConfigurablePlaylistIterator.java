@@ -10,8 +10,10 @@ import java.util.UUID;
 /**
  * Iteratore configurabile per la riproduzione di una playlist.
  *
- * <p>L'iteratore lavora sulla playlist aggiornata e mantiene lo stato
- * della sessione di riproduzione.</p>
+ * <p>
+ * L'iteratore lavora sulla playlist aggiornata e mantiene lo stato della
+ * sessione di riproduzione.
+ * </p>
  */
 public class ConfigurablePlaylistIterator implements PlaylistIterator {
 

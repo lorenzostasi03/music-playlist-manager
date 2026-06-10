@@ -16,10 +16,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,6 +61,14 @@ public class HomeController {
 	private ListView<Playlist> playlistListView;
 
 	private final AppContext appContext = AppContext.getInstance();
+
+	private List<Playlist> playlists;
+
+	private Playlist topSongs;
+	private final int TOP_SONGS = 10;
+
+	private List<Playlist> topPlaylists;
+	private final int TOP_PLAYLISTS = 3;
 
 	/**
 	 * Inizializza il controller configurando la lista delle playlist e caricando i
@@ -123,6 +133,7 @@ public class HomeController {
 	@FXML
 	private void onListViewClicked() {
 	}
+
 	/**
 	 * Crea un componente grafico che rappresenta visivamente una singola playlist
 	 * all'interno della ListView, includendo metadati e pulsanti di azione.
@@ -132,6 +143,8 @@ public class HomeController {
 	 * @return un oggetto HBox configurato con le informazioni della playlist
 	 */
 	private HBox createPlaylistRow(Playlist playlist) {
+		boolean storedPlaylist = playlists.contains(playlist);
+
 		Label nameLabel = new Label(playlist.getName());
 		nameLabel.getStyleClass().add("row-title");
 		nameLabel.setMinWidth(0);
@@ -156,13 +169,30 @@ public class HomeController {
 		playCountLabel.setPrefWidth(90);
 		playCountLabel.setMaxWidth(90);
 
+		if (!storedPlaylist) {
+			playCountLabel.setText("");
+		}
+
 		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
 		Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
-		Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
-		Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
 
-		HBox row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
-				renameButton, deleteButton);
+		HBox row;
+
+		if (storedPlaylist) {
+			Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
+			Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
+
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+					renameButton, deleteButton);
+		} else {
+			Region actionPlaceholder = new Region();
+			actionPlaceholder.setMinWidth(72);
+			actionPlaceholder.setPrefWidth(72);
+			actionPlaceholder.setMaxWidth(72);
+
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+					actionPlaceholder);
+		}
 
 		row.getStyleClass().add("list-row");
 		row.setMaxWidth(Double.MAX_VALUE);
@@ -190,17 +220,26 @@ public class HomeController {
 	 * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
 	 */
 	private void refreshPlaylists() {
-		List<Playlist> playlists = appContext.getMusicLibrary().getAllPlaylists();
+		playlists = appContext.getMusicLibrary().getAllPlaylists();
+		topSongs = refreshTopSongs();
 
-		playlistListView.getItems().setAll(playlists);
-		countLabel.setText(playlists.size() + " playlist");
+		playlistListView.getItems().clear();
 
-		boolean empty = playlists.isEmpty();
+		if (topSongs != null) {
+			playlistListView.getItems().add(topSongs);
+		}
+
+		playlistListView.getItems().addAll(playlists);
+
+		countLabel.setText(playlistListView.getItems().size() + " playlist");
+
+		boolean empty = playlistListView.getItems().isEmpty();
 		emptyStateBox.setVisible(empty);
 		emptyStateBox.setManaged(empty);
 		playlistListView.setVisible(!empty);
 		playlistListView.setManaged(!empty);
 	}
+
 	/**
 	 * Calcola la durata totale di una playlist sommando la durata dei singoli brani
 	 * e la formatta in una stringa (minuti:secondi).
@@ -237,6 +276,37 @@ public class HomeController {
 		} catch (PersistenceException | IllegalArgumentException e) {
 			AlertManager.showError(e.getMessage());
 		}
+	}
+
+	/**
+	 * Ricrea la playlist contenente i brani più riprodotti.
+	 *
+	 * @return playlist con i brani più riprodotti.
+	 */
+	private Playlist refreshTopSongs() {
+		List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
+		if (songs.isEmpty())
+			return null;
+
+		Playlist playlist = new Playlist("Top " + TOP_SONGS);
+
+		for (Song song : songs)
+			playlist.addSong(song);
+
+		return playlist;
+	}
+
+	/**
+	 * Ricrea la lista delle playlist più riprodotte.
+	 *
+	 * @return lista delle playlist più riprodotte.
+	 */
+	private List<Playlist> refreshTopPlaylists() {
+		List<Playlist> playlists = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
+		if (playlists.isEmpty())
+			return null;
+
+		return new ArrayList<>(playlists);
 	}
 
 	/**
@@ -290,7 +360,7 @@ public class HomeController {
 		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
-		private void enqueuePlaylist(Playlist playlist) {
+	private void enqueuePlaylist(Playlist playlist) {
 		if (playlist == null || playlist.size() == 0) {
 			AlertManager.showError("La playlist è vuota.");
 			return;

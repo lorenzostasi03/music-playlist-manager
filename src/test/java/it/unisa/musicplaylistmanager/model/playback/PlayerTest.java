@@ -159,6 +159,11 @@ class PlayerTest {
 		}
 
 		@Override
+		protected void updatePlayCount() {
+			return;
+		}
+
+		@Override
 		public void update(EventType eventType) {
 		}
 	}

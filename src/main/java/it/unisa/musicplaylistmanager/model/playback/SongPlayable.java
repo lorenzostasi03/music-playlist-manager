@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
 /**
@@ -37,7 +38,7 @@ public class SongPlayable extends Playable {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public String getTitle() {
@@ -55,6 +56,7 @@ public class SongPlayable extends Playable {
 	public void play() {
 		subscribeToAudioCompleted();
 		audioPlayer.play(song.getFilePath());
+		updatePlayCount();
 	}
 
 	/**
@@ -93,6 +95,12 @@ public class SongPlayable extends Playable {
 		return song;
 	}
 
+	@Override
+	protected void updatePlayCount() {
+		song.incrementPlayCount();
+		AppContext.getInstance().getMusicLibrary().updateSongPlayCount(song);
+	}
+
 	/**
 	 * Gestisce gli eventi ricevuti dal player audio.
 	 *
@@ -111,6 +119,8 @@ public class SongPlayable extends Playable {
 
 		if (playbackMode == PlaybackMode.LOOP) {
 			audioPlayer.play(song.getFilePath());
+			updatePlayCount();
+			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
 			return;
 		}
 
@@ -122,6 +132,7 @@ public class SongPlayable extends Playable {
 	public boolean skipToNextSong() {
 		if (playbackMode == PlaybackMode.LOOP) {
 			audioPlayer.play(song.getFilePath());
+			updatePlayCount();
 			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
 			return true;
 		}

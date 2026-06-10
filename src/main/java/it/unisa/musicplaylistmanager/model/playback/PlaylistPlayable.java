@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
@@ -32,12 +33,10 @@ public class PlaylistPlayable extends Playable {
 		this.subscribed = false;
 	}
 
-
 	@Override
 	public String getTitle() {
 		return playlist.getName();
 	}
-
 
 	@Override
 	public void play() {
@@ -45,6 +44,7 @@ public class PlaylistPlayable extends Playable {
 
 		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
 		playNextSong();
+		updatePlayCount();
 	}
 
 	@Override
@@ -69,6 +69,12 @@ public class PlaylistPlayable extends Playable {
 	@Override
 	public Song getCurrentSong() {
 		return currentSong;
+	}
+
+	@Override
+	protected void updatePlayCount() {
+		playlist.incrementPlayCount();
+		AppContext.getInstance().getMusicLibrary().updatePlaylistPlayCount(playlist);
 	}
 
 	@Override
@@ -125,6 +131,7 @@ public class PlaylistPlayable extends Playable {
 		}
 
 		audioPlayer.play(currentSong.getFilePath());
+		updateCurrentSongPlayCount();
 		getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
 
 		return true;
@@ -133,6 +140,11 @@ public class PlaylistPlayable extends Playable {
 	@Override
 	public boolean skipToNextSong() {
 		return playNextSong();
+	}
+
+	private void updateCurrentSongPlayCount() {
+		currentSong.incrementPlayCount();
+		AppContext.getInstance().getMusicLibrary().updateSongPlayCount(currentSong);
 	}
 
 	private void subscribeToAudioPlayer() {

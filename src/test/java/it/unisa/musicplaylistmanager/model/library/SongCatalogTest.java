@@ -3,6 +3,7 @@ package it.unisa.musicplaylistmanager.model.library;
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -136,5 +137,54 @@ class SongCatalogTest {
 	@Test
 	void testContainsNull() {
 		assertFalse(catalog.contains(null));
+	}
+	/**
+	 * Verifica che la ricerca sia case-insensitive.
+	 */
+	@Test
+	void testRicercaCaseInsensitive() {
+		catalog.addSong(song1);
+		List<Song> result = catalog.searchSong("BOHEMIAN");
+		assertEquals(1, result.size());
+		assertTrue(result.contains(song1));
+	}
+
+	/**
+	 * Verifica il filtro combinato per titolo, genere, autore, anno e tag.
+	 */
+	@Test
+	void testFiltroCombinatoPerMetadatiETag() {
+		song1.addTag(Tag.FAVOURITE);
+		catalog.addSong(song1);
+		catalog.addSong(song2);
+
+		List<Song> result = catalog.filterSongs("bohemian", Genre.ROCK, "Queen", 1975, Tag.FAVOURITE);
+
+		assertEquals(1, result.size());
+		assertTrue(result.contains(song1));
+	}
+
+	/**
+	 * Verifica che senza filtri vengano restituite tutte le tracce.
+	 */
+	@Test
+	void testFiltroSenzaCriteriRestituisceTutto() {
+		catalog.addSong(song1);
+		catalog.addSong(song2);
+
+		List<Song> result = catalog.filterSongs("", null, null, null, null);
+
+		assertEquals(2, result.size());
+		assertTrue(result.containsAll(List.of(song1, song2)));
+	}
+
+	/**
+	 * Verifica che un filtro senza corrispondenze restituisca una lista vuota.
+	 */
+	@Test
+	void testFiltroNessunRisultato() {
+		catalog.addSong(song1);
+		List<Song> result = catalog.filterSongs("", Genre.JAZZ, null, null, null);
+		assertTrue(result.isEmpty());
 	}
 }

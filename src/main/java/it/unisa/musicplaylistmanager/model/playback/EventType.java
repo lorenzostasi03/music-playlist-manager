@@ -21,8 +21,8 @@ public enum EventType {
 	CURRENT_PLAYABLE_CHANGED,
 
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	QUEUE_CHANGED,
 

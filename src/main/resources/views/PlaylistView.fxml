@@ -28,7 +28,7 @@
     </VBox>
     <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
-        <TextField fx:id="searchField" disable="true" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
+        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
         <Separator orientation="VERTICAL" style="-fx-opacity: 0;" />
         <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Ordina per:" />
         <ComboBox fx:id="sortComboBox" disable="true" onAction="#onSortChanged" promptText="—" styleClass="dark-combo" />
@@ -39,13 +39,13 @@
         <TableView fx:id="tracksTable" VBox.vgrow="ALWAYS" style="-fx-background-color: #000000; -fx-control-inner-background: #000000; -fx-table-cell-border-color: #121212; -fx-padding: 5;">
             <placeholder><Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 16px;" text="Nessuna traccia trovata" /></placeholder>
             <columns>
-                <TableColumn fx:id="indexColumn" prefWidth="40" text="#" />
-                <TableColumn fx:id="titleColumn" prefWidth="200" text="Titolo" />
-                <TableColumn fx:id="authorColumn" prefWidth="150" text="Autore" />
-                <TableColumn fx:id="durationColumn" prefWidth="70" text="Durata" />
-                <TableColumn fx:id="genreColumn" prefWidth="100" text="Genere" />
-                <TableColumn fx:id="yearColumn" prefWidth="60" text="Anno" />
-                <TableColumn fx:id="tagsColumn" prefWidth="120" text="Tag" />
+                <TableColumn fx:id="indexColumn" prefWidth="35" text="#" />
+                <TableColumn fx:id="titleColumn" prefWidth="120" text="Titolo" />
+                <TableColumn fx:id="authorColumn" prefWidth="100" text="Autore" />
+                <TableColumn fx:id="durationColumn" prefWidth="60" text="Durata" />
+                <TableColumn fx:id="genreColumn" prefWidth="80" text="Genere" />
+                <TableColumn fx:id="yearColumn" prefWidth="45" text="Anno" />
+                <TableColumn fx:id="tagsColumn" prefWidth="220" text="Tag" />
             </columns>
         </TableView>
     </StackPane>

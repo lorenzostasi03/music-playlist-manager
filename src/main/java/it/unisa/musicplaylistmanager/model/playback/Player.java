@@ -128,7 +128,6 @@ public class Player implements EventListener {
 		stopCurrentPlayable();
 		playNextFromQueue();
 	}
-	
 
 	/**
 	 * Restituisce lo stato corrente del player.

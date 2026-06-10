@@ -85,6 +85,7 @@ public class PlaybackController implements EventListener {
 		progressSlider.setFocusTraversable(false);
 
 		queueView.setSpacing(8);
+		playCountLabel.setText("0 riproduzioni totali");
 
 		if (currentPlayable != null) {
 			subscribeToCurrentPlayable();
@@ -162,6 +163,7 @@ public class PlaybackController implements EventListener {
 			currentTimeLabel.setText("0:00");
 			progressSlider.setMax(1);
 			progressSlider.setValue(0);
+			playCountLabel.setText("0 riproduzioni totali");
 			return;
 		}
 
@@ -173,6 +175,8 @@ public class PlaybackController implements EventListener {
 
 		progressSlider.setMax(1);
 		progressSlider.setValue(0);
+
+		playCountLabel.setText(currentSong.getPlayCount() + " riproduzioni totali");
 	}
 
 	private void updatePlayPauseButton() {
@@ -223,6 +227,8 @@ public class PlaybackController implements EventListener {
 			trackTitleLabel.setText("Nessuna traccia");
 			trackArtistLabel.setText("");
 			totalTimeLabel.setText("0:00");
+			currentTimeLabel.setText("0:00");
+			playCountLabel.setText("0 riproduzioni totali");
 			playPauseButton.setText("Play");
 			return;
 		}
@@ -272,8 +278,8 @@ public class PlaybackController implements EventListener {
 	private Label createQueueHeaderLabel(String text) {
 		Label label = new Label(text);
 		label.setMaxWidth(Double.MAX_VALUE);
-		label.setStyle("-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; "
-				+ "-fx-padding: 12 0 4 0;");
+		label.setStyle(
+				"-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: bold; " + "-fx-padding: 12 0 4 0;");
 		return label;
 	}
 
@@ -388,7 +394,7 @@ public class PlaybackController implements EventListener {
 		player.skipPlayable();
 	}
 
-		@FXML
+	@FXML
 	private void onSequential() {
 		setCurrentPlaybackMode(PlaybackMode.SEQUENTIAL);
 	}
