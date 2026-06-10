@@ -11,6 +11,7 @@ public class PlaylistPlayable extends Playable {
 	private PlaylistIterator iterator;
 	private PlaylistIteratorStrategy iteratorStrategy;
 	private Song currentSong;
+	private PlaybackMode playbackMode;
 	private boolean subscribed;
 
 	public PlaylistPlayable(Playlist playlist) {
@@ -27,6 +28,7 @@ public class PlaylistPlayable extends Playable {
 		this.iteratorStrategy = new SequentialIteratorStrategy();
 		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
 		this.currentSong = null;
+		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.subscribed = false;
 	}
 
@@ -50,6 +52,7 @@ public class PlaylistPlayable extends Playable {
 
 	@Override
 	public void stop() {
+		audioPlayer.setLoopMode(false);
 		audioPlayer.stop();
 		unsubscribeFromAudioPlayer();
 
@@ -62,9 +65,48 @@ public class PlaylistPlayable extends Playable {
 		return currentSong;
 	}
 
+	/**
+	 * Passa manualmente al brano successivo della playlist.
+	 */
+	@Override
+	public void skipNext() {
+		playNextSong();
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione della playlist.
+	 *
+	 * @param playbackMode
+	 *            modalita' scelta dall'utente
+	 */
+	@Override
+	public void setPlaybackMode(PlaybackMode playbackMode) {
+		if (playbackMode == null) {
+			throw new IllegalArgumentException("Playback mode cannot be null.");
+		}
+
+		this.playbackMode = playbackMode;
+		setIteratorStrategy(strategyFor(playbackMode));
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
+	}
+
+	/**
+	 * Restituisce la modalita' di riproduzione attiva.
+	 *
+	 * @return modalita' corrente
+	 */
+	@Override
+	public PlaybackMode getPlaybackMode() {
+		return playbackMode;
+	}
+
 	@Override
 	public void update(EventType eventType) {
 		if (eventType != EventType.AUDIO_COMPLETED) {
+			return;
+		}
+
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
 			return;
 		}
 
@@ -92,8 +134,17 @@ public class PlaylistPlayable extends Playable {
 			return;
 		}
 
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 		audioPlayer.play(currentSong.getFilePath());
 		getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+	}
+
+	private PlaylistIteratorStrategy strategyFor(PlaybackMode playbackMode) {
+		if (playbackMode == PlaybackMode.LOOP_PLAYLIST) {
+			return new LoopIteratorStrategy();
+		}
+
+		return new SequentialIteratorStrategy();
 	}
 
 	private void subscribeToAudioPlayer() {

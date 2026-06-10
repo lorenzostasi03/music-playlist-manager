@@ -118,6 +118,36 @@ public class Player implements EventListener {
 	}
 
 	/**
+	 * Richiede al riproducibile corrente di passare alla traccia successiva.
+	 */
+	public void skipNext() {
+		if (currentPlayable != null) {
+			currentPlayable.skipNext();
+		}
+	}
+
+	/**
+	 * Richiede al riproducibile corrente di passare alla traccia precedente.
+	 */
+	public void skipPrevious() {
+		if (currentPlayable != null) {
+			currentPlayable.skipPrevious();
+		}
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione del riproducibile corrente.
+	 *
+	 * @param playbackMode
+	 *            modalita' da applicare
+	 */
+	public void setPlaybackMode(PlaybackMode playbackMode) {
+		if (currentPlayable != null) {
+			currentPlayable.setPlaybackMode(playbackMode);
+		}
+	}
+
+	/**
 	 * Restituisce lo stato corrente del player.
 	 *
 	 * @return stato corrente del player
@@ -192,6 +222,7 @@ public class Player implements EventListener {
 	private void finishCurrentPlayable() {
 		if (currentPlayable != null) {
 			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
+			currentPlayable.stop();
 			currentPlayable = null;
 		}
 	}

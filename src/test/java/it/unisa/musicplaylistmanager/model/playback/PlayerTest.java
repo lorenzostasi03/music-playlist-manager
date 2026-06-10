@@ -1,7 +1,6 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -85,7 +84,7 @@ class PlayerTest {
 		player.play(playable);
 		playable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 
-		assertFalse(playable.stopCalled);
+		assertTrue(playable.stopCalled);
 		assertEquals(PlayerState.STOPPED, player.getState());
 		assertNull(player.getCurrentPlayable());
 	}
@@ -101,7 +100,7 @@ class PlayerTest {
 
 		firstPlayable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 
-		assertFalse(firstPlayable.stopCalled);
+		assertTrue(firstPlayable.stopCalled);
 		assertTrue(secondPlayable.playCalled);
 		assertEquals(PlayerState.PLAYING, player.getState());
 		assertSame(secondPlayable, player.getCurrentPlayable());
