@@ -1,7 +1,7 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
 /**
- * Modalita' disponibili per la riproduzione.
+ * Definisce le modalita' di riproduzione applicabili a un oggetto riproducibile.
  */
 public enum PlaybackMode {
 	/**
@@ -17,5 +17,10 @@ public enum PlaybackMode {
 	/**
 	 * Riparte dalla prima traccia dopo la fine della playlist.
 	 */
-	LOOP_PLAYLIST
+	LOOP_PLAYLIST,
+
+	/**
+	 * Riproduce i brani della playlist in ordine casuale.
+	 */
+	SHUFFLE
 }

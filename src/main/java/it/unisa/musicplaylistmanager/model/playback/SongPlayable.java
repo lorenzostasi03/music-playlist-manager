@@ -23,7 +23,7 @@ public class SongPlayable extends Playable {
 	 * @param song
 	 *            traccia da rendere riproducibile
 	 * @throws IllegalArgumentException
-	 *             se la traccia è {@code null}
+	 *             se la traccia e' {@code null}
 	 */
 	public SongPlayable(Song song) {
 		if (song == null) {
@@ -37,11 +37,21 @@ public class SongPlayable extends Playable {
 	}
 
 	/**
+	 * Restituisce il titolo della traccia.
+	 *
+	 * @return titolo del brano
+	 */
+	@Override
+	public String getTitle() {
+		return song.getTitle();
+	}
+
+	/**
 	 * Avvia la riproduzione della traccia.
 	 *
 	 * <p>
 	 * L'oggetto si registra agli eventi di completamento audio prima di avviare la
-	 * riproduzione, così da poter notificare il completamento del riproducibile.
+	 * riproduzione, cosi' da poter notificare il completamento del riproducibile.
 	 */
 	@Override
 	public void play() {
@@ -87,19 +97,36 @@ public class SongPlayable extends Playable {
 		return song;
 	}
 
+	@Override
+	public boolean skipToNextSong() {
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
+			audioPlayer.setLoopMode(true);
+			audioPlayer.play(song.getFilePath());
+			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Imposta la modalita' di riproduzione della traccia.
 	 *
-	 * @param playbackMode
+	 * @param mode
 	 *            modalita' da applicare
 	 */
 	@Override
-	public void setPlaybackMode(PlaybackMode playbackMode) {
-		if (playbackMode == null) {
+	public void setPlaybackMode(PlaybackMode mode) {
+		if (mode == null) {
 			throw new IllegalArgumentException("Playback mode cannot be null.");
 		}
 
-		this.playbackMode = playbackMode;
+		if (mode == PlaybackMode.SHUFFLE || mode == PlaybackMode.LOOP_PLAYLIST) {
+			this.playbackMode = PlaybackMode.SEQUENTIAL;
+		} else {
+			this.playbackMode = mode;
+		}
+
 		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 	}
 
@@ -125,19 +152,21 @@ public class SongPlayable extends Playable {
 	 */
 	@Override
 	public void update(EventType eventType) {
-		if (eventType == EventType.AUDIO_COMPLETED) {
-			if (playbackMode == PlaybackMode.LOOP_TRACK) {
-				return;
-			}
-
-			unsubscribeFromAudioCompleted();
-			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+		if (eventType != EventType.AUDIO_COMPLETED) {
+			return;
 		}
+
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
+			return;
+		}
+
+		unsubscribeFromAudioCompleted();
+		getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 	}
 
 	/**
 	 * Registra questo oggetto come listener degli eventi di completamento audio, se
-	 * non è già registrato.
+	 * non e' gia' registrato.
 	 */
 	private void subscribeToAudioCompleted() {
 		if (!subscribed) {

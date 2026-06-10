@@ -24,6 +24,13 @@ public abstract class Playable implements EventListener {
 	}
 
 	/**
+	 * Restituisce il titolo dell'elemento riproducibile.
+	 *
+	 * @return titolo mostrato nella coda di riproduzione
+	 */
+	public abstract String getTitle();
+
+	/**
 	 * Restituisce il gestore degli eventi associato all'oggetto riproducibile.
 	 *
 	 * @return event manager dell'oggetto riproducibile
@@ -60,32 +67,24 @@ public abstract class Playable implements EventListener {
 	public abstract Song getCurrentSong();
 
 	/**
-	 * Passa alla traccia successiva, se il riproducibile lo supporta.
-	 */
-	public void skipNext() {
-	}
-
-	/**
-	 * Passa alla traccia precedente, se il riproducibile lo supporta.
-	 */
-	public void skipPrevious() {
-	}
-
-	/**
-	 * Imposta la modalita' di riproduzione, se supportata.
+	 * Passa alla traccia successiva interna al riproducibile, se disponibile.
 	 *
-	 * @param playbackMode
+	 * @return {@code true} se il salto e' stato gestito dal riproducibile
+	 */
+	public abstract boolean skipToNextSong();
+
+	/**
+	 * Imposta la modalita' di riproduzione.
+	 *
+	 * @param mode
 	 *            modalita' da applicare
 	 */
-	public void setPlaybackMode(PlaybackMode playbackMode) {
-	}
+	public abstract void setPlaybackMode(PlaybackMode mode);
 
 	/**
 	 * Restituisce la modalita' di riproduzione corrente.
 	 *
 	 * @return modalita' corrente
 	 */
-	public PlaybackMode getPlaybackMode() {
-		return PlaybackMode.SEQUENTIAL;
-	}
+	public abstract PlaybackMode getPlaybackMode();
 }

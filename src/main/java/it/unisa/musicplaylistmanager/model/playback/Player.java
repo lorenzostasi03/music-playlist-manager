@@ -32,13 +32,13 @@ public class Player implements EventListener {
 	 * Avvia immediatamente la riproduzione dell'oggetto specificato.
 	 *
 	 * <p>
-	 * Se un altro oggetto è già in riproduzione, questo viene interrotto prima di
+	 * Se un altro oggetto e' gia' in riproduzione, questo viene interrotto prima di
 	 * avviare il nuovo oggetto. La coda di riproduzione non viene svuotata.
 	 *
 	 * @param playable
 	 *            oggetto da riprodurre
 	 * @throws IllegalArgumentException
-	 *             se l'oggetto riproducibile è {@code null}
+	 *             se l'oggetto riproducibile e' {@code null}
 	 */
 	public void play(Playable playable) {
 		if (playable == null) {
@@ -55,10 +55,11 @@ public class Player implements EventListener {
 	 * @param playable
 	 *            oggetto da aggiungere alla coda
 	 * @throws IllegalArgumentException
-	 *             se l'oggetto riproducibile è {@code null}
+	 *             se l'oggetto riproducibile e' {@code null}
 	 */
 	public void enqueue(Playable playable) {
 		queue.enqueue(playable);
+		notifyQueueChanged();
 	}
 
 	/**
@@ -66,6 +67,7 @@ public class Player implements EventListener {
 	 */
 	public void clearQueue() {
 		queue.clear();
+		notifyQueueChanged();
 	}
 
 	/**
@@ -78,7 +80,7 @@ public class Player implements EventListener {
 	}
 
 	/**
-	 * Mette in pausa la riproduzione corrente, se il player è in stato
+	 * Mette in pausa la riproduzione corrente, se il player e' in stato
 	 * {@link PlayerState#PLAYING}.
 	 */
 	public void pause() {
@@ -89,7 +91,7 @@ public class Player implements EventListener {
 	}
 
 	/**
-	 * Riprende la riproduzione corrente, se il player è in stato
+	 * Riprende la riproduzione corrente, se il player e' in stato
 	 * {@link PlayerState#PAUSED}.
 	 */
 	public void resume() {
@@ -109,30 +111,30 @@ public class Player implements EventListener {
 	}
 
 	/**
-	 * Salta l'oggetto riproducibile corrente e prova ad avviare il prossimo elemento
-	 * in coda.
+	 * Salta la traccia corrente se il riproducibile lo supporta; altrimenti passa
+	 * al prossimo elemento della coda.
 	 */
-	public void skip() {
+	public void skipSong() {
+		if (currentPlayable == null) {
+			playNextFromQueue();
+			return;
+		}
+
+		boolean skippedInsidePlayable = currentPlayable.skipToNextSong();
+
+		if (!skippedInsidePlayable) {
+			stopCurrentPlayable();
+			playNextFromQueue();
+		}
+	}
+
+	/**
+	 * Salta l'intero oggetto riproducibile corrente e prova ad avviare il prossimo
+	 * elemento in coda.
+	 */
+	public void skipPlayable() {
 		stopCurrentPlayable();
 		playNextFromQueue();
-	}
-
-	/**
-	 * Richiede al riproducibile corrente di passare alla traccia successiva.
-	 */
-	public void skipNext() {
-		if (currentPlayable != null) {
-			currentPlayable.skipNext();
-		}
-	}
-
-	/**
-	 * Richiede al riproducibile corrente di passare alla traccia precedente.
-	 */
-	public void skipPrevious() {
-		if (currentPlayable != null) {
-			currentPlayable.skipPrevious();
-		}
 	}
 
 	/**
@@ -159,7 +161,7 @@ public class Player implements EventListener {
 	/**
 	 * Restituisce l'oggetto attualmente gestito dal player.
 	 *
-	 * @return oggetto riproducibile corrente, oppure {@code null} se non è presente
+	 * @return oggetto riproducibile corrente, oppure {@code null} se non e' presente
 	 *         alcuna riproduzione
 	 */
 	public Playable getCurrentPlayable() {
@@ -200,6 +202,7 @@ public class Player implements EventListener {
 
 	private void playNextFromQueue() {
 		Playable nextPlayable = queue.dequeue();
+		notifyQueueChanged();
 
 		if (nextPlayable == null) {
 			currentPlayable = null;
@@ -229,5 +232,9 @@ public class Player implements EventListener {
 
 	private void notifyCurrentPlayableChanged() {
 		events.notifyListeners(EventType.CURRENT_PLAYABLE_CHANGED);
+	}
+
+	private void notifyQueueChanged() {
+		events.notifyListeners(EventType.QUEUE_CHANGED);
 	}
 }

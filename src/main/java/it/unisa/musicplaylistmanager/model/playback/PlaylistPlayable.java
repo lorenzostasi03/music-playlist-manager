@@ -33,6 +33,11 @@ public class PlaylistPlayable extends Playable {
 	}
 
 	@Override
+	public String getTitle() {
+		return playlist.getName();
+	}
+
+	@Override
 	public void play() {
 		subscribeToAudioPlayer();
 
@@ -65,41 +70,6 @@ public class PlaylistPlayable extends Playable {
 		return currentSong;
 	}
 
-	/**
-	 * Passa manualmente al brano successivo della playlist.
-	 */
-	@Override
-	public void skipNext() {
-		playNextSong();
-	}
-
-	/**
-	 * Imposta la modalita' di riproduzione della playlist.
-	 *
-	 * @param playbackMode
-	 *            modalita' scelta dall'utente
-	 */
-	@Override
-	public void setPlaybackMode(PlaybackMode playbackMode) {
-		if (playbackMode == null) {
-			throw new IllegalArgumentException("Playback mode cannot be null.");
-		}
-
-		this.playbackMode = playbackMode;
-		setIteratorStrategy(strategyFor(playbackMode));
-		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
-	}
-
-	/**
-	 * Restituisce la modalita' di riproduzione attiva.
-	 *
-	 * @return modalita' corrente
-	 */
-	@Override
-	public PlaybackMode getPlaybackMode() {
-		return playbackMode;
-	}
-
 	@Override
 	public void update(EventType eventType) {
 		if (eventType != EventType.AUDIO_COMPLETED) {
@@ -110,7 +80,42 @@ public class PlaylistPlayable extends Playable {
 			return;
 		}
 
-		playNextSong();
+		if (!playNextSong()) {
+			unsubscribeFromAudioPlayer();
+			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+		}
+	}
+
+	@Override
+	public boolean skipToNextSong() {
+		return playNextSong();
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione della playlist.
+	 *
+	 * @param mode
+	 *            modalita' scelta dall'utente
+	 */
+	@Override
+	public void setPlaybackMode(PlaybackMode mode) {
+		if (mode == null) {
+			throw new IllegalArgumentException("Playback mode cannot be null.");
+		}
+
+		this.playbackMode = mode;
+		setIteratorStrategy(strategyFor(mode));
+		audioPlayer.setLoopMode(mode == PlaybackMode.LOOP_TRACK);
+	}
+
+	/**
+	 * Restituisce la modalita' di riproduzione attiva.
+	 *
+	 * @return modalita' corrente
+	 */
+	@Override
+	public PlaybackMode getPlaybackMode() {
+		return playbackMode;
 	}
 
 	public void setIteratorStrategy(PlaylistIteratorStrategy strategy) {
@@ -125,23 +130,27 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
-	private void playNextSong() {
+	private boolean playNextSong() {
 		currentSong = iterator.next();
 
 		if (currentSong == null) {
-			unsubscribeFromAudioPlayer();
-			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
-			return;
+			return false;
 		}
 
 		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 		audioPlayer.play(currentSong.getFilePath());
 		getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+
+		return true;
 	}
 
-	private PlaylistIteratorStrategy strategyFor(PlaybackMode playbackMode) {
-		if (playbackMode == PlaybackMode.LOOP_PLAYLIST) {
+	private PlaylistIteratorStrategy strategyFor(PlaybackMode mode) {
+		if (mode == PlaybackMode.LOOP_PLAYLIST) {
 			return new LoopIteratorStrategy();
+		}
+
+		if (mode == PlaybackMode.SHUFFLE) {
+			return new ShuffleIteratorStrategy();
 		}
 
 		return new SequentialIteratorStrategy();
