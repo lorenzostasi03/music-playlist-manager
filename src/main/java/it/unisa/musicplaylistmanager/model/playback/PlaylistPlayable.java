@@ -6,12 +6,12 @@ import it.unisa.musicplaylistmanager.model.entity.Song;
 public class PlaylistPlayable extends Playable {
 
 	private final Playlist playlist;
-	private PlaybackMode playbackMode;
 	private final AudioPlayer audioPlayer;
 
 	private PlaylistIterator iterator;
 	private PlaylistIteratorStrategy iteratorStrategy;
 	private Song currentSong;
+	private PlaybackMode playbackMode;
 	private boolean subscribed;
 
 	public PlaylistPlayable(Playlist playlist) {
@@ -24,20 +24,18 @@ public class PlaylistPlayable extends Playable {
 		}
 
 		this.playlist = playlist;
-		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.iteratorStrategy = new SequentialIteratorStrategy();
 		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
 		this.currentSong = null;
+		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.subscribed = false;
 	}
-
 
 	@Override
 	public String getTitle() {
 		return playlist.getName();
 	}
-
 
 	@Override
 	public void play() {
@@ -59,6 +57,7 @@ public class PlaylistPlayable extends Playable {
 
 	@Override
 	public void stop() {
+		audioPlayer.setLoopMode(false);
 		audioPlayer.stop();
 		unsubscribeFromAudioPlayer();
 
@@ -77,6 +76,10 @@ public class PlaylistPlayable extends Playable {
 			return;
 		}
 
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
+			return;
+		}
+
 		if (!playNextSong()) {
 			unsubscribeFromAudioPlayer();
 			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
@@ -84,22 +87,32 @@ public class PlaylistPlayable extends Playable {
 	}
 
 	@Override
+	public boolean skipToNextSong() {
+		return playNextSong();
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione della playlist.
+	 *
+	 * @param mode
+	 *            modalita' scelta dall'utente
+	 */
+	@Override
 	public void setPlaybackMode(PlaybackMode mode) {
 		if (mode == null) {
 			throw new IllegalArgumentException("Playback mode cannot be null.");
 		}
 
 		this.playbackMode = mode;
-
-		if (mode == PlaybackMode.SEQUENTIAL) {
-			setIteratorStrategy(new SequentialIteratorStrategy());
-		} else if (mode == PlaybackMode.LOOP) {
-			setIteratorStrategy(new LoopIteratorStrategy());
-		} else if (mode == PlaybackMode.SHUFFLE) {
-			setIteratorStrategy(new ShuffleIteratorStrategy());
-		}
+		setIteratorStrategy(strategyFor(mode));
+		audioPlayer.setLoopMode(mode == PlaybackMode.LOOP_TRACK);
 	}
 
+	/**
+	 * Restituisce la modalita' di riproduzione attiva.
+	 *
+	 * @return modalita' corrente
+	 */
 	@Override
 	public PlaybackMode getPlaybackMode() {
 		return playbackMode;
@@ -124,15 +137,23 @@ public class PlaylistPlayable extends Playable {
 			return false;
 		}
 
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 		audioPlayer.play(currentSong.getFilePath());
 		getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
 
 		return true;
 	}
 
-	@Override
-	public boolean skipToNextSong() {
-		return playNextSong();
+	private PlaylistIteratorStrategy strategyFor(PlaybackMode mode) {
+		if (mode == PlaybackMode.LOOP_PLAYLIST) {
+			return new LoopIteratorStrategy();
+		}
+
+		if (mode == PlaybackMode.SHUFFLE) {
+			return new ShuffleIteratorStrategy();
+		}
+
+		return new SequentialIteratorStrategy();
 	}
 
 	private void subscribeToAudioPlayer() {

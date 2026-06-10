@@ -7,6 +7,7 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
@@ -94,6 +95,12 @@ public class PlaylistController {
 
 	@FXML
 	private void onPlay() {
+		if (playlist == null || playlist.isEmpty()) {
+			return;
+		}
+
+		appContext.playPlayable(new PlaylistPlayable(playlist));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
 	/**
@@ -228,6 +235,7 @@ public class PlaylistController {
 			return;
 		}
 
+		playButton.setDisable(playlist.isEmpty());
 		updatePlaylistInfo();
 		updateTracksTable();
 	}
@@ -236,6 +244,7 @@ public class PlaylistController {
 		playlistNameLabel.setText("Nessuna playlist selezionata");
 		trackCountLabel.setText("0 brani");
 		tracksTable.getItems().clear();
+		playButton.setDisable(true);
 		addTrackButton.setDisable(true);
 		removeTrackButton.setDisable(true);
 	}

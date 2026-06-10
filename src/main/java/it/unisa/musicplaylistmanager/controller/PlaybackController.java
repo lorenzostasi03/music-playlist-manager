@@ -6,9 +6,9 @@ import it.unisa.musicplaylistmanager.model.playback.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.EventListener;
 import it.unisa.musicplaylistmanager.model.playback.EventType;
 import it.unisa.musicplaylistmanager.model.playback.Playable;
+import it.unisa.musicplaylistmanager.model.playback.PlaybackMode;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.model.playback.PlayerState;
-import it.unisa.musicplaylistmanager.model.playback.PlaybackMode;
 import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -47,7 +47,9 @@ public class PlaybackController implements EventListener {
 	@FXML
 	private ToggleButton shuffleModeButton;
 	@FXML
-	private ToggleButton loopModeButton;
+	private ToggleButton loopTrackButton;
+	@FXML
+	private ToggleButton loopPlaylistButton;
 
 	@FXML
 	private Label playCountLabel;
@@ -87,6 +89,7 @@ public class PlaybackController implements EventListener {
 		queueView.setSpacing(8);
 
 		if (currentPlayable != null) {
+			updatePlaybackModeButtons();
 			subscribeToCurrentPlayable();
 			updatePlayableInfo(currentPlayable);
 			updatePlayPauseButton();
@@ -207,8 +210,10 @@ public class PlaybackController implements EventListener {
 			sequentialModeButton.setSelected(true);
 		} else if (mode == PlaybackMode.SHUFFLE) {
 			shuffleModeButton.setSelected(true);
-		} else if (mode == PlaybackMode.LOOP) {
-			loopModeButton.setSelected(true);
+		} else if (mode == PlaybackMode.LOOP_TRACK) {
+			loopTrackButton.setSelected(true);
+		} else if (mode == PlaybackMode.LOOP_PLAYLIST) {
+			loopPlaylistButton.setSelected(true);
 		}
 	}
 
@@ -380,7 +385,14 @@ public class PlaybackController implements EventListener {
 
 	@FXML
 	private void onNext() {
+		if (currentPlayable == null) {
+			return;
+		}
+
 		player.skipSong();
+		resetProgressView();
+		updatePlayableInfo(currentPlayable);
+		updatePlayPauseButton();
 	}
 
 	@FXML
@@ -388,7 +400,7 @@ public class PlaybackController implements EventListener {
 		player.skipPlayable();
 	}
 
-		@FXML
+	@FXML
 	private void onSequential() {
 		setCurrentPlaybackMode(PlaybackMode.SEQUENTIAL);
 	}
@@ -399,8 +411,12 @@ public class PlaybackController implements EventListener {
 	}
 
 	@FXML
-	private void onLoop() {
-		setCurrentPlaybackMode(PlaybackMode.LOOP);
+	private void onLoopTrack() {
+		setCurrentPlaybackMode(PlaybackMode.LOOP_TRACK);
 	}
 
+	@FXML
+	private void onLoopPlaylist() {
+		setCurrentPlaybackMode(PlaybackMode.LOOP_PLAYLIST);
+	}
 }

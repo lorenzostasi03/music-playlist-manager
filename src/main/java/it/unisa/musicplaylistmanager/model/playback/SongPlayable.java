@@ -13,9 +13,9 @@ import it.unisa.musicplaylistmanager.model.entity.Song;
 public class SongPlayable extends Playable {
 
 	private final Song song;
-	private PlaybackMode playbackMode;
 	private final AudioPlayer audioPlayer;
 	private boolean subscribed;
+	private PlaybackMode playbackMode;
 
 	/**
 	 * Crea un nuovo oggetto riproducibile a partire da una traccia.
@@ -23,7 +23,7 @@ public class SongPlayable extends Playable {
 	 * @param song
 	 *            traccia da rendere riproducibile
 	 * @throws IllegalArgumentException
-	 *             se la traccia è {@code null}
+	 *             se la traccia e' {@code null}
 	 */
 	public SongPlayable(Song song) {
 		if (song == null) {
@@ -31,13 +31,15 @@ public class SongPlayable extends Playable {
 		}
 
 		this.song = song;
-		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
+		this.playbackMode = PlaybackMode.SEQUENTIAL;
 	}
 
 	/**
-	 * 
+	 * Restituisce il titolo della traccia.
+	 *
+	 * @return titolo del brano
 	 */
 	@Override
 	public String getTitle() {
@@ -49,11 +51,12 @@ public class SongPlayable extends Playable {
 	 *
 	 * <p>
 	 * L'oggetto si registra agli eventi di completamento audio prima di avviare la
-	 * riproduzione, così da poter notificare il completamento del riproducibile.
+	 * riproduzione, cosi' da poter notificare il completamento del riproducibile.
 	 */
 	@Override
 	public void play() {
 		subscribeToAudioCompleted();
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 		audioPlayer.play(song.getFilePath());
 	}
 
@@ -79,6 +82,7 @@ public class SongPlayable extends Playable {
 	 */
 	@Override
 	public void stop() {
+		audioPlayer.setLoopMode(false);
 		audioPlayer.stop();
 		unsubscribeFromAudioCompleted();
 	}
@@ -91,6 +95,49 @@ public class SongPlayable extends Playable {
 	@Override
 	public Song getCurrentSong() {
 		return song;
+	}
+
+	@Override
+	public boolean skipToNextSong() {
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
+			audioPlayer.setLoopMode(true);
+			audioPlayer.play(song.getFilePath());
+			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione della traccia.
+	 *
+	 * @param mode
+	 *            modalita' da applicare
+	 */
+	@Override
+	public void setPlaybackMode(PlaybackMode mode) {
+		if (mode == null) {
+			throw new IllegalArgumentException("Playback mode cannot be null.");
+		}
+
+		if (mode == PlaybackMode.SHUFFLE || mode == PlaybackMode.LOOP_PLAYLIST) {
+			this.playbackMode = PlaybackMode.SEQUENTIAL;
+		} else {
+			this.playbackMode = mode;
+		}
+
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
+	}
+
+	/**
+	 * Restituisce la modalita' di riproduzione corrente.
+	 *
+	 * @return modalita' corrente
+	 */
+	@Override
+	public PlaybackMode getPlaybackMode() {
+		return playbackMode;
 	}
 
 	/**
@@ -109,8 +156,7 @@ public class SongPlayable extends Playable {
 			return;
 		}
 
-		if (playbackMode == PlaybackMode.LOOP) {
-			audioPlayer.play(song.getFilePath());
+		if (playbackMode == PlaybackMode.LOOP_TRACK) {
 			return;
 		}
 
@@ -118,39 +164,9 @@ public class SongPlayable extends Playable {
 		getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 	}
 
-	@Override
-	public boolean skipToNextSong() {
-		if (playbackMode == PlaybackMode.LOOP) {
-			audioPlayer.play(song.getFilePath());
-			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
-			return true;
-		}
-
-		return false;
-	}
-
-	@Override
-	public void setPlaybackMode(PlaybackMode mode) {
-		if (mode == null) {
-			throw new IllegalArgumentException("Playback mode cannot be null.");
-		}
-
-		if (mode == PlaybackMode.SHUFFLE) {
-			this.playbackMode = PlaybackMode.SEQUENTIAL;
-			return;
-		}
-
-		this.playbackMode = mode;
-	}
-
-	@Override
-	public PlaybackMode getPlaybackMode() {
-		return playbackMode;
-	}
-
 	/**
 	 * Registra questo oggetto come listener degli eventi di completamento audio, se
-	 * non è già registrato.
+	 * non e' gia' registrato.
 	 */
 	private void subscribeToAudioCompleted() {
 		if (!subscribed) {
