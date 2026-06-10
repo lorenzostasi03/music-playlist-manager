@@ -25,7 +25,7 @@ public class PlaylistPlayable extends Playable {
 		this.playlist = playlist;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.iteratorStrategy = new SequentialIteratorStrategy();
-		this.iterator = null;
+		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
 		this.currentSong = null;
 		this.subscribed = false;
 	}
@@ -34,7 +34,7 @@ public class PlaylistPlayable extends Playable {
 	public void play() {
 		subscribeToAudioPlayer();
 
-		iterator = new ConfigurablePlaylistIterator(playlist.getSongs(), iteratorStrategy);
+		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
 		playNextSong();
 	}
 
@@ -52,8 +52,9 @@ public class PlaylistPlayable extends Playable {
 	public void stop() {
 		audioPlayer.stop();
 		unsubscribeFromAudioPlayer();
-		iterator = null;
-		currentSong = null;
+
+		this.iterator = new ConfigurablePlaylistIterator(playlist, iteratorStrategy);
+		this.currentSong = null;
 	}
 
 	@Override
@@ -83,10 +84,6 @@ public class PlaylistPlayable extends Playable {
 	}
 
 	private void playNextSong() {
-		if (iterator == null) {
-			iterator = new ConfigurablePlaylistIterator(playlist.getSongs(), iteratorStrategy);
-		}
-
 		currentSong = iterator.next();
 
 		if (currentSong == null) {

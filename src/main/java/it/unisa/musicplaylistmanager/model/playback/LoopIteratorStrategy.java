@@ -1,20 +1,21 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.model.entity.Song;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * Strategia di riproduzione ciclica della playlist.
  */
 public class LoopIteratorStrategy implements PlaylistIteratorStrategy {
 
 	@Override
-	public void reset(int playlistSize, int currentIndex) {
-	}
-
-	@Override
-	public int nextIndex(int currentIndex, int playlistSize) {
-		if (playlistSize == 0) {
+	public int nextIndex(int currentIndex, List<Song> songs, Set<UUID> playedSongIds) {
+		if (songs.isEmpty()) {
 			return -1;
 		}
 
-		return (currentIndex + 1) % playlistSize;
+		return (currentIndex + 1) % songs.size();
 	}
 }

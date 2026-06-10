@@ -12,4 +12,6 @@ public interface PlaylistIterator {
 	void setStrategy(PlaylistIteratorStrategy strategy);
 
 	int getCurrentIndex();
+
+	Song getCurrentSong();
 }

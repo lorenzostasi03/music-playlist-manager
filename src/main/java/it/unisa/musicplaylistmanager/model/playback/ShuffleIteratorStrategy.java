@@ -1,35 +1,35 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.model.entity.Song;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Strategia di riproduzione casuale senza ripetizioni.
  */
 public class ShuffleIteratorStrategy implements PlaylistIteratorStrategy {
 
-	private final List<Integer> remainingIndexes = new ArrayList<>();
+	private final Random random = new Random();
 
 	@Override
-	public void reset(int playlistSize, int currentIndex) {
-		remainingIndexes.clear();
+	public int nextIndex(int currentIndex, List<Song> songs, Set<UUID> playedSongIds) {
+		List<Integer> availableIndexes = new ArrayList<>();
 
-		for (int i = 0; i < playlistSize; i++) {
-			if (i != currentIndex) {
-				remainingIndexes.add(i);
+		for (int i = 0; i < songs.size(); i++) {
+			Song song = songs.get(i);
+
+			if (!playedSongIds.contains(song.getId())) {
+				availableIndexes.add(i);
 			}
 		}
 
-		Collections.shuffle(remainingIndexes);
-	}
-
-	@Override
-	public int nextIndex(int currentIndex, int playlistSize) {
-		if (remainingIndexes.isEmpty()) {
+		if (availableIndexes.isEmpty()) {
 			return -1;
 		}
 
-		return remainingIndexes.removeFirst();
+		return availableIndexes.get(random.nextInt(availableIndexes.size()));
 	}
 }
