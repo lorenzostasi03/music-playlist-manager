@@ -50,7 +50,7 @@
     <VBox maxWidth="280" minWidth="280" prefWidth="280" style="-fx-background-color: #0A0A0A; -fx-border-color: #121212; -fx-border-width: 0 0 0 1;">
         <VBox spacing="10">
             <padding>
-                <Insets bottom="15" left="20" right="20" top="30" />
+                <Insets bottom="15" left="10" right="10" top="30" />
             </padding>
 
             <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;"
@@ -58,14 +58,17 @@
 
             <Button fx:id="skipPlayableButton"
                     onAction="#onSkipPlayable"
-                    maxWidth="Infinity"
+                    minWidth="220"
+                    prefWidth="220"
+                    maxWidth="220"
                     styleClass="spotify-btn"
+                    style="-fx-min-width: 220; -fx-pref-width: 220; -fx-max-width: 220;"
                     text="Riproduci prossimo" />
         </VBox>
 
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0A0A0A; -fx-background-color: transparent; -fx-control-inner-background: #0A0A0A; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
             <content>
-                <VBox fx:id="queueView" style="-fx-padding: 0 10 0 10;" />
+                <VBox fx:id="queueView" style="-fx-padding: 0 5 0 5;" />
             </content>
         </ScrollPane>
     </VBox>

@@ -280,7 +280,8 @@ public class PlaybackController implements EventListener {
 	private Label createCurrentQueueItemLabel(String text) {
 		Label label = new Label(text);
 		label.setWrapText(true);
-		label.setMaxWidth(Double.MAX_VALUE);
+		label.setPrefWidth(220);
+		label.setMaxWidth(220);
 		label.setStyle("-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold; "
 				+ "-fx-padding: 8 10 8 10; -fx-background-color: #121212; -fx-background-radius: 6;");
 		return label;
@@ -289,7 +290,8 @@ public class PlaybackController implements EventListener {
 	private Label createQueueItemLabel(String text) {
 		Label label = new Label(text);
 		label.setWrapText(true);
-		label.setMaxWidth(Double.MAX_VALUE);
+		label.setPrefWidth(220);
+		label.setMaxWidth(220);
 		label.setStyle("-fx-text-fill: #B3B3B3; -fx-font-size: 12px; "
 				+ "-fx-padding: 8 10 8 10; -fx-background-color: #121212; -fx-background-radius: 6;");
 		return label;

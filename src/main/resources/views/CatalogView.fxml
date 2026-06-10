@@ -30,11 +30,26 @@
     </VBox>
     <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="10" left="25" right="25" top="10" /></padding>
-        <Label prefWidth="190" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="TITOLO" />
-        <Label alignment="CENTER_LEFT" prefWidth="85" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="AUTORE" />
-        <Label alignment="CENTER_LEFT" prefWidth="65" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="GENERE" />
-        <Label alignment="CENTER_LEFT" prefWidth="50" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="ANNO" />
-        <Label alignment="CENTER_LEFT" prefWidth="55" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="DURATA" />
+        <Label minWidth="160" prefWidth="160" maxWidth="160"
+        style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
+        text="TITOLO" />
+
+        <Label alignment="CENTER_LEFT" minWidth="80" prefWidth="80" maxWidth="80"
+            style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
+            text="AUTORE" />
+
+        <Label alignment="CENTER_LEFT" minWidth="60" prefWidth="60" maxWidth="60"
+            style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
+            text="GENERE" />
+
+        <Label alignment="CENTER_LEFT" minWidth="45" prefWidth="45" maxWidth="45"
+            style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
+            text="ANNO" />
+
+        <Label alignment="CENTER_LEFT" minWidth="50" prefWidth="50" maxWidth="50"
+            style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
+            text="DURATA" />
+        
         <Region HBox.hgrow="ALWAYS" />
     </HBox>
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #000000; -fx-background-color: transparent; -fx-control-inner-background: #000000; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">

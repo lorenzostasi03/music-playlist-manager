@@ -148,8 +148,10 @@ public class CatalogController {
 
 		Label titleLabel = new Label(song.getTitle());
 		titleLabel.getStyleClass().add("row-title");
-		titleLabel.setPrefWidth(190);
-		titleLabel.setMinWidth(190);
+		titleLabel.setMinWidth(160);
+		titleLabel.setPrefWidth(160);
+		titleLabel.setMaxWidth(160);
+		titleLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
 
 		Label authorLabel = createMetaLabel(song.getAuthor(), 85);
 		Label genreLabel = createMetaLabel(song.getGenre().name(), 65);
@@ -194,8 +196,10 @@ public class CatalogController {
 	private Label createMetaLabel(String text, double width) {
 		Label label = new Label(text);
 		label.getStyleClass().add("row-meta");
-		label.setPrefWidth(width);
 		label.setMinWidth(width);
+		label.setPrefWidth(width);
+		label.setMaxWidth(width);
+		label.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
 		return label;
 	}
 
