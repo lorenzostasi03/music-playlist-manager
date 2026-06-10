@@ -22,7 +22,13 @@ public class FakePlaylistDAO implements PlaylistDAO {
 		save(playlist);
 	}
 
-	@Override
+    @Override
+    public void updatePlayCount(UUID playlistId, int playCount) {
+        playlists.stream().filter(p -> p.getId().equals(playlistId)).findFirst().ifPresent(Playlist::incrementPlayCount);
+
+    }
+
+    @Override
 	public void delete(UUID playlistId) {
 		playlists.removeIf(p -> p.getId().equals(playlistId));
 		playlistSongs.remove(playlistId);

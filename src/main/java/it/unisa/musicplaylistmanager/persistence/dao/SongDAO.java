@@ -31,6 +31,18 @@ public interface SongDAO {
 	 */
 	void update(Song song);
 
+    /**
+     * Aggiorna il numero di riproduzioni di un brano.
+     *
+     * @param songId
+     *            identificativo del brano da aggiornare
+     * @param playCount
+     *            nuovo numero di riproduzioni del brano
+     * @throws PersistenceException
+     *             se si verifica un errore durante l'aggiornamento nel database
+     */
+    void updatePlayCount(UUID songId,int playCount);
+
 	/**
 	 * Elimina un brano dal database.
 	 *
