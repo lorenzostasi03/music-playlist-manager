@@ -6,6 +6,7 @@ import it.unisa.musicplaylistmanager.model.playback.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.EventListener;
 import it.unisa.musicplaylistmanager.model.playback.EventType;
 import it.unisa.musicplaylistmanager.model.playback.Playable;
+import it.unisa.musicplaylistmanager.model.playback.PlaybackMode;
 import it.unisa.musicplaylistmanager.model.playback.Player;
 import it.unisa.musicplaylistmanager.model.playback.PlayerState;
 import javafx.animation.KeyFrame;
@@ -59,6 +60,7 @@ public class PlaybackController implements EventListener {
 	private AudioPlayer audioPlayer;
 	private Playable currentPlayable;
 	private boolean subscribedToCurrentPlayable;
+	private Song displayedSong;
 
 	private Timeline progressTimeline;
 
@@ -70,6 +72,7 @@ public class PlaybackController implements EventListener {
 		audioPlayer = AudioPlayer.getInstance();
 		currentPlayable = appContext.getCurrentPlayable();
 		subscribedToCurrentPlayable = false;
+		displayedSong = null;
 
 		currentTimeLabel.setText("0:00");
 		totalTimeLabel.setText("0:00");
@@ -82,6 +85,7 @@ public class PlaybackController implements EventListener {
 		progressSlider.setFocusTraversable(false);
 
 		if (currentPlayable != null) {
+			selectModeButton(currentPlayable.getPlaybackMode());
 			subscribeToCurrentPlayable();
 			updatePlayableInfo(currentPlayable);
 			updatePlayPauseButton();
@@ -123,6 +127,7 @@ public class PlaybackController implements EventListener {
 			unsubscribeFromCurrentPlayable();
 			resetProgressTimeline();
 			playPauseButton.setText("Play");
+			updatePlayableInfo(currentPlayable);
 		}
 	}
 
@@ -136,9 +141,15 @@ public class PlaybackController implements EventListener {
 			currentTimeLabel.setText("0:00");
 			progressSlider.setMax(1);
 			progressSlider.setValue(0);
+			displayedSong = null;
 			return;
 		}
 
+		if (currentSong == displayedSong) {
+			return;
+		}
+
+		displayedSong = currentSong;
 		trackTitleLabel.setText(currentSong.getTitle());
 		trackArtistLabel.setText(currentSong.getAuthor());
 
@@ -183,6 +194,10 @@ public class PlaybackController implements EventListener {
 	}
 
 	private void updateProgress() {
+		if (currentPlayable != null) {
+			updatePlayableInfo(currentPlayable);
+		}
+
 		double currentSeconds = audioPlayer.getCurrentTimeSeconds();
 		double totalSeconds = audioPlayer.getTotalDurationSeconds();
 
@@ -236,25 +251,68 @@ public class PlaybackController implements EventListener {
 
 	@FXML
 	private void onPrevious() {
+		if (currentPlayable == null) {
+			return;
+		}
+
+		player.skipPrevious();
+		resetProgressView();
+		updatePlayableInfo(currentPlayable);
+		startProgressTimeline();
+		updatePlayPauseButton();
 	}
 
 	@FXML
 	private void onNext() {
+		if (currentPlayable == null) {
+			return;
+		}
+
+		player.skipNext();
+		resetProgressView();
+		updatePlayableInfo(currentPlayable);
+		if (player.getState() == PlayerState.PLAYING) {
+			startProgressTimeline();
+		} else {
+			resetProgressTimeline();
+		}
+		updatePlayPauseButton();
 	}
 
 	@FXML
 	private void onSequential() {
+		setPlaybackMode(PlaybackMode.SEQUENTIAL);
 	}
 
 	@FXML
 	private void onShuffle() {
+		selectModeButton(currentPlayable != null ? currentPlayable.getPlaybackMode() : PlaybackMode.SEQUENTIAL);
 	}
 
 	@FXML
 	private void onLoopTrack() {
+		setPlaybackMode(PlaybackMode.LOOP_TRACK);
 	}
 
 	@FXML
 	private void onLoopPlaylist() {
+		setPlaybackMode(PlaybackMode.LOOP_PLAYLIST);
+	}
+
+	private void setPlaybackMode(PlaybackMode playbackMode) {
+		if (currentPlayable == null) {
+			selectModeButton(PlaybackMode.SEQUENTIAL);
+			return;
+		}
+
+		player.setPlaybackMode(playbackMode);
+		selectModeButton(playbackMode);
+	}
+
+	private void selectModeButton(PlaybackMode playbackMode) {
+		sequentialModeButton.setSelected(playbackMode == PlaybackMode.SEQUENTIAL);
+		loopTrackButton.setSelected(playbackMode == PlaybackMode.LOOP_TRACK);
+		loopPlaylistButton.setSelected(playbackMode == PlaybackMode.LOOP_PLAYLIST);
+		shuffleModeButton.setSelected(false);
 	}
 }

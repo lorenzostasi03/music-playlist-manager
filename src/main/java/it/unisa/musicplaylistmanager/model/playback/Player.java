@@ -106,6 +106,44 @@ public class Player implements EventListener {
 	}
 
 	/**
+	 * Richiede all'oggetto riproducibile corrente di passare alla traccia
+	 * successiva.
+	 */
+	public void skipNext() {
+		if (currentPlayable != null) {
+			currentPlayable.skipNext();
+			if (currentPlayable != null) {
+				state = PlayerState.PLAYING;
+			}
+		}
+	}
+
+	/**
+	 * Richiede all'oggetto riproducibile corrente di passare alla traccia
+	 * precedente.
+	 */
+	public void skipPrevious() {
+		if (currentPlayable != null) {
+			currentPlayable.skipPrevious();
+			if (currentPlayable != null) {
+				state = PlayerState.PLAYING;
+			}
+		}
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione dell'oggetto corrente.
+	 *
+	 * @param playbackMode
+	 *            modalita' da applicare
+	 */
+	public void setPlaybackMode(PlaybackMode playbackMode) {
+		if (currentPlayable != null) {
+			currentPlayable.setPlaybackMode(playbackMode);
+		}
+	}
+
+	/**
 	 * Gestisce gli eventi ricevuti dall'oggetto riproducibile corrente.
 	 *
 	 * @param eventType

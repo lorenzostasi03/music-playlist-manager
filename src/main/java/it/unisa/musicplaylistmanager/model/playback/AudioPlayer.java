@@ -18,6 +18,7 @@ public class AudioPlayer {
 
 	private final EventManager events;
 	private MediaPlayer mediaPlayer;
+	private boolean loopMode;
 
 	/**
 	 * Crea un nuovo player audio.
@@ -27,6 +28,7 @@ public class AudioPlayer {
 	 */
 	private AudioPlayer() {
 		this.events = new EventManager();
+		this.loopMode = false;
 	}
 
 	/**
@@ -80,9 +82,26 @@ public class AudioPlayer {
 		Media media = new Media(audioFile.toURI().toString());
 		mediaPlayer = new MediaPlayer(media);
 
-		mediaPlayer.setOnEndOfMedia(() -> events.notifyListeners(EventType.AUDIO_COMPLETED));
+		mediaPlayer.setOnEndOfMedia(() -> {
+			if (loopMode) {
+				mediaPlayer.seek(Duration.ZERO);
+				mediaPlayer.play();
+			} else {
+				events.notifyListeners(EventType.AUDIO_COMPLETED);
+			}
+		});
 
 		mediaPlayer.play();
+	}
+
+	/**
+	 * Imposta il loop della traccia attualmente riprodotta.
+	 *
+	 * @param loopMode
+	 *            true per ripetere indefinitamente la traccia corrente
+	 */
+	public void setLoopMode(boolean loopMode) {
+		this.loopMode = loopMode;
 	}
 
 	/**

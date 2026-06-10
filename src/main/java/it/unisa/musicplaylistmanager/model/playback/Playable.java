@@ -58,4 +58,36 @@ public abstract class Playable implements EventListener {
 	 * @return traccia corrente
 	 */
 	public abstract Song getCurrentSong();
+
+	/**
+	 * Passa manualmente alla traccia successiva, se l'oggetto riproducibile lo
+	 * supporta.
+	 */
+	public void skipNext() {
+	}
+
+	/**
+	 * Passa manualmente alla traccia precedente, se l'oggetto riproducibile lo
+	 * supporta.
+	 */
+	public void skipPrevious() {
+	}
+
+	/**
+	 * Imposta la modalita' di riproduzione, se supportata dall'oggetto corrente.
+	 *
+	 * @param playbackMode
+	 *            modalita' da applicare
+	 */
+	public void setPlaybackMode(PlaybackMode playbackMode) {
+	}
+
+	/**
+	 * Restituisce la modalita' di riproduzione corrente.
+	 *
+	 * @return modalita' corrente
+	 */
+	public PlaybackMode getPlaybackMode() {
+		return PlaybackMode.SEQUENTIAL;
+	}
 }

@@ -1,11 +1,14 @@
 package it.unisa.musicplaylistmanager.model.entity;
 
+import it.unisa.musicplaylistmanager.model.playback.ConfigurablePlaylistIterator;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistIterable;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistIterator;
 import java.util.*;
 
 /**
  * Rappresenta una playlist musicale.
  */
-public class Playlist {
+public class Playlist implements PlaylistIterable {
 
 	private final UUID id;
 	private String name;
@@ -178,6 +181,16 @@ public class Playlist {
 			throw new IndexOutOfBoundsException("Indice non valido: " + index);
 		}
 		return songs.get(index);
+	}
+
+	/**
+	 * Crea un iteratore configurabile per scorrere le tracce della playlist.
+	 *
+	 * @return iteratore della playlist
+	 */
+	@Override
+	public PlaylistIterator createIterator() {
+		return new ConfigurablePlaylistIterator(this);
 	}
 
 	/**

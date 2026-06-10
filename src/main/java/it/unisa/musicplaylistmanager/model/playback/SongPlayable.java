@@ -15,6 +15,7 @@ public class SongPlayable extends Playable {
 	private final Song song;
 	private final AudioPlayer audioPlayer;
 	private boolean subscribed;
+	private PlaybackMode playbackMode;
 
 	/**
 	 * Crea un nuovo oggetto riproducibile a partire da una traccia.
@@ -32,6 +33,7 @@ public class SongPlayable extends Playable {
 		this.song = song;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
+		this.playbackMode = PlaybackMode.SEQUENTIAL;
 	}
 
 	/**
@@ -44,6 +46,7 @@ public class SongPlayable extends Playable {
 	@Override
 	public void play() {
 		subscribeToAudioCompleted();
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
 		audioPlayer.play(song.getFilePath());
 	}
 
@@ -69,6 +72,7 @@ public class SongPlayable extends Playable {
 	 */
 	@Override
 	public void stop() {
+		audioPlayer.setLoopMode(false);
 		audioPlayer.stop();
 		unsubscribeFromAudioCompleted();
 	}
@@ -84,6 +88,34 @@ public class SongPlayable extends Playable {
 	}
 
 	/**
+	 * Imposta la modalita' di riproduzione della traccia.
+	 *
+	 * @param playbackMode
+	 *            modalita' da applicare
+	 * @throws IllegalArgumentException
+	 *             se la modalita' e' {@code null}
+	 */
+	@Override
+	public void setPlaybackMode(PlaybackMode playbackMode) {
+		if (playbackMode == null) {
+			throw new IllegalArgumentException("Playback mode cannot be null.");
+		}
+
+		this.playbackMode = playbackMode;
+		audioPlayer.setLoopMode(playbackMode == PlaybackMode.LOOP_TRACK);
+	}
+
+	/**
+	 * Restituisce la modalita' di riproduzione corrente.
+	 *
+	 * @return modalita' corrente
+	 */
+	@Override
+	public PlaybackMode getPlaybackMode() {
+		return playbackMode;
+	}
+
+	/**
 	 * Gestisce gli eventi ricevuti dal player audio.
 	 *
 	 * <p>
@@ -96,6 +128,10 @@ public class SongPlayable extends Playable {
 	@Override
 	public void update(EventType eventType) {
 		if (eventType == EventType.AUDIO_COMPLETED) {
+			if (playbackMode == PlaybackMode.LOOP_TRACK) {
+				return;
+			}
+
 			unsubscribeFromAudioCompleted();
 			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 		}

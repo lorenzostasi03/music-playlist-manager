@@ -21,7 +21,7 @@
         </HBox>
         <HBox alignment="CENTER_LEFT" spacing="15">
             <padding><Insets top="5" /></padding>
-            <Button fx:id="playButton" disable="true" onAction="#onPlay" styleClass="play-btn" style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-min-width: auto; -fx-min-height: auto; -fx-padding: 8 20 8 20;" text="▶  Riproduci" />
+            <Button fx:id="playButton" onAction="#onPlay" styleClass="play-btn" style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-min-width: auto; -fx-min-height: auto; -fx-padding: 8 20 8 20;" text="▶  Riproduci" />
             <Button fx:id="editNameButton" onAction="#onRename" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-cursor: hand;" text="Rinomina" />
             <Button fx:id="deletePlaylistButton" onAction="#onDeletePlaylist" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" text="Elimina playlist" />
         </HBox>
