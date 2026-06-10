@@ -18,6 +18,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -189,9 +190,13 @@ public class HomeController {
 	private void refreshPlaylists() {
 		playlists = appContext.getMusicLibrary().getAllPlaylists();
         topSongs = refreshTopSongs();
+        topPlaylists = refreshTopPlaylists();
 
 		playlistListView.getItems().setAll(playlists);
-        playlistListView.getItems().addAll(topSongs);
+
+        if (topSongs != null) playlistListView.getItems().addAll(topSongs);
+        if (topPlaylists != null) playlistListView.getItems().addAll(topPlaylists);
+
 		countLabel.setText(playlistListView.getItems().size() + " playlist");
 
 		boolean empty = playlistListView.getItems().isEmpty();
@@ -200,7 +205,8 @@ public class HomeController {
 		playlistListView.setVisible(!empty);
 		playlistListView.setManaged(!empty);
 	}
-	/**
+
+    /**
 	 * Calcola la durata totale di una playlist sommando la durata dei singoli brani
 	 * e la formatta in una stringa (minuti:secondi).
 	 *
@@ -238,6 +244,11 @@ public class HomeController {
 		}
 	}
 
+    /**
+     *  Ricrea la playlist contenente i brani più riprodotti.
+     *
+     * @return playlist con i brani più riprodotti.
+     */
     private Playlist refreshTopSongs() {
         List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
         if (songs.isEmpty()) return null;
@@ -248,6 +259,18 @@ public class HomeController {
             playlist.addSong(song);
 
         return playlist;
+    }
+
+    /**
+     *  Ricrea la lista delle playlist più riprodotte.
+     *
+     * @return lista delle playlist più riprodotte.
+     */
+    private List<Playlist> refreshTopPlaylists() {
+        List<Playlist> playlists = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
+        if (playlists.isEmpty()) return null;
+
+        return new ArrayList<>(playlists);
     }
 
 	/**

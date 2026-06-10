@@ -312,4 +312,22 @@ public class MusicLibrary {
 	public List<Playlist> getAllPlaylists() {
 		return playlistCatalog.getAllPlaylists();
 	}
+
+    /**
+     * Recupera le prime {@code n} playlist più riprodotte del catalogo,
+     * ordinate per numero di riproduzioni in ordine decrescente.
+     *
+     * @param n il numero massimo di playlist da restituire; deve essere positivo
+     * @return lista di al più {@code n} playlist ordinate per playCount decrescente;
+     *         può contenere meno di {@code n} elementi se il catalogo è più piccolo
+     */
+    public List<Playlist> getTopPlaylists(int n) {
+        if (n <= 0) return null;
+
+        return playlistCatalog.getAllPlaylists().stream()
+                                .filter(p -> p.getPlayCount() > 0)
+                                .sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed())
+                                .limit(n)
+                                .toList();
+    }
 }
