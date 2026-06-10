@@ -140,6 +140,8 @@ public class CatalogController {
 	private HBox createSongRow(Song song) {
 		Button playButton = createButton("▶", "Riproduci traccia", () -> playSong(song));
 
+		Button enqueueButton = createButton("+", "Aggiungi traccia alla coda", () -> enqueueSong(song));
+
 		Button editButton = createButton("✎", "Modifica traccia", () -> openSongForm(song));
 
 		Button deleteButton = createButton("×", "Elimina traccia", () -> deleteSong(song));
@@ -158,7 +160,7 @@ public class CatalogController {
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 
 		HBox row = new HBox(8, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
-				editButton, deleteButton);
+		enqueueButton, editButton, deleteButton);
 
 		row.getStyleClass().add("list-row");
 		return row;
@@ -171,8 +173,12 @@ public class CatalogController {
 		button.setMinWidth(32);
 		button.setPrefWidth(32);
 		button.setMaxWidth(32);
-		button.setOnAction(e -> action.run());
+		button.setOnAction(event -> {
+			event.consume();
+			action.run();
+		});
 		button.setFocusTraversable(false);
+
 		return button;
 	}
 
@@ -285,6 +291,11 @@ public class CatalogController {
 	private void playSong(Song song) {
 		appContext.playPlayable(new SongPlayable(song));
 		ViewSwitcher.switchTo("PlaybackView.fxml");
+	}
+
+	private void enqueueSong(Song song) {
+		appContext.enqueuePlayable(new SongPlayable(song));
+		AlertManager.showInfo("Traccia aggiunta alla coda.");
 	}
 
 	/**

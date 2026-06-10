@@ -16,6 +16,11 @@ public enum EventType {
 	CURRENT_SONG_CHANGED,
 
 	/**
+	 * Indica che l'oggetto riproducibile corrente del player è cambiato.
+	 */
+	CURRENT_PLAYABLE_CHANGED,
+
+	/**
 	 * Indica che l'oggetto riproducibile corrente ha completato la riproduzione.
 	 */
 	PLAYABLE_COMPLETED

@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,16 +78,33 @@ class PlayerTest {
 	}
 
 	@Test
-	void playerShouldStopWhenPlayableCompletedEventIsReceived() {
+	void playerShouldBecomeStoppedWhenPlayableCompletedEventIsReceived() {
 		Player player = new Player();
 		FakePlayable playable = new FakePlayable();
 
 		player.play(playable);
 		playable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
 
-		assertTrue(playable.stopCalled);
+		assertFalse(playable.stopCalled);
 		assertEquals(PlayerState.STOPPED, player.getState());
 		assertNull(player.getCurrentPlayable());
+	}
+
+	@Test
+	void playerShouldPlayNextQueuedPlayableWhenCurrentPlayableCompleted() {
+		Player player = new Player();
+		FakePlayable firstPlayable = new FakePlayable();
+		FakePlayable secondPlayable = new FakePlayable();
+
+		player.play(firstPlayable);
+		player.enqueue(secondPlayable);
+
+		firstPlayable.getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+
+		assertFalse(firstPlayable.stopCalled);
+		assertTrue(secondPlayable.playCalled);
+		assertEquals(PlayerState.PLAYING, player.getState());
+		assertSame(secondPlayable, player.getCurrentPlayable());
 	}
 
 	private static class FakePlayable extends Playable {

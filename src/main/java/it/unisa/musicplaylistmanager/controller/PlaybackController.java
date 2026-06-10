@@ -71,6 +71,8 @@ public class PlaybackController implements EventListener {
 		currentPlayable = appContext.getCurrentPlayable();
 		subscribedToCurrentPlayable = false;
 
+		player.getEvents().subscribe(EventType.CURRENT_PLAYABLE_CHANGED, this);
+
 		currentTimeLabel.setText("0:00");
 		totalTimeLabel.setText("0:00");
 		playPauseButton.setText("Play");
@@ -119,6 +121,11 @@ public class PlaybackController implements EventListener {
 
 	@Override
 	public void update(EventType eventType) {
+		if (eventType == EventType.CURRENT_PLAYABLE_CHANGED) {
+			handleCurrentPlayableChanged();
+			return;
+		}
+
 		if (eventType == EventType.CURRENT_SONG_CHANGED) {
 			updatePlayableInfo(currentPlayable);
 			updateProgress();
@@ -162,6 +169,32 @@ public class PlaybackController implements EventListener {
 			playPauseButton.setText("Riprendi");
 		} else {
 			playPauseButton.setText("Play");
+		}
+	}
+
+	private void handleCurrentPlayableChanged() {
+		unsubscribeFromCurrentPlayable();
+
+		currentPlayable = player.getCurrentPlayable();
+
+		if (currentPlayable == null) {
+			resetProgressTimeline();
+			trackTitleLabel.setText("Nessuna traccia");
+			trackArtistLabel.setText("");
+			totalTimeLabel.setText("0:00");
+			playPauseButton.setText("Play");
+			return;
+		}
+
+		subscribeToCurrentPlayable();
+		updatePlayableInfo(currentPlayable);
+		updatePlayPauseButton();
+		updateProgress();
+
+		if (player.getState() == PlayerState.PLAYING) {
+			startProgressTimeline();
+		} else {
+			stopProgressTimeline();
 		}
 	}
 

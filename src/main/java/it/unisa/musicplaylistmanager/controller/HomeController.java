@@ -157,11 +157,12 @@ public class HomeController {
 		playCountLabel.setMaxWidth(90);
 
 		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
+		Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
 		Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
 		Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
 
-		HBox row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, renameButton,
-				deleteButton);
+		HBox row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+				renameButton, deleteButton);
 
 		row.getStyleClass().add("list-row");
 		row.setMaxWidth(Double.MAX_VALUE);
@@ -287,5 +288,15 @@ public class HomeController {
 
 		appContext.playPlayable(new PlaylistPlayable(playlist));
 		ViewSwitcher.switchTo("PlaybackView.fxml");
+	}
+
+		private void enqueuePlaylist(Playlist playlist) {
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
+
+		appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+		AlertManager.showInfo("Playlist aggiunta alla coda.");
 	}
 }

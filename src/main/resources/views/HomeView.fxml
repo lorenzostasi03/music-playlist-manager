@@ -88,7 +88,7 @@
         <Label text="RIPRODUZIONI" prefWidth="90"
                style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
 
-        <Region prefWidth="104"/>
+        <Region prefWidth="144"/>
     </HBox>
 
     <!-- LISTA / EMPTY STATE -->

@@ -22,56 +22,61 @@ import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;
  * </p>
  */
 public class AppContext {
+
 	private static AppContext instance;
 
 	private final MusicLibrary musicLibrary;
 	private final Player player;
 
 	private Playlist selectedPlaylist;
-	private Playable currentPlayable;
 
 	private AppContext() {
 		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DatabaseConfig.DB_URL),
 				new SQLitePlaylistDAO(DatabaseConfig.DB_URL));
 		musicLibrary.init();
+
 		player = new Player();
 	}
 
 	public static AppContext getInstance() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new AppContext();
+		}
 
 		return instance;
 	}
 
 	public MusicLibrary getMusicLibrary() {
-		return this.musicLibrary;
+		return musicLibrary;
 	}
+
 	public Player getPlayer() {
-		return this.player;
+		return player;
 	}
 
 	public Playlist getSelectedPlaylist() {
-		return this.selectedPlaylist;
+		return selectedPlaylist;
 	}
+
 	public void setSelectedPlaylist(Playlist playlist) {
-		this.selectedPlaylist = playlist;
+		selectedPlaylist = playlist;
 	}
 
 	public Playable getCurrentPlayable() {
-		return currentPlayable;
-	}
-
-	public void setCurrentPlayable(Playable playable) {
-		this.currentPlayable = playable;
+		return player.getCurrentPlayable();
 	}
 
 	public void playPlayable(Playable playable) {
-		if (playable == null) {
-			throw new IllegalArgumentException("Playable cannot be null.");
-		}
-
-		currentPlayable = playable;
 		player.play(playable);
 	}
+
+	public void enqueuePlayable(Playable playable) {
+		player.enqueue(playable);
+	}
+
+	public void clearPlaybackQueue() {
+		player.clearQueue();
+	}
+
+	
 }
