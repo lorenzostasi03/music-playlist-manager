@@ -59,6 +59,7 @@ public class Player implements EventListener {
 	 */
 	public void enqueue(Playable playable) {
 		queue.enqueue(playable);
+		notifyQueueChanged();
 	}
 
 	/**
@@ -66,6 +67,7 @@ public class Player implements EventListener {
 	 */
 	public void clearQueue() {
 		queue.clear();
+		notifyQueueChanged();
 	}
 
 	/**
@@ -108,14 +110,25 @@ public class Player implements EventListener {
 		notifyCurrentPlayableChanged();
 	}
 
-	/**
-	 * Salta l'oggetto riproducibile corrente e prova ad avviare il prossimo elemento
-	 * in coda.
-	 */
-	public void skip() {
+	public void skipSong() {
+		if (currentPlayable == null) {
+			playNextFromQueue();
+			return;
+		}
+
+		boolean skippedInsidePlayable = currentPlayable.skipToNextSong();
+
+		if (!skippedInsidePlayable) {
+			stopCurrentPlayable();
+			playNextFromQueue();
+		}
+	}
+
+	public void skipPlayable() {
 		stopCurrentPlayable();
 		playNextFromQueue();
 	}
+	
 
 	/**
 	 * Restituisce lo stato corrente del player.
@@ -170,6 +183,7 @@ public class Player implements EventListener {
 
 	private void playNextFromQueue() {
 		Playable nextPlayable = queue.dequeue();
+		notifyQueueChanged();
 
 		if (nextPlayable == null) {
 			currentPlayable = null;
@@ -198,5 +212,9 @@ public class Player implements EventListener {
 
 	private void notifyCurrentPlayableChanged() {
 		events.notifyListeners(EventType.CURRENT_PLAYABLE_CHANGED);
+	}
+
+	private void notifyQueueChanged() {
+		events.notifyListeners(EventType.QUEUE_CHANGED);
 	}
 }

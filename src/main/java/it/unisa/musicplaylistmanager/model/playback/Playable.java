@@ -23,6 +23,13 @@ public abstract class Playable implements EventListener {
 		this.events = new EventManager();
 	}
 
+
+	/**
+	 * 
+	 * 
+	 */
+	public abstract String getTitle();
+
 	/**
 	 * Restituisce il gestore degli eventi associato all'oggetto riproducibile.
 	 *
@@ -58,4 +65,10 @@ public abstract class Playable implements EventListener {
 	 * @return traccia corrente
 	 */
 	public abstract Song getCurrentSong();
+
+	public abstract boolean skipToNextSong();
+
+	public abstract void setPlaybackMode(PlaybackMode mode);
+
+	public abstract PlaybackMode getPlaybackMode();
 }

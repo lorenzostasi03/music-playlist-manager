@@ -21,7 +21,14 @@ public enum EventType {
 	CURRENT_PLAYABLE_CHANGED,
 
 	/**
+	 * 
+	 * 
+	 */
+	QUEUE_CHANGED,
+
+	/**
 	 * Indica che l'oggetto riproducibile corrente ha completato la riproduzione.
 	 */
 	PLAYABLE_COMPLETED
+
 }

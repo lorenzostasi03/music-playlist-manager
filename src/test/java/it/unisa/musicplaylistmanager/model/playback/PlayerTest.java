@@ -140,6 +140,25 @@ class PlayerTest {
 		}
 
 		@Override
+		public String getTitle() {
+			return "Fake playable";
+		}
+
+		@Override
+		public boolean skipToNextSong() {
+			return false;
+		}
+
+		@Override
+		public void setPlaybackMode(PlaybackMode mode) {
+		}
+
+		@Override
+		public PlaybackMode getPlaybackMode() {
+			return PlaybackMode.SEQUENTIAL;
+		}
+
+		@Override
 		public void update(EventType eventType) {
 		}
 	}
