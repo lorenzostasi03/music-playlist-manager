@@ -46,7 +46,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 	public void update(Song song) {
 		String query = """
 				UPDATE song
-				SET title = ?, author = ?, genre = ?, year = ?, duration = ?, file_path = ?, play_count = ?
+				SET title = ?, author = ?, genre = ?, year = ?, duration = ?, file_path = ?
 				WHERE id = ?
 				""";
 
@@ -58,8 +58,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			stmt.setInt(4, song.getYear());
 			stmt.setInt(5, song.getDuration());
 			stmt.setString(6, song.getFilePath());
-			stmt.setInt(7, song.getPlayCount());
-			stmt.setString(8, song.getId().toString());
+			stmt.setString(7, song.getId().toString());
 
 			stmt.executeUpdate();
 		} catch (SQLException | NullPointerException e) {
@@ -67,7 +66,23 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 		}
 	}
 
-	@Override
+    @Override
+    public void updatePlayCount(UUID songId, int playCount) {
+        String query = "UPDATE song SET play_count = ? WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, playCount);
+            stmt.setString(2, songId.toString());
+            stmt.executeUpdate();
+
+        } catch (SQLException | NullPointerException e) {
+            throw new PersistenceException("Si è verificato un errore durante l'aggiornamento del play count del brano!");
+        }
+    }
+
+    @Override
 	public void delete(UUID songId) {
 		String query = "DELETE FROM song WHERE id = ?";
 

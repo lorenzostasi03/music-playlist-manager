@@ -110,6 +110,18 @@ public class MusicLibrary {
 		songDAO.update(song);
 	}
 
+    /**
+     * Aggiorna il numero di riproduzioni di un brano.
+     *
+     * @param song
+     *            brano di cui aggiornare il play count
+     * @throws PersistenceException
+     *             se si verifica un errore durante l'aggiornamento nel database
+     */
+    public void updateSongPlayCount(Song song) {
+        songDAO.updatePlayCount(song.getId(), song.getPlayCount());
+    }
+
 	/**
 	 * Cerca tracce nel catalogo per titolo e artista.
 	 *
@@ -201,6 +213,18 @@ public class MusicLibrary {
 		playlist.setName(newName);
 		playlistDAO.update(playlist);
 	}
+
+    /**
+     * Aggiorna il numero di riproduzioni di una playlist.
+     *
+     * @param playlist
+     *            playlist di cui aggiornare il play count
+     * @throws PersistenceException
+     *             se si verifica un errore durante l'aggiornamento nel database
+     */
+    void updatePlaylistPlayCount(Playlist playlist) {
+        playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
+    }
 
 	/**
 	 * Aggiunge una traccia del catalogo a una playlist.
