@@ -58,6 +58,14 @@ public class HomeController {
 
 	private final AppContext appContext = AppContext.getInstance();
 
+    private List<Playlist> playlists;
+
+    private Playlist topSongs;
+    private final int TOP_SONGS = 10;
+
+    private List<Playlist> topPlaylists;
+    private final int TOP_PLAYLISTS = 3;
+
 	/**
 	 * Inizializza il controller configurando la lista delle playlist e caricando i
 	 * dati attualmente presenti nel catalogo.
@@ -121,6 +129,7 @@ public class HomeController {
 	@FXML
 	private void onListViewClicked() {
 	}
+
 	/**
 	 * Crea un componente grafico che rappresenta visivamente una singola playlist
 	 * all'interno della ListView, includendo metadati e pulsanti di azione.
@@ -142,9 +151,14 @@ public class HomeController {
 		durationLabel.getStyleClass().add("row-meta");
 		durationLabel.setPrefWidth(80);
 
-		Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
-		playCountLabel.getStyleClass().add("row-meta");
-		playCountLabel.setPrefWidth(90);
+
+        Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
+        playCountLabel.getStyleClass().add("row-meta");
+        playCountLabel.setPrefWidth(90);
+
+        if (!playlists.contains(playlist)) {
+            playCountLabel.setText("");
+        }
 
 		Button renameButton = new Button("✎");
 		renameButton.getStyleClass().add("row-action");
@@ -173,12 +187,14 @@ public class HomeController {
 	 * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
 	 */
 	private void refreshPlaylists() {
-		List<Playlist> playlists = appContext.getMusicLibrary().getAllPlaylists();
+		playlists = appContext.getMusicLibrary().getAllPlaylists();
+        topSongs = refreshTopSongs();
 
 		playlistListView.getItems().setAll(playlists);
-		countLabel.setText(playlists.size() + " playlist");
+        playlistListView.getItems().addAll(topSongs);
+		countLabel.setText(playlistListView.getItems().size() + " playlist");
 
-		boolean empty = playlists.isEmpty();
+		boolean empty = playlistListView.getItems().isEmpty();
 		emptyStateBox.setVisible(empty);
 		emptyStateBox.setManaged(empty);
 		playlistListView.setVisible(!empty);
@@ -221,6 +237,18 @@ public class HomeController {
 			AlertManager.showError(e.getMessage());
 		}
 	}
+
+    private Playlist refreshTopSongs() {
+        List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
+        if (songs.isEmpty()) return null;
+
+        Playlist playlist = new Playlist("Top " + TOP_SONGS);
+
+        for (Song song : songs)
+            playlist.addSong(song);
+
+        return playlist;
+    }
 
 	/**
 	 * Naviga verso la schermata della playlist specificata. Memorizza la playlist

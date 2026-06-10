@@ -10,6 +10,7 @@ import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -173,6 +174,24 @@ public class MusicLibrary {
 	public List<Song> getAllSongs() {
 		return songCatalog.getAllSongs();
 	}
+
+    /**
+     * Recupera i primi {@code n} brani più riprodotti del catalogo,
+     * ordinati per numero di riproduzioni in ordine decrescente.
+     *
+     * @param n il numero massimo di brani da restituire; deve essere positivo
+     * @return lista di al più {@code n} brani ordinati per playCount decrescente;
+     *         può contenere meno di {@code n} elementi se il catalogo è più piccolo
+     */
+    public List<Song> getTopSongs(int n) {
+        if (n <= 0) return null;
+
+        return songCatalog.getAllSongs().stream()
+                            .filter(s -> s.getPlayCount() > 0)
+                            .sorted(Comparator.comparingInt(Song::getPlayCount).reversed())
+                            .limit(n)
+                            .toList();
+    }
 
 	/**
 	 * Crea e aggiunge una nuova playlist alla collezione.
