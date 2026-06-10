@@ -121,7 +121,12 @@ class PlayerTest {
 			return null;
 		}
 
-		@Override
+        @Override
+        protected void updatePlayCount() {
+            return;
+        }
+
+        @Override
 		public void update(EventType eventType) {
 		}
 	}

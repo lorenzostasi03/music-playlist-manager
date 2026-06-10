@@ -58,4 +58,6 @@ public abstract class Playable implements EventListener {
 	 * @return traccia corrente
 	 */
 	public abstract Song getCurrentSong();
+
+    protected abstract void updatePlayCount();
 }

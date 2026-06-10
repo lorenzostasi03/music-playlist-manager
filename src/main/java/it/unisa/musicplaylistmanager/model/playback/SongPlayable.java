@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
 /**
@@ -45,7 +46,7 @@ public class SongPlayable extends Playable {
 	public void play() {
 		subscribeToAudioCompleted();
 		audioPlayer.play(song.getFilePath());
-        song.incrementPlayCount();
+        updatePlayCount();
 	}
 
 	/**
@@ -84,7 +85,13 @@ public class SongPlayable extends Playable {
 		return song;
 	}
 
-	/**
+    @Override
+    protected void updatePlayCount() {
+        song.incrementPlayCount();
+        AppContext.getInstance().getMusicLibrary().updateSongPlayCount(song);
+    }
+
+    /**
 	 * Gestisce gli eventi ricevuti dal player audio.
 	 *
 	 * <p>

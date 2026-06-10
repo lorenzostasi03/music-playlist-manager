@@ -1,7 +1,5 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
-import it.unisa.musicplaylistmanager.app.AppContext;
-
 /**
  * Gestisce la riproduzione corrente dell'applicazione.
  *
@@ -15,15 +13,12 @@ public class Player implements EventListener {
 	private Playable currentPlayable;
 	private PlayerState state;
 
-    private final AppContext appContext;
-
 	/**
 	 * Crea un nuovo player senza alcun oggetto in riproduzione.
 	 */
 	public Player() {
 		this.currentPlayable = null;
 		this.state = PlayerState.STOPPED;
-        this.appContext = AppContext.getInstance();
 	}
 
 	/**
@@ -53,8 +48,6 @@ public class Player implements EventListener {
 		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
 		currentPlayable.play();
 		state = PlayerState.PLAYING;
-
-        updatePlayCount(currentPlayable);
 	}
 
 	/**
@@ -124,13 +117,4 @@ public class Player implements EventListener {
 			stop();
 		}
 	}
-
-    private void updatePlayCount(Playable playable) {
-        switch (playable) {
-            case SongPlayable s -> appContext.getMusicLibrary().updateSongPlayCount(playable.getCurrentSong());
-//            case PlaylistPlayable p -> appContext.getMusicLibrary().updateSongPlayCount(playable.getCurrentPlaylist();
-
-            default -> throw new IllegalArgumentException("Unexpected value: " + playable);
-        }
-    }
 }
