@@ -113,17 +113,17 @@ public class MusicLibrary {
 		songDAO.update(song);
 	}
 
-    /**
-     * Aggiorna il numero di riproduzioni di un brano.
-     *
-     * @param song
-     *            brano di cui aggiornare il play count
-     * @throws PersistenceException
-     *             se si verifica un errore durante l'aggiornamento nel database
-     */
-    public void updateSongPlayCount(Song song) {
-        songDAO.updatePlayCount(song.getId(), song.getPlayCount());
-    }
+	/**
+	 * Aggiorna il numero di riproduzioni di un brano.
+	 *
+	 * @param song
+	 *            brano di cui aggiornare il play count
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento nel database
+	 */
+	public void updateSongPlayCount(Song song) {
+		songDAO.updatePlayCount(song.getId(), song.getPlayCount());
+	}
 
 	/**
 	 * Cerca tracce nel catalogo per titolo e artista.
@@ -175,23 +175,22 @@ public class MusicLibrary {
 		return songCatalog.getAllSongs();
 	}
 
-    /**
-     * Recupera i primi {@code n} brani più riprodotti del catalogo,
-     * ordinati per numero di riproduzioni in ordine decrescente.
-     *
-     * @param n il numero massimo di brani da restituire; deve essere positivo
-     * @return lista di al più {@code n} brani ordinati per playCount decrescente;
-     *         può contenere meno di {@code n} elementi se il catalogo è più piccolo
-     */
-    public List<Song> getTopSongs(int n) {
-        if (n <= 0) return null;
+	/**
+	 * Recupera i primi {@code n} brani più riprodotti del catalogo, ordinati per
+	 * numero di riproduzioni in ordine decrescente.
+	 *
+	 * @param n
+	 *            il numero massimo di brani da restituire; deve essere positivo
+	 * @return lista di al più {@code n} brani ordinati per playCount decrescente;
+	 *         può contenere meno di {@code n} elementi se il catalogo è più piccolo
+	 */
+	public List<Song> getTopSongs(int n) {
+		if (n <= 0)
+			return null;
 
-        return songCatalog.getAllSongs().stream()
-                            .filter(s -> s.getPlayCount() > 0)
-                            .sorted(Comparator.comparingInt(Song::getPlayCount).reversed())
-                            .limit(n)
-                            .toList();
-    }
+		return songCatalog.getAllSongs().stream().filter(s -> s.getPlayCount() > 0)
+				.sorted(Comparator.comparingInt(Song::getPlayCount).reversed()).limit(n).toList();
+	}
 
 	/**
 	 * Crea e aggiunge una nuova playlist alla collezione.
@@ -254,17 +253,17 @@ public class MusicLibrary {
 		playlistDAO.update(playlist);
 	}
 
-    /**
-     * Aggiorna il numero di riproduzioni di una playlist.
-     *
-     * @param playlist
-     *            playlist di cui aggiornare il play count
-     * @throws PersistenceException
-     *             se si verifica un errore durante l'aggiornamento nel database
-     */
-    void updatePlaylistPlayCount(Playlist playlist) {
-        playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
-    }
+	/**
+	 * Aggiorna il numero di riproduzioni di una playlist.
+	 *
+	 * @param playlist
+	 *            playlist di cui aggiornare il play count
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento nel database
+	 */
+	public void updatePlaylistPlayCount(Playlist playlist) {
+		playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
+	}
 
 	/**
 	 * Aggiunge una traccia del catalogo a una playlist.
@@ -313,21 +312,21 @@ public class MusicLibrary {
 		return playlistCatalog.getAllPlaylists();
 	}
 
-    /**
-     * Recupera le prime {@code n} playlist più riprodotte del catalogo,
-     * ordinate per numero di riproduzioni in ordine decrescente.
-     *
-     * @param n il numero massimo di playlist da restituire; deve essere positivo
-     * @return lista di al più {@code n} playlist ordinate per playCount decrescente;
-     *         può contenere meno di {@code n} elementi se il catalogo è più piccolo
-     */
-    public List<Playlist> getTopPlaylists(int n) {
-        if (n <= 0) return null;
+	/**
+	 * Recupera le prime {@code n} playlist più riprodotte del catalogo, ordinate
+	 * per numero di riproduzioni in ordine decrescente.
+	 *
+	 * @param n
+	 *            il numero massimo di playlist da restituire; deve essere positivo
+	 * @return lista di al più {@code n} playlist ordinate per playCount
+	 *         decrescente; può contenere meno di {@code n} elementi se il catalogo
+	 *         è più piccolo
+	 */
+	public List<Playlist> getTopPlaylists(int n) {
+		if (n <= 0)
+			return null;
 
-        return playlistCatalog.getAllPlaylists().stream()
-                                .filter(p -> p.getPlayCount() > 0)
-                                .sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed())
-                                .limit(n)
-                                .toList();
-    }
+		return playlistCatalog.getAllPlaylists().stream().filter(p -> p.getPlayCount() > 0)
+				.sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed()).limit(n).toList();
+	}
 }

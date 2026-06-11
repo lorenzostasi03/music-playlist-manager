@@ -59,27 +59,27 @@ class SQLitePlaylistDAOTest {
 		assertThrows(PersistenceException.class, () -> playlistDAO.save(playlist));
 	}
 
-    @Test
-    void updateValidPlaylists() {
-        Playlist playlist = new Playlist("A");
+	@Test
+	void updateValidPlaylists() {
+		Playlist playlist = new Playlist("A");
 
-        playlistDAO.save(playlist);
+		playlistDAO.save(playlist);
 
-        playlist.setName("B");
-        playlistDAO.update(playlist);
+		playlist.setName("B");
+		playlistDAO.update(playlist);
 
-        List<Playlist> playlists = playlistDAO.getPlaylists();
-        assertEquals(1, playlists.size());
+		List<Playlist> playlists = playlistDAO.getPlaylists();
+		assertEquals(1, playlists.size());
 
-        assertEquals(playlist.getName(), playlists.getFirst().getName());
+		assertEquals(playlist.getName(), playlists.getFirst().getName());
 
-        int oldPlayCount = playlist.getPlayCount();
-        playlist.incrementPlayCount();
-        playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
-        playlists = playlistDAO.getPlaylists();
-        assertEquals(playlist.getPlayCount(), playlists.getFirst().getPlayCount());
-        assertEquals(oldPlayCount + 1, playlists.getFirst().getPlayCount());
-    }
+		int oldPlayCount = playlist.getPlayCount();
+		playlist.incrementPlayCount();
+		playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
+		playlists = playlistDAO.getPlaylists();
+		assertEquals(playlist.getPlayCount(), playlists.getFirst().getPlayCount());
+		assertEquals(oldPlayCount + 1, playlists.getFirst().getPlayCount());
+	}
 
 	@Test
 	void updateNullPlaylist() {

@@ -31,17 +31,17 @@ public interface PlaylistDAO {
 	 */
 	void update(Playlist playlist);
 
-    /**
-     * Aggiorna il numero di riproduzioni di una playlist.
-     *
-     * @param playlistId
-     *            identificativo della playlist da aggiornare
-     * @param playCount
-     *            nuovo numero di riproduzioni della playlist
-     * @throws PersistenceException
-     *             se si verifica un errore durante l'aggiornamento nel database
-     */
-    void updatePlayCount(UUID playlistId, int playCount);
+	/**
+	 * Aggiorna il numero di riproduzioni di una playlist.
+	 *
+	 * @param playlistId
+	 *            identificativo della playlist da aggiornare
+	 * @param playCount
+	 *            nuovo numero di riproduzioni della playlist
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento nel database
+	 */
+	void updatePlayCount(UUID playlistId, int playCount);
 
 	/**
 	 * Elimina una playlist dal database.

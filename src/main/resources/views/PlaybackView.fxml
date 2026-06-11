@@ -22,8 +22,8 @@
             <Label style="-fx-text-fill: #282828; -fx-font-size: 90px;" text="♫" />
         </StackPane>
         <VBox alignment="CENTER" spacing="8">
-            <Label fx:id="trackTitleLabel" style="-fx-text-fill: #FFFFFF; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Titolo" />
-            <Label fx:id="trackArtistLabel" style="-fx-text-fill: #1DB954; -fx-font-size: 16px; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-weight: bold;" text="Artista - Nome playlist" />
+            <Label fx:id="trackTitleLabel" style="-fx-text-fill: #FFFFFF; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Nessuna traccia" />
+            <Label fx:id="trackArtistLabel" style="-fx-text-fill: #1DB954; -fx-font-size: 16px; -fx-font-family: 'Segoe UI', sans-serif; -fx-font-weight: bold;" text="" />
         </VBox>
         <VBox maxWidth="500" prefWidth="500" spacing="8">
             <Slider fx:id="progressSlider" value="37" style="-fx-cursor: hand;" />
@@ -42,24 +42,33 @@
             <HBox alignment="CENTER" spacing="10">
                 <ToggleButton fx:id="sequentialModeButton" toggleGroup="$playModeGroup" onAction="#onSequential" selected="true" minWidth="130" styleClass="mode-btn" text="↓ Sequenziale" />
                 <ToggleButton fx:id="shuffleModeButton" toggleGroup="$playModeGroup" onAction="#onShuffle" minWidth="130" styleClass="mode-btn" text="🔀 Shuffle" />
-            </HBox>
-            <HBox alignment="CENTER" spacing="10">
-                <ToggleButton fx:id="loopTrackButton" toggleGroup="$playModeGroup" onAction="#onLoopTrack" minWidth="130" styleClass="mode-btn" text="🔂 Loop traccia" />
-                <ToggleButton fx:id="loopPlaylistButton" toggleGroup="$playModeGroup" onAction="#onLoopPlaylist" minWidth="130" styleClass="mode-btn" text="🔁 Loop playlist" />
+                <ToggleButton fx:id="loopModeButton" toggleGroup="$playModeGroup" onAction="#onLoop" minWidth="130" styleClass="mode-btn" text="🔂 Loop" />
             </HBox>
         </VBox>
         <Label fx:id="playCountLabel" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="142 RIPRODUZIONI TOTALI" />
     </VBox>
     <VBox maxWidth="280" minWidth="280" prefWidth="280" style="-fx-background-color: #0A0A0A; -fx-border-color: #121212; -fx-border-width: 0 0 0 1;">
-        <HBox alignment="CENTER_LEFT" spacing="6">
+        <VBox spacing="10">
             <padding>
-                <Insets bottom="15" left="20" right="20" top="30" />
+                <Insets bottom="15" left="10" right="10" top="30" />
             </padding>
-            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="≣ Coda di riproduzione" />
-        </HBox>
+
+            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 18px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;"
+                text="≣ Coda di riproduzione" />
+
+            <Button fx:id="skipPlayableButton"
+                    onAction="#onSkipPlayable"
+                    minWidth="220"
+                    prefWidth="220"
+                    maxWidth="220"
+                    styleClass="spotify-btn"
+                    style="-fx-min-width: 220; -fx-pref-width: 220; -fx-max-width: 220;"
+                    text="Riproduci prossimo" />
+        </VBox>
+
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0A0A0A; -fx-background-color: transparent; -fx-control-inner-background: #0A0A0A; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
             <content>
-                <VBox fx:id="queueView" style="-fx-padding: 0 10 0 10;" />
+                <VBox fx:id="queueView" style="-fx-padding: 0 5 0 5;" />
             </content>
         </ScrollPane>
     </VBox>

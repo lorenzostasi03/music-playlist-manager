@@ -24,6 +24,12 @@ public abstract class Playable implements EventListener {
 	}
 
 	/**
+	 *
+	 *
+	 */
+	public abstract String getTitle();
+
+	/**
 	 * Restituisce il gestore degli eventi associato all'oggetto riproducibile.
 	 *
 	 * @return event manager dell'oggetto riproducibile
@@ -59,5 +65,11 @@ public abstract class Playable implements EventListener {
 	 */
 	public abstract Song getCurrentSong();
 
-    protected abstract void updatePlayCount();
+	public abstract boolean skipToNextSong();
+
+	public abstract void setPlaybackMode(PlaybackMode mode);
+
+	public abstract PlaybackMode getPlaybackMode();
+
+	protected abstract void updatePlayCount();
 }

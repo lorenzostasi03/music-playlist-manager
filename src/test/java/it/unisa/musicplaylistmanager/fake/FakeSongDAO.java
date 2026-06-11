@@ -22,12 +22,12 @@ public class FakeSongDAO implements SongDAO {
 		songs.add(song);
 	}
 
-    @Override
-    public void updatePlayCount(UUID songId, int playCount) {
-        songs.stream().filter(p -> p.getId().equals(songId)).findFirst().ifPresent(Song::incrementPlayCount);
-    }
+	@Override
+	public void updatePlayCount(UUID songId, int playCount) {
+		songs.stream().filter(p -> p.getId().equals(songId)).findFirst().ifPresent(Song::incrementPlayCount);
+	}
 
-    @Override
+	@Override
 	public void delete(UUID songId) {
 		songs.removeIf(s -> s.getId().equals(songId));
 	}

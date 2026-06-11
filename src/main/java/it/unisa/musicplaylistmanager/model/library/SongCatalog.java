@@ -89,13 +89,10 @@ public class SongCatalog {
 		String normalizedAuthor = author == null ? "" : author.trim().toLowerCase();
 
 		return songs.values().stream()
-				.filter(song -> normalizedQuery.isEmpty()
-						|| song.getTitle().toLowerCase().contains(normalizedQuery))
+				.filter(song -> normalizedQuery.isEmpty() || song.getTitle().toLowerCase().contains(normalizedQuery))
 				.filter(song -> genre == null || song.getGenre() == genre)
-				.filter(song -> normalizedAuthor.isEmpty()
-						|| song.getAuthor().toLowerCase().equals(normalizedAuthor))
-				.filter(song -> year == null || song.getYear() == year)
-				.filter(song -> tag == null || song.hasTag(tag))
+				.filter(song -> normalizedAuthor.isEmpty() || song.getAuthor().toLowerCase().equals(normalizedAuthor))
+				.filter(song -> year == null || song.getYear() == year).filter(song -> tag == null || song.hasTag(tag))
 				.toList();
 	}
 

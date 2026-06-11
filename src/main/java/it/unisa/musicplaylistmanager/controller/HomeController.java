@@ -5,6 +5,7 @@ import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -59,13 +62,13 @@ public class HomeController {
 
 	private final AppContext appContext = AppContext.getInstance();
 
-    private List<Playlist> playlists;
+	private List<Playlist> playlists;
 
-    private Playlist topSongs;
-    private final int TOP_SONGS = 10;
+	private Playlist topSongs;
+	private final int TOP_SONGS = 10;
 
-    private List<Playlist> topPlaylists;
-    private final int TOP_PLAYLISTS = 3;
+	private List<Playlist> topPlaylists;
+	private final int TOP_PLAYLISTS = 3;
 
 	/**
 	 * Inizializza il controller configurando la lista delle playlist e caricando i
@@ -140,62 +143,93 @@ public class HomeController {
 	 * @return un oggetto HBox configurato con le informazioni della playlist
 	 */
 	private HBox createPlaylistRow(Playlist playlist) {
+		boolean storedPlaylist = playlists.contains(playlist);
+
 		Label nameLabel = new Label(playlist.getName());
 		nameLabel.getStyleClass().add("row-title");
-		nameLabel.setPrefWidth(300);
+		nameLabel.setMinWidth(0);
+		nameLabel.setMaxWidth(Double.MAX_VALUE);
+		HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
 		Label songsLabel = new Label(String.valueOf(playlist.size()));
 		songsLabel.getStyleClass().add("row-meta");
+		songsLabel.setMinWidth(60);
 		songsLabel.setPrefWidth(60);
+		songsLabel.setMaxWidth(60);
 
 		Label durationLabel = new Label(formatDuration(playlist));
 		durationLabel.getStyleClass().add("row-meta");
+		durationLabel.setMinWidth(80);
 		durationLabel.setPrefWidth(80);
+		durationLabel.setMaxWidth(80);
 
+		Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
+		playCountLabel.getStyleClass().add("row-meta");
+		playCountLabel.setMinWidth(90);
+		playCountLabel.setPrefWidth(90);
+		playCountLabel.setMaxWidth(90);
 
-        Label playCountLabel = new Label(String.valueOf(playlist.getPlayCount()));
-        playCountLabel.getStyleClass().add("row-meta");
-        playCountLabel.setPrefWidth(90);
+		if (!storedPlaylist) {
+			playCountLabel.setText("");
+		}
 
-        if (!playlists.contains(playlist)) {
-            playCountLabel.setText("");
-        }
+		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
+		Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
 
-		Button renameButton = new Button("✎");
-		renameButton.getStyleClass().add("row-action");
-		renameButton.setTooltip(new Tooltip("Rinomina playlist"));
-		renameButton.setPrefWidth(28);
-		renameButton.setOnAction(event -> {
-			event.consume();
-			openPlaylistForm(playlist);
-		});
+		HBox row;
 
-		Button deleteButton = new Button("×");
-		deleteButton.getStyleClass().add("row-action");
-		deleteButton.setTooltip(new Tooltip("Elimina playlist"));
-		deleteButton.setPrefWidth(28);
-		deleteButton.setOnAction(event -> {
-			event.consume();
-			deletePlaylist(playlist);
-		});
+		if (storedPlaylist) {
+			Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
+			Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
 
-		HBox row = new HBox(0, nameLabel, songsLabel, durationLabel, playCountLabel, renameButton, deleteButton);
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+					renameButton, deleteButton);
+		} else {
+			Region actionPlaceholder = new Region();
+			actionPlaceholder.setMinWidth(72);
+			actionPlaceholder.setPrefWidth(72);
+			actionPlaceholder.setMaxWidth(72);
+
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+					actionPlaceholder);
+		}
+
 		row.getStyleClass().add("list-row");
+		row.setMaxWidth(Double.MAX_VALUE);
 		row.setOnMouseClicked(event -> openPlaylistView(playlist));
+
 		return row;
+	}
+
+	private Button createButton(String text, String tooltip, Runnable action) {
+		Button button = new Button(text);
+		button.getStyleClass().add("row-action");
+		button.setTooltip(new Tooltip(tooltip));
+		button.setMinWidth(32);
+		button.setPrefWidth(32);
+		button.setMaxWidth(32);
+		button.setOnAction(event -> {
+			event.consume();
+			action.run();
+		});
+		button.setFocusTraversable(false);
+
+		return button;
 	}
 	/**
 	 * Ricarica la lista delle playlist dal catalogo e aggiorna l'interfaccia.
 	 */
 	private void refreshPlaylists() {
 		playlists = appContext.getMusicLibrary().getAllPlaylists();
-        topSongs = refreshTopSongs();
-        topPlaylists = refreshTopPlaylists();
+		topSongs = refreshTopSongs();
 
-		playlistListView.getItems().setAll(playlists);
+		playlistListView.getItems().clear();
 
-        if (topSongs != null) playlistListView.getItems().addAll(topSongs);
-        if (topPlaylists != null) playlistListView.getItems().addAll(topPlaylists);
+		if (topSongs != null) {
+			playlistListView.getItems().add(topSongs);
+		}
+
+		playlistListView.getItems().addAll(playlists);
 
 		countLabel.setText(playlistListView.getItems().size() + " playlist");
 
@@ -206,7 +240,7 @@ public class HomeController {
 		playlistListView.setManaged(!empty);
 	}
 
-    /**
+	/**
 	 * Calcola la durata totale di una playlist sommando la durata dei singoli brani
 	 * e la formatta in una stringa (minuti:secondi).
 	 *
@@ -244,34 +278,36 @@ public class HomeController {
 		}
 	}
 
-    /**
-     *  Ricrea la playlist contenente i brani più riprodotti.
-     *
-     * @return playlist con i brani più riprodotti.
-     */
-    private Playlist refreshTopSongs() {
-        List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
-        if (songs.isEmpty()) return null;
+	/**
+	 * Ricrea la playlist contenente i brani più riprodotti.
+	 *
+	 * @return playlist con i brani più riprodotti.
+	 */
+	private Playlist refreshTopSongs() {
+		List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
+		if (songs.isEmpty())
+			return null;
 
-        Playlist playlist = new Playlist("Top " + TOP_SONGS);
+		Playlist playlist = new Playlist("Top " + TOP_SONGS);
 
-        for (Song song : songs)
-            playlist.addSong(song);
+		for (Song song : songs)
+			playlist.addSong(song);
 
-        return playlist;
-    }
+		return playlist;
+	}
 
-    /**
-     *  Ricrea la lista delle playlist più riprodotte.
-     *
-     * @return lista delle playlist più riprodotte.
-     */
-    private List<Playlist> refreshTopPlaylists() {
-        List<Playlist> playlists = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
-        if (playlists.isEmpty()) return null;
+	/**
+	 * Ricrea la lista delle playlist più riprodotte.
+	 *
+	 * @return lista delle playlist più riprodotte.
+	 */
+	private List<Playlist> refreshTopPlaylists() {
+		List<Playlist> playlists = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
+		if (playlists.isEmpty())
+			return null;
 
-        return new ArrayList<>(playlists);
-    }
+		return new ArrayList<>(playlists);
+	}
 
 	/**
 	 * Naviga verso la schermata della playlist specificata. Memorizza la playlist
@@ -312,5 +348,25 @@ public class HomeController {
 		} catch (IOException e) {
 			AlertManager.showError("Impossibile aprire il form playlist.");
 		}
+	}
+
+	private void playPlaylist(Playlist playlist) {
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
+
+		appContext.playPlayable(new PlaylistPlayable(playlist));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
+	}
+
+	private void enqueuePlaylist(Playlist playlist) {
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
+
+		appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+		AlertManager.showInfo("Playlist aggiunta alla coda.");
 	}
 }

@@ -96,12 +96,12 @@ class SQLiteSongDAOTest {
 		assertEquals(song.getFilePath(), dbSong.getFilePath());
 		assertEquals(song.getId(), dbSong.getId());
 
-        int oldPlayCount = song.getPlayCount();
-        song.incrementPlayCount();
-        songDAO.updatePlayCount(song.getId(), song.getPlayCount());
-        songs = songDAO.getSongs();
-        assertEquals(song.getPlayCount(), songs.getFirst().getPlayCount());
-        assertEquals(oldPlayCount + 1, songs.getFirst().getPlayCount());
+		int oldPlayCount = song.getPlayCount();
+		song.incrementPlayCount();
+		songDAO.updatePlayCount(song.getId(), song.getPlayCount());
+		songs = songDAO.getSongs();
+		assertEquals(song.getPlayCount(), songs.getFirst().getPlayCount());
+		assertEquals(oldPlayCount + 1, songs.getFirst().getPlayCount());
 	}
 
 	@Test

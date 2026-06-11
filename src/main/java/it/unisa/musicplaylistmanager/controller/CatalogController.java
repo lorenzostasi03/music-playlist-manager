@@ -144,8 +144,10 @@ public class CatalogController {
 	 * @return un oggetto HBox formattato contenente le informazioni e i comandi
 	 *         della traccia
 	 */
-	private HBox createSongRow(Song song) {
+	private VBox createSongRow(Song song) {
 		Button playButton = createButton("▶", "Riproduci traccia", () -> playSong(song));
+
+		Button enqueueButton = createButton("+", "Aggiungi traccia alla coda", () -> enqueueSong(song));
 
 		Button editButton = createButton("✎", "Modifica traccia", () -> openSongForm(song));
 
@@ -153,23 +155,34 @@ public class CatalogController {
 
 		Label titleLabel = new Label(song.getTitle());
 		titleLabel.getStyleClass().add("row-title");
-		titleLabel.setPrefWidth(125);
 		titleLabel.setMinWidth(125);
+		titleLabel.setPrefWidth(125);
+		titleLabel.setMaxWidth(125);
+		titleLabel.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
 
 		Label authorLabel = createMetaLabel(song.getAuthor(), 60);
 		Label genreLabel = createMetaLabel(song.getGenre().getLabel(), 55);
 		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 40);
 		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 60);
-		Label tagsLabel = createMetaLabel(formatTags(song), 153);
-		tagsLabel.setWrapText(true);
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-		HBox row = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, tagsLabel, spacer, playButton,
-				editButton, deleteButton);
+		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
+				enqueueButton, editButton, deleteButton);
 
+		mainRow.setMaxWidth(Double.MAX_VALUE);
+
+		Label tagsLabel = new Label("Tag: " + formatTags(song));
+		tagsLabel.getStyleClass().add("row-meta");
+		tagsLabel.setWrapText(true);
+		tagsLabel.setMaxWidth(Double.MAX_VALUE);
+		tagsLabel.setStyle("-fx-text-fill: #1DB954; -fx-font-size: 11px; -fx-padding: 0 0 0 0;");
+
+		VBox row = new VBox(4, mainRow, tagsLabel);
 		row.getStyleClass().add("list-row");
+		row.setMaxWidth(Double.MAX_VALUE);
+
 		return row;
 	}
 
@@ -180,8 +193,12 @@ public class CatalogController {
 		button.setMinWidth(24);
 		button.setPrefWidth(24);
 		button.setMaxWidth(24);
-		button.setOnAction(e -> action.run());
+		button.setOnAction(event -> {
+			event.consume();
+			action.run();
+		});
 		button.setFocusTraversable(false);
+
 		return button;
 	}
 
@@ -197,8 +214,11 @@ public class CatalogController {
 	private Label createMetaLabel(String text, double width) {
 		Label label = new Label(text);
 		label.getStyleClass().add("row-meta");
-		label.setPrefWidth(width);
 		label.setMinWidth(width);
+		label.setPrefWidth(width);
+		label.setMaxWidth(width);
+		label.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+
 		return label;
 	}
 
@@ -310,6 +330,11 @@ public class CatalogController {
 		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
+	private void enqueueSong(Song song) {
+		appContext.enqueuePlayable(new SongPlayable(song));
+		AlertManager.showInfo("Traccia aggiunta alla coda.");
+	}
+
 	/**
 	 * Recupera la lista dei brani dal catalogo.
 	 *
@@ -353,9 +378,7 @@ public class CatalogController {
 			return null;
 		}
 
-		return Arrays.stream(Tag.values())
-				.filter(tag -> tag.getDisplayName().equals(value))
-				.findFirst()
+		return Arrays.stream(Tag.values()).filter(tag -> tag.getDisplayName().equals(value)).findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("Tag non valido: " + value));
 	}
 

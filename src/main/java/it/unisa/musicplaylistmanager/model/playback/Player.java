@@ -1,17 +1,22 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import java.util.List;
+
 /**
  * Gestisce la riproduzione corrente dell'applicazione.
  *
  * <p>
  * Il player mantiene il riferimento all'oggetto riproducibile attualmente in
- * esecuzione e coordina le operazioni di avvio, pausa, ripresa e interruzione
- * della riproduzione.
+ * esecuzione e coordina le operazioni di avvio, pausa, ripresa, interruzione e
+ * avanzamento della coda di riproduzione.
  */
 public class Player implements EventListener {
 
 	private Playable currentPlayable;
 	private PlayerState state;
+
+	private final PlaybackQueue queue;
+	private final EventManager events;
 
 	/**
 	 * Crea un nuovo player senza alcun oggetto in riproduzione.
@@ -19,15 +24,16 @@ public class Player implements EventListener {
 	public Player() {
 		this.currentPlayable = null;
 		this.state = PlayerState.STOPPED;
+		this.queue = new PlaybackQueue();
+		this.events = new EventManager();
 	}
 
 	/**
-	 * Avvia la riproduzione dell'oggetto specificato.
+	 * Avvia immediatamente la riproduzione dell'oggetto specificato.
 	 *
 	 * <p>
 	 * Se un altro oggetto è già in riproduzione, questo viene interrotto prima di
-	 * avviare il nuovo oggetto. Il player si registra inoltre agli eventi di
-	 * completamento del nuovo oggetto riproducibile.
+	 * avviare il nuovo oggetto. La coda di riproduzione non viene svuotata.
 	 *
 	 * @param playable
 	 *            oggetto da riprodurre
@@ -39,15 +45,38 @@ public class Player implements EventListener {
 			throw new IllegalArgumentException("Playable cannot be null.");
 		}
 
-		if (currentPlayable != null) {
-			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
-			currentPlayable.stop();
-		}
+		stopCurrentPlayable();
+		startPlayable(playable);
+	}
 
-		currentPlayable = playable;
-		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
-		currentPlayable.play();
-		state = PlayerState.PLAYING;
+	/**
+	 * Aggiunge un oggetto riproducibile alla coda.
+	 *
+	 * @param playable
+	 *            oggetto da aggiungere alla coda
+	 * @throws IllegalArgumentException
+	 *             se l'oggetto riproducibile è {@code null}
+	 */
+	public void enqueue(Playable playable) {
+		queue.enqueue(playable);
+		notifyQueueChanged();
+	}
+
+	/**
+	 * Svuota la coda di riproduzione.
+	 */
+	public void clearQueue() {
+		queue.clear();
+		notifyQueueChanged();
+	}
+
+	/**
+	 * Restituisce una copia della coda corrente.
+	 *
+	 * @return lista degli elementi in coda
+	 */
+	public List<Playable> getQueueSnapshot() {
+		return queue.getSnapshot();
 	}
 
 	/**
@@ -73,17 +102,31 @@ public class Player implements EventListener {
 	}
 
 	/**
-	 * Interrompe la riproduzione corrente e rimuove il riferimento all'oggetto
-	 * riproducibile.
+	 * Interrompe la riproduzione corrente. La coda non viene svuotata.
 	 */
 	public void stop() {
-		if (currentPlayable != null) {
-			currentPlayable.stop();
-			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
-			currentPlayable = null;
+		stopCurrentPlayable();
+		state = PlayerState.STOPPED;
+		notifyCurrentPlayableChanged();
+	}
+
+	public void skipSong() {
+		if (currentPlayable == null) {
+			playNextFromQueue();
+			return;
 		}
 
-		state = PlayerState.STOPPED;
+		boolean skippedInsidePlayable = currentPlayable.skipToNextSong();
+
+		if (!skippedInsidePlayable) {
+			stopCurrentPlayable();
+			playNextFromQueue();
+		}
+	}
+
+	public void skipPlayable() {
+		stopCurrentPlayable();
+		playNextFromQueue();
 	}
 
 	/**
@@ -106,6 +149,15 @@ public class Player implements EventListener {
 	}
 
 	/**
+	 * Restituisce il gestore eventi del player.
+	 *
+	 * @return event manager del player
+	 */
+	public EventManager getEvents() {
+		return events;
+	}
+
+	/**
 	 * Gestisce gli eventi ricevuti dall'oggetto riproducibile corrente.
 	 *
 	 * @param eventType
@@ -114,7 +166,54 @@ public class Player implements EventListener {
 	@Override
 	public void update(EventType eventType) {
 		if (eventType == EventType.PLAYABLE_COMPLETED) {
-			stop();
+			finishCurrentPlayable();
+			playNextFromQueue();
 		}
+	}
+
+	private void startPlayable(Playable playable) {
+		currentPlayable = playable;
+		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
+		currentPlayable.play();
+
+		state = PlayerState.PLAYING;
+		notifyCurrentPlayableChanged();
+	}
+
+	private void playNextFromQueue() {
+		Playable nextPlayable = queue.dequeue();
+		notifyQueueChanged();
+
+		if (nextPlayable == null) {
+			currentPlayable = null;
+			state = PlayerState.STOPPED;
+			notifyCurrentPlayableChanged();
+			return;
+		}
+
+		startPlayable(nextPlayable);
+	}
+
+	private void stopCurrentPlayable() {
+		if (currentPlayable != null) {
+			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
+			currentPlayable.stop();
+			currentPlayable = null;
+		}
+	}
+
+	private void finishCurrentPlayable() {
+		if (currentPlayable != null) {
+			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
+			currentPlayable = null;
+		}
+	}
+
+	private void notifyCurrentPlayableChanged() {
+		events.notifyListeners(EventType.CURRENT_PLAYABLE_CHANGED);
+	}
+
+	private void notifyQueueChanged() {
+		events.notifyListeners(EventType.QUEUE_CHANGED);
 	}
 }

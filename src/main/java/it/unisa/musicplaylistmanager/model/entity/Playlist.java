@@ -205,9 +205,7 @@ public class Playlist {
 			return getSongs();
 		}
 
-		return songs.stream()
-				.filter(song -> song.getTitle().toLowerCase().contains(normalizedQuery))
-				.toList();
+		return songs.stream().filter(song -> song.getTitle().toLowerCase().contains(normalizedQuery)).toList();
 	}
 
 	/**

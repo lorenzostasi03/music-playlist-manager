@@ -7,6 +7,7 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
@@ -38,6 +39,8 @@ public class PlaylistController {
 
 	@FXML
 	private Button playButton;
+    @FXML
+    private Button enqueueButton;
 	@FXML
 	private Button editNameButton;
 	@FXML
@@ -83,19 +86,43 @@ public class PlaylistController {
 
 	@FXML
 	private void initialize() {
-		playlist = appContext.getSelectedPlaylist();
+        playlist = appContext.getSelectedPlaylist();
+        boolean readOnly = appContext.isSelectedPlaylistReadOnly();
 
-		configureTable();
-		tracksTable.getSelectionModel().selectedItemProperty().addListener(
-				(observable, oldValue, selectedSong) -> removeTrackButton.setDisable(selectedSong == null));
-		addTrackButton.setDisable(playlist == null);
+        configureTable();
 
-		refreshPlaylist();
+        initButtons(readOnly);
+
+        // gestione selezione tabella
+        tracksTable.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, selectedSong) ->
+                removeTrackButton.setDisable(selectedSong == null || readOnly)
+        );
+
+        refreshPlaylist();
 	}
 
 	@FXML
 	private void onPlay() {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.playPlayable(new PlaylistPlayable(playlist));
+        ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
+
+    @FXML
+    private void onEnqueue() {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+        AlertManager.showInfo("Playlist aggiunta alla coda.");
+    }
 
 	/**
 	 * Apre la finestra modale per modificare il nome della playlist corrente.
@@ -180,6 +207,23 @@ public class PlaylistController {
 			AlertManager.showError(e.getMessage());
 		}
 	}
+
+    private void initButtons(boolean readOnly) {
+        boolean showButton = (playlist == null || readOnly) ? false : true;
+
+        addTrackButton.setDisable(!showButton);
+        addTrackButton.setVisible(showButton);
+
+        editNameButton.setDisable(!showButton);
+        editNameButton.setVisible(showButton);
+
+        deletePlaylistButton.setDisable(!showButton);
+        deletePlaylistButton.setVisible(showButton);
+
+        removeTrackButton.setDisable(!showButton);
+        removeTrackButton.setVisible(showButton);
+    }
+
 	/**
 	 * Configura le proprietà della TableView.
 	 */
@@ -303,8 +347,8 @@ public class PlaylistController {
 			return;
 		}
 
-		DialogUtil.open("PlaylistFormView.fxml", "Rinomina playlist",
-				editNameButton.getScene().getWindow(), (PlaylistFormController c) -> {
+		DialogUtil.open("PlaylistFormView.fxml", "Rinomina playlist", editNameButton.getScene().getWindow(),
+				(PlaylistFormController c) -> {
 					c.setPlaylistToEdit(playlist);
 					c.setOnSave(this::refreshPlaylist);
 				});

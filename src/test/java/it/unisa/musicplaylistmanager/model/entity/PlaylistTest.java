@@ -216,7 +216,8 @@ class PlaylistTest {
 		assertNotEquals(playlist, altra);
 	}
 	/**
-	 * Verifica che la ricerca nella playlist sia case-insensitive e basata sul titolo.
+	 * Verifica che la ricerca nella playlist sia case-insensitive e basata sul
+	 * titolo.
 	 */
 	@Test
 	void testSearchSongsCaseInsensitive() {

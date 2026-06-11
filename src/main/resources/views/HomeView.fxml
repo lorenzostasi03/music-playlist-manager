@@ -71,24 +71,38 @@
     </HBox>
 
     <!-- HEADER LISTA -->
-    <HBox spacing="0" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
+    <HBox spacing="8" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding>
             <Insets bottom="10" left="25" right="25" top="10" />
         </padding>
 
-        <Label text="NOME" prefWidth="300"
-               style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
+        <Label text="NOME"
+            minWidth="0"
+            maxWidth="Infinity"
+            HBox.hgrow="ALWAYS"
+            style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
 
-        <Label text="BRANI" prefWidth="60"
-               style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
+        <Label text="BRANI"
+            minWidth="60"
+            prefWidth="60"
+            maxWidth="60"
+            style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
 
-        <Label text="DURATA" prefWidth="80"
-               style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
+        <Label text="DURATA"
+            minWidth="80"
+            prefWidth="80"
+            maxWidth="80"
+            style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
 
-        <Label text="RIPRODUZIONI" prefWidth="90"
-               style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
+        <Label text="RIPRODUZIONI"
+            minWidth="90"
+            prefWidth="90"
+            maxWidth="90"
+            style="-fx-text-fill: #B3B3B3; -fx-font-weight: bold;" />
 
-        <Region prefWidth="56"/>
+        <Region minWidth="152"
+                prefWidth="152"
+                maxWidth="152" />
     </HBox>
 
     <!-- LISTA / EMPTY STATE -->

@@ -5,6 +5,7 @@ import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
@@ -15,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -57,10 +59,6 @@ public class HomeController2 implements Initializable {
         updateViews();
     }
 
-    // ------------------------------------------------------------
-    // LIST VIEW SETUP
-    // ------------------------------------------------------------
-
     private void initListView(ListView<PlaylistItem> listView) {
         listView.setCellFactory(view -> new ListCell<>() {
             @Override
@@ -76,10 +74,6 @@ public class HomeController2 implements Initializable {
             }
         });
     }
-
-    // ------------------------------------------------------------
-    // VIEW UPDATE
-    // ------------------------------------------------------------
 
     private void updateViews() {
         refreshPlaylists();
@@ -123,10 +117,6 @@ public class HomeController2 implements Initializable {
         countLabel.setText(listView.getItems().size() + " playlist");
     }
 
-    // ------------------------------------------------------------
-    // TOP PLAYLISTS
-    // ------------------------------------------------------------
-
     private Playlist buildTopSongsPlaylist() {
         List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
         if (songs.isEmpty()) return null;
@@ -140,10 +130,6 @@ public class HomeController2 implements Initializable {
         List<Playlist> list = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
         return list.isEmpty() ? null : new ArrayList<>(list);
     }
-
-    // ------------------------------------------------------------
-    // ROW CREATION
-    // ------------------------------------------------------------
 
     private HBox createPlaylistRow(PlaylistItem item) {
         Playlist playlist = item.playlist;
@@ -167,39 +153,49 @@ public class HomeController2 implements Initializable {
         playCountLabel.getStyleClass().add("row-meta");
         playCountLabel.setPrefWidth(90);
 
-        Button renameButton = createActionButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
-        Button deleteButton = createActionButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
+        Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
+        Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
 
-        renameButton.setDisable(readOnly);
-        deleteButton.setDisable(readOnly);
-
-        HBox row = new HBox(0, nameLabel, songsLabel, durationLabel, playCountLabel);
+        HBox row;
 
         if (!readOnly) {
-            row.getChildren().addAll(renameButton, deleteButton);
+            Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
+            Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
+
+            row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+                renameButton, deleteButton);
+        } else {
+            Region actionPlaceholder = new Region();
+            actionPlaceholder.setMinWidth(72);
+            actionPlaceholder.setPrefWidth(72);
+            actionPlaceholder.setMaxWidth(72);
+
+            row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+                actionPlaceholder);
         }
 
         row.getStyleClass().add("list-row");
+        row.setMaxWidth(Double.MAX_VALUE);
         row.setOnMouseClicked(event -> openPlaylistView(item));
 
         return row;
     }
 
-    private Button createActionButton(String text, String tooltip, Runnable action) {
-        Button btn = new Button(text);
-        btn.getStyleClass().add("row-action");
-        btn.setTooltip(new Tooltip(tooltip));
-        btn.setPrefWidth(28);
-        btn.setOnAction(e -> {
-            e.consume();
+    private Button createButton(String text, String tooltip, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("row-action");
+        button.setTooltip(new Tooltip(tooltip));
+        button.setMinWidth(32);
+        button.setPrefWidth(32);
+        button.setMaxWidth(32);
+        button.setOnAction(event -> {
+            event.consume();
             action.run();
         });
-        return btn;
-    }
+        button.setFocusTraversable(false);
 
-    // ------------------------------------------------------------
-    // PLAYLIST OPERATIONS
-    // ------------------------------------------------------------
+        return button;
+    }
 
     private void deletePlaylist(Playlist playlist) {
         boolean confirmed = AlertManager.showConfirmation(
@@ -240,10 +236,6 @@ public class HomeController2 implements Initializable {
         );
     }
 
-    // ------------------------------------------------------------
-    // UTILS
-    // ------------------------------------------------------------
-
     private String formatDuration(Playlist playlist) {
         int totalSeconds = playlist.getSongs().stream().mapToInt(Song::getDuration).sum();
         return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
@@ -261,9 +253,25 @@ public class HomeController2 implements Initializable {
         }
     }
 
-    // ------------------------------------------------------------
-    // FXML HANDLERS
-    // ------------------------------------------------------------
+    private void playPlaylist(Playlist playlist) {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.playPlayable(new PlaylistPlayable(playlist));
+        ViewSwitcher.switchTo("PlaybackView.fxml");
+    }
+
+    private void enqueuePlaylist(Playlist playlist) {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+        AlertManager.showInfo("Playlist aggiunta alla coda.");
+    }
 
     @FXML private void onAutoCreateByGenre() {}
     @FXML private void onAutoCreateByYear() {}
