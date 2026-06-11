@@ -1,6 +1,9 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.player;
 
 import java.io.File;
+
+import it.unisa.musicplaylistmanager.model.playback.events.EventManager;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;

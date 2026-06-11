@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.player;
 
 /**
  * Definisce i possibili stati del player.

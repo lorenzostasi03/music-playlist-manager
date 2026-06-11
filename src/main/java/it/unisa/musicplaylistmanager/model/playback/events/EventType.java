@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.events;
 
 /**
  * Definisce i tipi di evento generati durante la riproduzione.

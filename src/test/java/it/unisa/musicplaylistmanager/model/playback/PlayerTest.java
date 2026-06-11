@@ -8,6 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
+import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
+import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
+import it.unisa.musicplaylistmanager.model.playback.player.Player;
+import it.unisa.musicplaylistmanager.model.playback.player.PlayerState;
 import org.junit.jupiter.api.Test;
 
 class PlayerTest {

@@ -1,8 +1,11 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.playable;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
+import it.unisa.musicplaylistmanager.model.playback.mode.*;
+import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
 
 public class PlaylistPlayable extends Playable {
 

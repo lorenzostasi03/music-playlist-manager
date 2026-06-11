@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.events;
 
 /**
  * Rappresenta un oggetto che può ricevere notifiche relative agli eventi di

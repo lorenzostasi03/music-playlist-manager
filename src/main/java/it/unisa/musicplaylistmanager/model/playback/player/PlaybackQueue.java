@@ -1,4 +1,6 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.player;
+
+import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

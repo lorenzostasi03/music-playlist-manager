@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
+import it.unisa.musicplaylistmanager.model.playback.events.EventManager;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import org.junit.jupiter.api.Test;
 
 class EventManagerTest {

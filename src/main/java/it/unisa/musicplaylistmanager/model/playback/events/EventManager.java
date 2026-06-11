@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.events;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

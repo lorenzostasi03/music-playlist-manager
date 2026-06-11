@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
+import it.unisa.musicplaylistmanager.model.playback.playable.SongPlayable;
 import org.junit.jupiter.api.Test;
 
 class SongPlayableTest {

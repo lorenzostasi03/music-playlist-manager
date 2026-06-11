@@ -1,7 +1,10 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.playable;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
+import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 
 /**
  * Adatta una singola traccia al concetto di oggetto riproducibile.

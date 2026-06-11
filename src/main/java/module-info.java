@@ -17,7 +17,6 @@ module it.unisa.musicplaylistmanager {
 
 	exports it.unisa.musicplaylistmanager.model.entity;
 	exports it.unisa.musicplaylistmanager.model.library;
-	exports it.unisa.musicplaylistmanager.model.playback;
 
 	exports it.unisa.musicplaylistmanager.persistence.dao;
 	exports it.unisa.musicplaylistmanager.persistence.sqlite;
@@ -25,4 +24,9 @@ module it.unisa.musicplaylistmanager {
 	exports it.unisa.musicplaylistmanager.util;
 
 	exports it.unisa.musicplaylistmanager.exceptions;
+
+    exports it.unisa.musicplaylistmanager.model.playback.playable;
+    exports it.unisa.musicplaylistmanager.model.playback.mode;
+    exports it.unisa.musicplaylistmanager.model.playback.events;
+    exports it.unisa.musicplaylistmanager.model.playback.player;
 }

@@ -1,6 +1,9 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.playable;
 
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
+import it.unisa.musicplaylistmanager.model.playback.events.EventManager;
+import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 
 /**
  * Rappresenta un elemento riproducibile dal sistema.

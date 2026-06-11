@@ -2,8 +2,8 @@ package it.unisa.musicplaylistmanager.app;
 
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
-import it.unisa.musicplaylistmanager.model.playback.Playable;
-import it.unisa.musicplaylistmanager.model.playback.Player;
+import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
+import it.unisa.musicplaylistmanager.model.playback.player.Player;
 import it.unisa.musicplaylistmanager.persistence.sqlite.DatabaseConfig;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLitePlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.sqlite.SQLiteSongDAO;

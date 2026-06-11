@@ -1,4 +1,9 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.player;
+
+import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
+import it.unisa.musicplaylistmanager.model.playback.events.EventManager;
+import it.unisa.musicplaylistmanager.model.playback.events.EventType;
+import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
 
 import java.util.List;
 

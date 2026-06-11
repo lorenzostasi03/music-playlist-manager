@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.mode;
 
 /**
  * Definisce le modalità di riproduzione applicabili a un oggetto riproducibile.

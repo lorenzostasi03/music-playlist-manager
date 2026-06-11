@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.mode;
 
 import it.unisa.musicplaylistmanager.model.entity.Song;
 

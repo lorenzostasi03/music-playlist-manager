@@ -7,7 +7,7 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
-import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
+import it.unisa.musicplaylistmanager.model.playback.playable.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
