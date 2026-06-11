@@ -21,6 +21,15 @@ public interface SongDAO {
 	 */
 	void save(Song song);
 
+    /**
+     * Recupera tutti i brani presenti nel database.
+     *
+     * @return lista di tutti i brani
+     * @throws PersistenceException
+     *             se si verifica un errore durante il recupero dei brani
+     */
+    List<Song> getSongs();
+
 	/**
 	 * Aggiorna un brano esistente nel database.
 	 *
@@ -30,6 +39,16 @@ public interface SongDAO {
 	 *             se si verifica un errore durante l'aggiornamento
 	 */
 	void update(Song song);
+
+    /**
+     * Elimina un brano dal database.
+     *
+     * @param songId
+     *            identificatore del brano da eliminare
+     * @throws PersistenceException
+     *             se si verifica un errore durante l'eliminazione
+     */
+    void delete(UUID songId);
 
 	/**
 	 * Aggiorna il numero di riproduzioni di un brano.
@@ -43,22 +62,5 @@ public interface SongDAO {
 	 */
 	void updatePlayCount(UUID songId, int playCount);
 
-	/**
-	 * Elimina un brano dal database.
-	 *
-	 * @param songId
-	 *            identificatore del brano da eliminare
-	 * @throws PersistenceException
-	 *             se si verifica un errore durante l'eliminazione
-	 */
-	void delete(UUID songId);
 
-	/**
-	 * Recupera tutti i brani presenti nel database.
-	 *
-	 * @return lista di tutti i brani
-	 * @throws PersistenceException
-	 *             se si verifica un errore durante il recupero dei brani
-	 */
-	List<Song> getSongs();
 }

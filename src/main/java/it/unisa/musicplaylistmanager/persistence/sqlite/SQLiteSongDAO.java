@@ -20,6 +20,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 		super(DB_URL);
 	}
 
+    // CRUD Song
+
 	@Override
 	public void save(Song song) {
 		String query = """
@@ -43,6 +45,35 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			throw new PersistenceException("Si è verificato un errore durante il salvataggio del brano!");
 		}
 	}
+
+    @Override
+    public List<Song> getSongs() {
+        List<Song> songs = new ArrayList<>();
+        String query = "SELECT * FROM song ORDER BY title ASC, author ASC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                UUID id = UUID.fromString(rs.getString("id"));
+                String title = rs.getString("title");
+                String author = rs.getString("author");
+                String genre = rs.getString("genre");
+                int year = rs.getInt("year");
+                int duration = rs.getInt("duration");
+                String filePath = rs.getString("file_path");
+                int playCount = rs.getInt("play_count");
+                Song song = new Song(id, title, author, Genre.valueOf(genre), year, duration, filePath, playCount);
+                loadTags(conn, song);
+                songs.add(song);
+            }
+        } catch (SQLException | NullPointerException e) {
+            throw new PersistenceException("Si è verificato un errore durante il caricamento dei brani!");
+        }
+
+        return songs;
+    }
 
 	@Override
 	public void update(Song song) {
@@ -70,6 +101,23 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 		}
 	}
 
+    @Override
+    public void delete(UUID songId) {
+        String query = "DELETE FROM song WHERE id = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            deleteTags(conn, songId);
+            stmt.setString(1, songId.toString());
+
+            stmt.executeUpdate();
+        } catch (SQLException | NullPointerException e) {
+            throw new PersistenceException("Si è verificato un errore durante l'eliminazione del brano!");
+        }
+    }
+
+    // Gestione play count
+
 	@Override
 	public void updatePlayCount(UUID songId, int playCount) {
 		String query = "UPDATE song SET play_count = ? WHERE id = ?";
@@ -86,49 +134,7 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 		}
 	}
 
-	@Override
-	public void delete(UUID songId) {
-		String query = "DELETE FROM song WHERE id = ?";
-
-		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-			deleteTags(conn, songId);
-			stmt.setString(1, songId.toString());
-
-			stmt.executeUpdate();
-		} catch (SQLException | NullPointerException e) {
-			throw new PersistenceException("Si è verificato un errore durante l'eliminazione del brano!");
-		}
-	}
-
-	@Override
-	public List<Song> getSongs() {
-		List<Song> songs = new ArrayList<>();
-		String query = "SELECT * FROM song ORDER BY title ASC, author ASC";
-
-		try (Connection conn = getConnection();
-				PreparedStatement stmt = conn.prepareStatement(query);
-				ResultSet rs = stmt.executeQuery()) {
-
-			while (rs.next()) {
-				UUID id = UUID.fromString(rs.getString("id"));
-				String title = rs.getString("title");
-				String author = rs.getString("author");
-				String genre = rs.getString("genre");
-				int year = rs.getInt("year");
-				int duration = rs.getInt("duration");
-				String filePath = rs.getString("file_path");
-				int playCount = rs.getInt("play_count");
-				Song song = new Song(id, title, author, Genre.valueOf(genre), year, duration, filePath, playCount);
-				loadTags(conn, song);
-				songs.add(song);
-			}
-		} catch (SQLException | NullPointerException e) {
-			throw new PersistenceException("Si è verificato un errore durante il caricamento dei brani!");
-		}
-
-		return songs;
-	}
+    // Gestione tags
 
 	private void saveTags(Connection conn, Song song) throws SQLException {
 		String query = "INSERT INTO song_tag (song_id, tag) VALUES (?, ?)";
@@ -143,26 +149,26 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 		}
 	}
 
+    private void loadTags(Connection conn, Song song) throws SQLException {
+        String query = "SELECT tag FROM song_tag WHERE song_id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, song.getId().toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    song.addTag(Tag.valueOf(rs.getString("tag")));
+                }
+            }
+        }
+    }
+
 	private void deleteTags(Connection conn, UUID songId) throws SQLException {
 		String query = "DELETE FROM song_tag WHERE song_id = ?";
 
 		try (PreparedStatement stmt = conn.prepareStatement(query)) {
 			stmt.setString(1, songId.toString());
 			stmt.executeUpdate();
-		}
-	}
-
-	private void loadTags(Connection conn, Song song) throws SQLException {
-		String query = "SELECT tag FROM song_tag WHERE song_id = ?";
-
-		try (PreparedStatement stmt = conn.prepareStatement(query)) {
-			stmt.setString(1, song.getId().toString());
-
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					song.addTag(Tag.valueOf(rs.getString("tag")));
-				}
-			}
 		}
 	}
 }

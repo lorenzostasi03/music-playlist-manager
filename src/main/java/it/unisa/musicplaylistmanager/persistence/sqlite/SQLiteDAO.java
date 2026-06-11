@@ -13,7 +13,7 @@ public abstract class SQLiteDAO {
 	}
 
 	/**
-	 * Crea una conessione con il database.
+	 * Crea una connessione con il database.
 	 *
 	 * @return la connessione nel database.
 	 * @throws SQLException
