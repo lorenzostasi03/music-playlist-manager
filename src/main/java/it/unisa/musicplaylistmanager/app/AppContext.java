@@ -28,6 +28,8 @@ public class AppContext {
 	private final Player player;
 
 	private Playlist selectedPlaylist;
+    private boolean selectedPlaylistReadOnly;
+
 	private Playable currentPlayable;
 
 	private AppContext() {
@@ -57,6 +59,9 @@ public class AppContext {
 	public void setSelectedPlaylist(Playlist playlist) {
 		this.selectedPlaylist = playlist;
 	}
+
+    public boolean isSelectedPlaylistReadOnly() { return selectedPlaylistReadOnly; }
+    public void setSelectedPlaylistReadOnly(boolean readOnly) { this.selectedPlaylistReadOnly = readOnly; }
 
 	public Playable getCurrentPlayable() {
 		return currentPlayable;
