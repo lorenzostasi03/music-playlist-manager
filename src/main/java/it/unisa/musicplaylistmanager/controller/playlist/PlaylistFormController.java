@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.util.Set;
+
 /**
  * Controller per la finestra modale dedicata alla creazione di una nuova
  * playlist o alla rinomina di una playlist esistente.
@@ -34,12 +36,13 @@ public class PlaylistFormController {
 	private Runnable onSave;
 
 	private final AppContext appContext = AppContext.getInstance();
+
+    private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
 	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
 	 */
 	@FXML
 	private void initialize() {
-		hideErrors();
 	}
 
 	/**
@@ -81,10 +84,17 @@ public class PlaylistFormController {
 	 */
 	@FXML
 	private void onConfirm() {
-		hideErrors();
-
 		try {
 			String name = nameField.getText();
+
+            boolean invalidName = defaultPlaylistNames.stream()
+                .map(String::toLowerCase)
+                .anyMatch(s -> s.equals(name.toLowerCase()));
+
+            if (invalidName) {
+                AlertManager.showError("Non è possibile creare una playlist con questo nome!");
+                return;
+            }
 
 			if (playlistToEdit == null) {
 				appContext.getMusicLibrary().addPlaylist(new Playlist(name));
@@ -99,24 +109,8 @@ public class PlaylistFormController {
 			}
 			closeWindow();
 		} catch (IllegalArgumentException e) {
-			showError(e.getMessage());
+            AlertManager.showError(e.getMessage());
 		}
-	}
-
-	private void hideErrors() {
-		nameErrorLabel.setVisible(false);
-		nameErrorLabel.setManaged(false);
-		globalErrorLabel.setVisible(false);
-		globalErrorLabel.setManaged(false);
-	}
-
-	private void showError(String message) {
-		nameErrorLabel.setVisible(true);
-		nameErrorLabel.setManaged(true);
-		globalErrorLabel.setText(message);
-		globalErrorLabel.setVisible(true);
-		globalErrorLabel.setManaged(true);
-		AlertManager.showError(message);
 	}
 
 	private void closeWindow() {

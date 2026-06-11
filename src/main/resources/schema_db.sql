@@ -29,3 +29,13 @@ CREATE TABLE IF NOT EXISTS playlist_song (
     FOREIGN KEY (song_id) REFERENCES song(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS song_tag (
+    song_id TEXT NOT NULL,
+    tag TEXT NOT NULL,
+
+    PRIMARY KEY (song_id, tag),
+
+    FOREIGN KEY (song_id) REFERENCES song(id)
+        ON DELETE CASCADE
+);

@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.playback;
 
+import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
 /**
@@ -13,6 +14,7 @@ import it.unisa.musicplaylistmanager.model.entity.Song;
 public class SongPlayable extends Playable {
 
 	private final Song song;
+	private PlaybackMode playbackMode;
 	private final AudioPlayer audioPlayer;
 	private boolean subscribed;
 
@@ -30,8 +32,17 @@ public class SongPlayable extends Playable {
 		}
 
 		this.song = song;
+		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	public String getTitle() {
+		return song.getTitle();
 	}
 
 	/**
@@ -45,6 +56,7 @@ public class SongPlayable extends Playable {
 	public void play() {
 		subscribeToAudioCompleted();
 		audioPlayer.play(song.getFilePath());
+		updatePlayCount();
 	}
 
 	/**
@@ -83,6 +95,12 @@ public class SongPlayable extends Playable {
 		return song;
 	}
 
+	@Override
+	protected void updatePlayCount() {
+		song.incrementPlayCount();
+		AppContext.getInstance().getMusicLibrary().updateSongPlayCount(song);
+	}
+
 	/**
 	 * Gestisce gli eventi ricevuti dal player audio.
 	 *
@@ -95,10 +113,50 @@ public class SongPlayable extends Playable {
 	 */
 	@Override
 	public void update(EventType eventType) {
-		if (eventType == EventType.AUDIO_COMPLETED) {
-			unsubscribeFromAudioCompleted();
-			getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+		if (eventType != EventType.AUDIO_COMPLETED) {
+			return;
 		}
+
+		if (playbackMode == PlaybackMode.LOOP) {
+			audioPlayer.play(song.getFilePath());
+			updatePlayCount();
+			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+			return;
+		}
+
+		unsubscribeFromAudioCompleted();
+		getEvents().notifyListeners(EventType.PLAYABLE_COMPLETED);
+	}
+
+	@Override
+	public boolean skipToNextSong() {
+		if (playbackMode == PlaybackMode.LOOP) {
+			audioPlayer.play(song.getFilePath());
+			updatePlayCount();
+			getEvents().notifyListeners(EventType.CURRENT_SONG_CHANGED);
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void setPlaybackMode(PlaybackMode mode) {
+		if (mode == null) {
+			throw new IllegalArgumentException("Playback mode cannot be null.");
+		}
+
+		if (mode == PlaybackMode.SHUFFLE) {
+			this.playbackMode = PlaybackMode.SEQUENTIAL;
+			return;
+		}
+
+		this.playbackMode = mode;
+	}
+
+	@Override
+	public PlaybackMode getPlaybackMode() {
+		return playbackMode;
 	}
 
 	/**

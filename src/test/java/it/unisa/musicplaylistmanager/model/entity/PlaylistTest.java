@@ -3,6 +3,8 @@ package it.unisa.musicplaylistmanager.model.entity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -212,5 +214,28 @@ class PlaylistTest {
 	void testEqualsNomiDiversiNonUguali() {
 		Playlist altra = new Playlist("Altra playlist");
 		assertNotEquals(playlist, altra);
+	}
+	/**
+	 * Verifica che la ricerca nella playlist sia case-insensitive e basata sul
+	 * titolo.
+	 */
+	@Test
+	void testSearchSongsCaseInsensitive() {
+		playlist.addSong(song1);
+		playlist.addSong(song2);
+
+		assertEquals(List.of(song1), playlist.searchSongs("song a"));
+		assertEquals(List.of(song2), playlist.searchSongs("SONG B"));
+	}
+
+	/**
+	 * Verifica che una query vuota restituisca tutte le tracce della playlist.
+	 */
+	@Test
+	void testSearchSongsQueryVuotaRestituisceTutte() {
+		playlist.addSong(song1);
+		playlist.addSong(song2);
+
+		assertEquals(playlist.getSongs(), playlist.searchSongs("   "));
 	}
 }

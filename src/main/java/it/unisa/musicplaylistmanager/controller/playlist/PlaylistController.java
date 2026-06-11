@@ -7,6 +7,7 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
+import it.unisa.musicplaylistmanager.model.playback.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -37,6 +39,8 @@ public class PlaylistController {
 
 	@FXML
 	private Button playButton;
+    @FXML
+    private Button enqueueButton;
 	@FXML
 	private Button editNameButton;
 	@FXML
@@ -82,19 +86,43 @@ public class PlaylistController {
 
 	@FXML
 	private void initialize() {
-		playlist = appContext.getSelectedPlaylist();
+        playlist = appContext.getSelectedPlaylist();
+        boolean readOnly = appContext.isSelectedPlaylistReadOnly();
 
-		configureTable();
-		tracksTable.getSelectionModel().selectedItemProperty().addListener(
-				(observable, oldValue, selectedSong) -> removeTrackButton.setDisable(selectedSong == null));
-		addTrackButton.setDisable(playlist == null);
+        configureTable();
 
-		refreshPlaylist();
+        initButtons(readOnly);
+
+        // gestione selezione tabella
+        tracksTable.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, selectedSong) ->
+                removeTrackButton.setDisable(selectedSong == null || readOnly)
+        );
+
+        refreshPlaylist();
 	}
 
 	@FXML
 	private void onPlay() {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.playPlayable(new PlaylistPlayable(playlist));
+        ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
+
+    @FXML
+    private void onEnqueue() {
+        if (playlist == null || playlist.size() == 0) {
+            AlertManager.showError("La playlist è vuota.");
+            return;
+        }
+
+        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+        AlertManager.showInfo("Playlist aggiunta alla coda.");
+    }
 
 	/**
 	 * Apre la finestra modale per modificare il nome della playlist corrente.
@@ -137,6 +165,7 @@ public class PlaylistController {
 
 	@FXML
 	private void onSearchChanged() {
+		refreshPlaylist();
 	}
 
 	@FXML
@@ -178,6 +207,23 @@ public class PlaylistController {
 			AlertManager.showError(e.getMessage());
 		}
 	}
+
+    private void initButtons(boolean readOnly) {
+        boolean showButton = (playlist == null || readOnly) ? false : true;
+
+        addTrackButton.setDisable(!showButton);
+        addTrackButton.setVisible(showButton);
+
+        editNameButton.setDisable(!showButton);
+        editNameButton.setVisible(showButton);
+
+        deletePlaylistButton.setDisable(!showButton);
+        deletePlaylistButton.setVisible(showButton);
+
+        removeTrackButton.setDisable(!showButton);
+        removeTrackButton.setVisible(showButton);
+    }
+
 	/**
 	 * Configura le proprietà della TableView.
 	 */
@@ -195,7 +241,15 @@ public class PlaylistController {
 		yearColumn.setSortable(false);
 		tagsColumn.setSortable(false);
 
-		tagsColumn.setPrefWidth(250);
+		tracksTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+		indexColumn.setPrefWidth(35);
+		titleColumn.setPrefWidth(120);
+		authorColumn.setPrefWidth(100);
+		durationColumn.setPrefWidth(60);
+		genreColumn.setPrefWidth(80);
+		yearColumn.setPrefWidth(45);
+		tagsColumn.setPrefWidth(220);
 	}
 
 	private void configureCellFactories() {
@@ -215,6 +269,27 @@ public class PlaylistController {
 		yearColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getYear()));
 
 		tagsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(formatTags(cellData.getValue())));
+		tagsColumn.setCellFactory(column -> new TableCell<>() {
+			private final Label label = new Label();
+
+			{
+				label.setWrapText(true);
+			}
+
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+
+				if (empty || item == null) {
+					setGraphic(null);
+					return;
+				}
+
+				label.setText(item);
+				label.setMaxWidth(tagsColumn.getWidth() - 12);
+				setGraphic(label);
+			}
+		});
 	}
 
 	/**
@@ -246,7 +321,7 @@ public class PlaylistController {
 	}
 
 	private void updateTracksTable() {
-		tracksTable.getItems().setAll(playlist.getSongs());
+		tracksTable.getItems().setAll(playlist.searchSongs(searchField.getText()));
 	}
 
 	/**
@@ -272,8 +347,8 @@ public class PlaylistController {
 			return;
 		}
 
-		DialogUtil.<PlaylistFormController>open("PlaylistFormView.fxml", "Rinomina playlist",
-				editNameButton.getScene().getWindow(), (PlaylistFormController c) -> {
+		DialogUtil.open("PlaylistFormView.fxml", "Rinomina playlist", editNameButton.getScene().getWindow(),
+				(PlaylistFormController c) -> {
 					c.setPlaylistToEdit(playlist);
 					c.setOnSave(this::refreshPlaylist);
 				});

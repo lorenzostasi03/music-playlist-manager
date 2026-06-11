@@ -32,17 +32,32 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 	@Override
 	public void update(Playlist playlist) {
-		String query = "UPDATE playlist SET name = ?, play_count = ? WHERE id = ?";
+		String query = "UPDATE playlist SET name = ? WHERE id = ?";
 
 		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
 			stmt.setString(1, playlist.getName());
-			stmt.setInt(2, playlist.getPlayCount());
-			stmt.setString(3, playlist.getId().toString());
+			stmt.setString(2, playlist.getId().toString());
 
 			stmt.executeUpdate();
 		} catch (SQLException | NullPointerException e) {
 			throw new PersistenceException("Si è verificato un errore durante la modifica della playlist!");
+		}
+	}
+
+	@Override
+	public void updatePlayCount(UUID playlistId, int playCount) {
+		String query = "UPDATE playlist SET play_count = ? WHERE id = ?";
+
+		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+
+			stmt.setInt(1, playCount);
+			stmt.setString(2, playlistId.toString());
+			stmt.executeUpdate();
+
+		} catch (SQLException | NullPointerException e) {
+			throw new PersistenceException(
+					"Si è verificato un errore durante l'aggiornamento del play count della playlist!");
 		}
 	}
 
@@ -117,7 +132,7 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		List<UUID> songIds = new ArrayList<>();
 		String query = "SELECT song_id FROM playlist_song WHERE playlist_id = ?";
 
-		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query);) {
+		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
 			stmt.setString(1, playlistId.toString());
 			ResultSet rs = stmt.executeQuery();

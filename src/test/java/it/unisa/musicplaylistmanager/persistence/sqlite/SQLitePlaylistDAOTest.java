@@ -60,8 +60,31 @@ class SQLitePlaylistDAOTest {
 	}
 
 	@Test
+	void updateValidPlaylists() {
+		Playlist playlist = new Playlist("A");
+
+		playlistDAO.save(playlist);
+
+		playlist.setName("B");
+		playlistDAO.update(playlist);
+
+		List<Playlist> playlists = playlistDAO.getPlaylists();
+		assertEquals(1, playlists.size());
+
+		assertEquals(playlist.getName(), playlists.getFirst().getName());
+
+		int oldPlayCount = playlist.getPlayCount();
+		playlist.incrementPlayCount();
+		playlistDAO.updatePlayCount(playlist.getId(), playlist.getPlayCount());
+		playlists = playlistDAO.getPlaylists();
+		assertEquals(playlist.getPlayCount(), playlists.getFirst().getPlayCount());
+		assertEquals(oldPlayCount + 1, playlists.getFirst().getPlayCount());
+	}
+
+	@Test
 	void updateNullPlaylist() {
 		assertThrows(PersistenceException.class, () -> playlistDAO.update(null));
+		assertThrows(PersistenceException.class, () -> playlistDAO.updatePlayCount(null, 2));
 	}
 
 	@Test
