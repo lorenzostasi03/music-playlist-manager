@@ -137,11 +137,11 @@ public class HomeController2 implements Initializable {
 
         Label nameLabel = new Label(playlist.getName());
         nameLabel.getStyleClass().add("row-title");
-        nameLabel.setPrefWidth(300);
+        nameLabel.setPrefWidth(140);
 
         Label songsLabel = new Label(String.valueOf(playlist.size()));
         songsLabel.getStyleClass().add("row-meta");
-        songsLabel.setPrefWidth(60);
+        songsLabel.setPrefWidth(50);
 
         Label durationLabel = new Label(formatDuration(playlist));
         durationLabel.getStyleClass().add("row-meta");
