@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="0" style="-fx-background-color: #000000;" stylesheets="@style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
+<VBox spacing="0" style="-fx-background-color: #000000;" stylesheets="@style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
     <VBox spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="20" left="25" right="25" top="25" /></padding>
         <HBox alignment="CENTER_LEFT" spacing="12">

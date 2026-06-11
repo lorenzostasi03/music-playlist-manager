@@ -25,12 +25,12 @@ public class MainController {
 	@FXML
 	private void initialize() {
 		ViewSwitcher.setMainRoot(root);
-		ViewSwitcher.switchTo("HomeView2.fxml");
+		ViewSwitcher.switchTo("HomeView.fxml");
 	}
 
 	@FXML
 	private void onHome() {
-		ViewSwitcher.switchTo("HomeView2.fxml");
+		ViewSwitcher.switchTo("HomeView.fxml");
 	}
 
 	@FXML
