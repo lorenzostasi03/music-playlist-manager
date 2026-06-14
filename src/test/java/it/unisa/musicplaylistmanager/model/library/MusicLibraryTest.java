@@ -118,4 +118,47 @@ class MusicLibraryTest {
 		assertFalse(playlist.contains(song));
 		assertTrue(library.catalogContains(song));
 	}
+
+	@Test
+	void spostamentoBranoInPlaylistConPosizioneValida() {
+		Song secondSong = new Song("Hey Jude", "Beatles", Genre.POP, 1968, 431, "/hey-jude.mp3");
+		library.addSongToCatalog(song);
+		library.addSongToCatalog(secondSong);
+		library.addPlaylist(playlist);
+		library.addSongToPlaylist(song, playlist);
+		library.addSongToPlaylist(secondSong, playlist);
+
+		library.moveSongInPlaylist(secondSong, playlist, 0);
+
+		assertEquals(secondSong, playlist.getSongAt(0));
+		assertEquals(song, playlist.getSongAt(1));
+	}
+
+	@Test
+	void spostamentoBranoInUltimaPosizione() {
+		Song secondSong = new Song("Hey Jude", "Beatles", Genre.POP, 1968, 431, "/hey-jude.mp3");
+		Song thirdSong = new Song("Come Together", "Beatles", Genre.ROCK, 1969, 259, "/come-together.mp3");
+		library.addSongToCatalog(song);
+		library.addSongToCatalog(secondSong);
+		library.addSongToCatalog(thirdSong);
+		library.addPlaylist(playlist);
+		library.addSongToPlaylist(song, playlist);
+		library.addSongToPlaylist(secondSong, playlist);
+		library.addSongToPlaylist(thirdSong, playlist);
+
+		library.moveSongInPlaylist(song, playlist, 2);
+
+		assertEquals(secondSong, playlist.getSongAt(0));
+		assertEquals(thirdSong, playlist.getSongAt(1));
+		assertEquals(song, playlist.getSongAt(2));
+	}
+
+	@Test
+	void spostamentoBranoInPlaylistConPosizioneNonValidaLanciaEccezione() {
+		library.addSongToCatalog(song);
+		library.addPlaylist(playlist);
+		library.addSongToPlaylist(song, playlist);
+
+		assertThrows(IllegalArgumentException.class, () -> library.moveSongInPlaylist(song, playlist, 5));
+	}
 }

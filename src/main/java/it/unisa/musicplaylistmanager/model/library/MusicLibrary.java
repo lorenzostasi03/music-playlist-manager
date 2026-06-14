@@ -304,6 +304,27 @@ public class MusicLibrary {
 	}
 
 	/**
+	 * Sposta una traccia in una nuova posizione della playlist.
+	 *
+	 * @param song
+	 *            traccia da spostare
+	 * @param playlist
+	 *            playlist da modificare
+	 * @param newPosition
+	 *            nuovo indice della traccia nella playlist
+	 * @throws IllegalArgumentException
+	 *             se la traccia, la playlist o la posizione non sono validi
+	 */
+	public void moveSongInPlaylist(Song song, Playlist playlist, int newPosition) {
+		if (playlist == null) {
+			throw new IllegalArgumentException("La playlist non puo' essere null.");
+		}
+
+		playlist.moveSong(song, newPosition);
+		playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+	}
+
+	/**
 	 * Restituisce tutte le playlist della collezione.
 	 *
 	 * @return lista non modificabile di tutte le playlist
