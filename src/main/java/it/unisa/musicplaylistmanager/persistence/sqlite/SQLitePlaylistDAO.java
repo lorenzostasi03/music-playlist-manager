@@ -128,9 +128,40 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 	}
 
 	@Override
+	public void replaceSongs(UUID playlistId, List<UUID> songIds) {
+		String deleteQuery = "DELETE FROM playlist_song WHERE playlist_id = ?";
+		String insertQuery = "INSERT INTO playlist_song (playlist_id, song_id) VALUES (?, ?)";
+
+		try (Connection conn = getConnection()) {
+			conn.setAutoCommit(false);
+
+			try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery);
+					PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+
+				deleteStmt.setString(1, playlistId.toString());
+				deleteStmt.executeUpdate();
+
+				for (UUID songId : songIds) {
+					insertStmt.setString(1, playlistId.toString());
+					insertStmt.setString(2, songId.toString());
+					insertStmt.addBatch();
+				}
+
+				insertStmt.executeBatch();
+				conn.commit();
+			} catch (SQLException | NullPointerException e) {
+				conn.rollback();
+				throw e;
+			}
+		} catch (SQLException | NullPointerException e) {
+			throw new PersistenceException("Si Ã¨ verificato un errore durante il riordinamento della playlist!");
+		}
+	}
+
+	@Override
 	public List<UUID> getSongIds(UUID playlistId) {
 		List<UUID> songIds = new ArrayList<>();
-		String query = "SELECT song_id FROM playlist_song WHERE playlist_id = ?";
+		String query = "SELECT song_id FROM playlist_song WHERE playlist_id = ? ORDER BY rowid";
 
 		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 

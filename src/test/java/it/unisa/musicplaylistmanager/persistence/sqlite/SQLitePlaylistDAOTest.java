@@ -108,6 +108,23 @@ class SQLitePlaylistDAOTest {
 	}
 
 	@Test
+	void replaceSongs() {
+		Playlist playlist = new Playlist("A");
+		Song firstSong = new Song("Prima", "Boh", Genre.ROCK, 2003, 180, "prima.mp3");
+		Song secondSong = new Song("Seconda", "Boh", Genre.POP, 2004, 190, "seconda.mp3");
+
+		playlistDAO.save(playlist);
+		songDAO.save(firstSong);
+		songDAO.save(secondSong);
+		playlistDAO.addSong(playlist.getId(), firstSong.getId());
+		playlistDAO.addSong(playlist.getId(), secondSong.getId());
+
+		playlistDAO.replaceSongs(playlist.getId(), List.of(secondSong.getId(), firstSong.getId()));
+
+		assertEquals(List.of(secondSong.getId(), firstSong.getId()), playlistDAO.getSongIds(playlist.getId()));
+	}
+
+	@Test
 	void addSongToNullPlaylist() {
 		Song song = new Song("Prova", "Boh", Genre.ROCK, 2003, 180, "pippo.mp3");
 

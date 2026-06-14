@@ -19,8 +19,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 import java.util.stream.Collectors;
 
@@ -39,8 +43,8 @@ public class PlaylistController {
 
 	@FXML
 	private Button playButton;
-    @FXML
-    private Button enqueueButton;
+	@FXML
+	private Button enqueueButton;
 	@FXML
 	private Button editNameButton;
 	@FXML
@@ -76,6 +80,7 @@ public class PlaylistController {
 	private Button removeTrackButton;
 
 	private Playlist playlist;
+	private boolean readOnly;
 
 	private final AppContext appContext = AppContext.getInstance();
 
@@ -86,21 +91,18 @@ public class PlaylistController {
 
 	@FXML
 	private void initialize() {
-        playlist = appContext.getSelectedPlaylist();
-        boolean readOnly = appContext.isSelectedPlaylistReadOnly();
+		playlist = appContext.getSelectedPlaylist();
+		readOnly = appContext.isSelectedPlaylistReadOnly();
 
-        configureTable();
+		configureTable();
 
-        initButtons(readOnly);
-        initSort();
+		initButtons(readOnly);
+		initSort();
 
-        // gestione selezione tabella
-        tracksTable.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, selectedSong) ->
-                removeTrackButton.setDisable(selectedSong == null || readOnly)
-        );
+		tracksTable.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, selectedSong) -> updateSelectionButtons(selectedSong));
 
-        refreshPlaylist();
+		refreshPlaylist();
 	}
 
 	@FXML
@@ -222,21 +224,21 @@ public class PlaylistController {
 		}
 	}
 
-    private void initButtons(boolean readOnly) {
-        boolean showButton = (playlist == null || readOnly) ? false : true;
+	private void initButtons(boolean readOnly) {
+		boolean showButton = playlist != null && !readOnly;
 
-        addTrackButton.setDisable(!showButton);
-        addTrackButton.setVisible(showButton);
+		addTrackButton.setDisable(!showButton);
+		addTrackButton.setVisible(showButton);
 
-        editNameButton.setDisable(!showButton);
-        editNameButton.setVisible(showButton);
+		editNameButton.setDisable(!showButton);
+		editNameButton.setVisible(showButton);
 
-        deletePlaylistButton.setDisable(!showButton);
-        deletePlaylistButton.setVisible(showButton);
+		deletePlaylistButton.setDisable(!showButton);
+		deletePlaylistButton.setVisible(showButton);
 
-        removeTrackButton.setDisable(!showButton);
-        removeTrackButton.setVisible(showButton);
-    }
+		removeTrackButton.setDisable(!showButton);
+		removeTrackButton.setVisible(showButton);
+	}
 
 	/**
 	 * Inizializza i criteri disponibili per l'ordinamento automatico della
@@ -260,6 +262,7 @@ public class PlaylistController {
 	private void configureTable() {
 		configureColumnProperties();
 		configureCellFactories();
+		configureDragAndDrop();
 	}
 
 	private void configureColumnProperties() {
@@ -353,6 +356,90 @@ public class PlaylistController {
 
 	private void updateTracksTable() {
 		tracksTable.getItems().setAll(playlist.searchSongs(searchField.getText()));
+	}
+
+	private void updateSelectionButtons(Song selectedSong) {
+		boolean disabled = selectedSong == null || readOnly;
+		removeTrackButton.setDisable(disabled);
+	}
+
+	private void configureDragAndDrop() {
+		tracksTable.setRowFactory(table -> {
+			TableRow<Song> row = new TableRow<>();
+
+			row.setOnDragDetected(event -> {
+				if (row.isEmpty() || !canMoveTracks()) {
+					return;
+				}
+
+				Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);
+				ClipboardContent content = new ClipboardContent();
+				content.putString(row.getItem().getId().toString());
+				dragboard.setContent(content);
+				event.consume();
+			});
+
+			row.setOnDragOver(event -> {
+				Dragboard dragboard = event.getDragboard();
+				if (!row.isEmpty() && dragboard.hasString() && canMoveTracks()
+						&& !row.getItem().getId().toString().equals(dragboard.getString())) {
+					event.acceptTransferModes(TransferMode.MOVE);
+				}
+
+				event.consume();
+			});
+
+			row.setOnDragDropped(event -> {
+				boolean completed = false;
+				Dragboard dragboard = event.getDragboard();
+
+				if (!row.isEmpty() && dragboard.hasString() && canMoveTracks()) {
+					completed = moveDraggedSong(dragboard.getString(), row.getItem());
+				}
+
+				event.setDropCompleted(completed);
+				event.consume();
+			});
+
+			return row;
+		});
+	}
+
+	private boolean moveDraggedSong(String draggedSongId, Song targetSong) {
+		if (playlist == null || targetSong == null) {
+			return false;
+		}
+
+		Song draggedSong = findSongById(draggedSongId);
+		if (draggedSong == null || draggedSong.equals(targetSong)) {
+			return false;
+		}
+
+		int targetPosition = playlist.getSongs().indexOf(targetSong);
+		if (targetPosition < 0) {
+			return false;
+		}
+
+		try {
+			appContext.getMusicLibrary().moveSongInPlaylist(draggedSong, playlist, targetPosition);
+			sortComboBox.setValue(null);
+			refreshPlaylist();
+			tracksTable.getSelectionModel().select(draggedSong);
+			return true;
+		} catch (IllegalArgumentException | PersistenceException e) {
+			AlertManager.showError(e.getMessage());
+			return false;
+		}
+	}
+
+	private Song findSongById(String songId) {
+		return playlist.getSongs().stream().filter(song -> song.getId().toString().equals(songId)).findFirst()
+				.orElse(null);
+	}
+
+	private boolean canMoveTracks() {
+		String query = searchField.getText();
+		return !readOnly && (query == null || query.isBlank());
 	}
 
 	/**
