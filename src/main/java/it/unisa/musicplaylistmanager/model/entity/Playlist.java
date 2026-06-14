@@ -209,6 +209,20 @@ public class Playlist {
 	}
 
 	/**
+	 * Ordina automaticamente le tracce della playlist per titolo.
+	 */
+	public void sortSongsByTitle() {
+		songs.sort(Comparator.comparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
+	}
+
+	/**
+	 * Ordina automaticamente le tracce della playlist per autore.
+	 */
+	public void sortSongsByAuthor() {
+		songs.sort(Comparator.comparing(Song::getAuthor, String.CASE_INSENSITIVE_ORDER));
+	}
+
+	/**
 	 * Incrementa il contatore di riproduzioni della playlist.
 	 */
 	public void incrementPlayCount() {

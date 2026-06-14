@@ -238,4 +238,36 @@ class PlaylistTest {
 
 		assertEquals(playlist.getSongs(), playlist.searchSongs("   "));
 	}
+
+	/**
+	 * Verifica che le tracce vengano ordinate alfabeticamente per titolo senza
+	 * duplicazioni o eliminazioni.
+	 */
+	@Test
+	void testOrdinamentoTraccePerTitolo() {
+		playlist.addSong(song2);
+		playlist.addSong(song1);
+
+		playlist.sortSongsByTitle();
+
+		assertEquals(List.of(song1, song2), playlist.getSongs());
+		assertEquals(2, playlist.size());
+	}
+
+	/**
+	 * Verifica che le tracce vengano ordinate alfabeticamente per autore senza
+	 * duplicazioni o eliminazioni.
+	 */
+	@Test
+	void testOrdinamentoTraccePerAutore() {
+		Song primaPerAutore = new Song("Titolo Z", "Autore A", Genre.POP, 2020, 100, "/autore-a.mp3");
+		Song secondaPerAutore = new Song("Titolo A", "Autore Z", Genre.ROCK, 2021, 120, "/autore-z.mp3");
+		playlist.addSong(secondaPerAutore);
+		playlist.addSong(primaPerAutore);
+
+		playlist.sortSongsByAuthor();
+
+		assertEquals(List.of(primaPerAutore, secondaPerAutore), playlist.getSongs());
+		assertEquals(2, playlist.size());
+	}
 }

@@ -92,6 +92,7 @@ public class PlaylistController {
         configureTable();
 
         initButtons(readOnly);
+        initSort();
 
         // gestione selezione tabella
         tracksTable.getSelectionModel().selectedItemProperty().addListener(
@@ -170,6 +171,19 @@ public class PlaylistController {
 
 	@FXML
 	private void onSortChanged() {
+		if (playlist == null || sortComboBox.getValue() == null) {
+			return;
+		}
+
+		switch (sortComboBox.getValue()) {
+			case "Titolo" -> playlist.sortSongsByTitle();
+			case "Autore" -> playlist.sortSongsByAuthor();
+			default -> {
+				return;
+			}
+		}
+
+		refreshPlaylist();
 	}
 
 	/**
@@ -223,6 +237,22 @@ public class PlaylistController {
         removeTrackButton.setDisable(!showButton);
         removeTrackButton.setVisible(showButton);
     }
+
+	/**
+	 * Inizializza i criteri disponibili per l'ordinamento automatico della
+	 * playlist.
+	 */
+	private void initSort() {
+		sortComboBox.getItems().setAll("Titolo", "Autore");
+		updateSortState();
+	}
+
+	/**
+	 * Aggiorna lo stato del menu di ordinamento in base alla playlist corrente.
+	 */
+	private void updateSortState() {
+		sortComboBox.setDisable(playlist == null || playlist.isEmpty() || appContext.isSelectedPlaylistReadOnly());
+	}
 
 	/**
 	 * Configura le proprietà della TableView.
@@ -305,6 +335,7 @@ public class PlaylistController {
 
 		updatePlaylistInfo();
 		updateTracksTable();
+		updateSortState();
 	}
 
 	private void showNoPlaylistSelectedState() {
