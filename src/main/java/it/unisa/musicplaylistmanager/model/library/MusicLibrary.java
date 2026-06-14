@@ -313,6 +313,17 @@ public class MusicLibrary {
 	}
 
 	/**
+	 * Cerca playlist in base al nome.
+	 *
+	 * @param query
+	 *            testo da cercare; se vuoto restituisce tutte le playlist
+	 * @return lista delle playlist compatibili con la ricerca
+	 */
+	public List<Playlist> searchPlaylists(String query) {
+		return playlistCatalog.searchPlaylists(query);
+	}
+
+	/**
 	 * Recupera le prime {@code n} playlist più riprodotte del catalogo, ordinate
 	 * per numero di riproduzioni in ordine decrescente.
 	 *

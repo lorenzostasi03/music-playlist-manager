@@ -18,6 +18,7 @@ import javafx.scene.layout.Region;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -66,6 +67,7 @@ public class HomeController implements Initializable {
         initListView(mostPlayedListView);
 
         initEmptyLabels();
+        initSearch();
 
         updateViews();
     }
@@ -92,7 +94,7 @@ public class HomeController implements Initializable {
     @FXML private void onNewPlaylist() { openPlaylistForm(null); }
 
     @FXML private void onSortChanged() {
-
+        refreshPlaylists();
     }
 
     @FXML private void onListViewClicked() {
@@ -204,13 +206,46 @@ public class HomeController implements Initializable {
      * e aggiorna la relativa list view.
      */
     private void refreshPlaylists() {
-        playlists = appContext.getMusicLibrary().getAllPlaylists();
+        playlists = new ArrayList<>(appContext.getMusicLibrary().searchPlaylists(searchBar.getText()));
+        sortPlaylists();
 
         List<PlaylistItem> items = new ArrayList<>();
 
         playlists.forEach(playlist -> items.add(new PlaylistItem(playlist, false, true)));
 
         playlistListView.getItems().setAll(items);
+    }
+
+    /**
+     * Ordina le playlist visualizzate secondo il criterio selezionato nella Home.
+     */
+    private void sortPlaylists() {
+        String selectedSort = sortComboBox.getValue();
+
+        if (selectedSort == null) {
+            return;
+        }
+
+        Comparator<Playlist> byName =
+            Comparator.comparing(Playlist::getName, String.CASE_INSENSITIVE_ORDER);
+
+        Comparator<Playlist> comparator = switch (selectedSort) {
+            case "Numero brani" -> Comparator.comparingInt(Playlist::size).reversed().thenComparing(byName);
+            case "Riproduzioni" -> Comparator.comparingInt(Playlist::getPlayCount).reversed().thenComparing(byName);
+            default -> byName;
+        };
+
+        playlists.sort(comparator);
+    }
+
+    /**
+     * Collega la barra di ricerca all'elenco delle playlist visualizzate.
+     */
+    private void initSearch() {
+        searchBar.textProperty().addListener((observable, oldValue, newValue) -> {
+            refreshPlaylists();
+            countLabel.setText(playlists.size() + " playlist");
+        });
     }
 
     /**
