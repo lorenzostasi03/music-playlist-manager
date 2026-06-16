@@ -7,6 +7,8 @@ import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import it.unisa.musicplaylistmanager.model.playback.mode.*;
 import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
 
+import java.util.Objects;
+
 public class PlaylistPlayable extends Playable {
 
 	private final Playlist playlist;
@@ -23,11 +25,12 @@ public class PlaylistPlayable extends Playable {
 			throw new IllegalArgumentException("Playlist cannot be null.");
 		}
 
-		if (playlist.size() == 0) {
+		if (playlist.isEmpty()) {
 			throw new IllegalArgumentException("Playlist cannot be empty.");
 		}
 
 		this.playlist = playlist;
+        this.id = "playlist-" + playlist.getName();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.iteratorStrategy = new SequentialIteratorStrategy();
@@ -163,4 +166,21 @@ public class PlaylistPlayable extends Playable {
 			subscribed = false;
 		}
 	}
+
+    public String getId() { return id; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+        if (!(o instanceof SongPlayable)) return false;
+
+        PlaylistPlayable p = (PlaylistPlayable) o;
+        return this.id.equals(p.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

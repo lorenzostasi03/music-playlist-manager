@@ -33,6 +33,8 @@ public class MusicLibrary {
 		this.playlistCatalog = new PlaylistCatalog();
 		this.songDAO = songDAO;
 		this.playlistDAO = playlistDAO;
+
+        init();
 	}
 
 	/**
@@ -51,9 +53,7 @@ public class MusicLibrary {
 		for (Playlist playlist : playlists) {
 			List<UUID> songUUIDs = playlistDAO.getSongIds(playlist.getId());
 
-			for (UUID songId : songUUIDs) {
-				playlist.addSong(songCatalog.getSongById(songId));
-			}
+            songUUIDs.stream().map(songCatalog::getSongById).forEach(playlist::addSong);
 
 			playlistCatalog.addPlaylist(playlist);
 		}
@@ -193,7 +193,7 @@ public class MusicLibrary {
 	}
 
 	/**
-	 * Crea e aggiunge una nuova playlist alla collezione.
+	 * Aggiunge una nuova playlist alla collezione.
 	 *
 	 * @param playlist
 	 *            playlist da aggiungere

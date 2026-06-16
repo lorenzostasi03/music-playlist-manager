@@ -13,6 +13,7 @@ import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -488,4 +489,8 @@ public class PlaylistController {
 			case NEW_RELEASE -> "Nuova uscita";
 		};
 	}
+
+    @FXML
+    public void onUndoCommand(ActionEvent actionEvent) {
+    }
 }

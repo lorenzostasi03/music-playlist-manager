@@ -1,6 +1,10 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddPlayableToQueueCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
+import it.unisa.musicplaylistmanager.controller.command.RemoveSongFromCatalogCommand;
 import it.unisa.musicplaylistmanager.controller.song.SongFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
@@ -11,6 +15,7 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -35,7 +40,8 @@ import java.util.stream.Collectors;
  */
 public class CatalogController {
 
-	@FXML
+    public Button undoCommandButton;
+    @FXML
 	private TextField searchField;
 
 	@FXML
@@ -77,15 +83,17 @@ public class CatalogController {
 		yearFilter.setOnAction(event -> refreshCatalogIfReady());
 		tagFilter.setOnAction(event -> refreshCatalogIfReady());
 
+        initUndoButton();
+
 		refreshCatalog();
 	}
 
-	/**
+    /**
 	 * Apre la schermata del form per l'inserimento di una nuova traccia nel
 	 * catalogo.
 	 */
 	@FXML
-	private void onAddTrack() {
+	private void onAddSong() {
 		openSongForm(null);
 	}
 
@@ -106,6 +114,18 @@ public class CatalogController {
 		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getDisplayName).toList());
 		tagFilter.setValue(ALL);
 	}
+
+    /**
+     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
+     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
+     */
+    private void initUndoButton() {
+        ReadOnlyBooleanProperty canUndo = CommandExecutor.getInstance().canUndoProperty();
+
+        undoCommandButton.visibleProperty().bind(canUndo);
+        undoCommandButton.managedProperty().bind(canUndo);
+        undoCommandButton.disableProperty().bind(canUndo.not());
+    }
 
 	/**
 	 * Ricarica e ridisegna la lista delle tracce a schermo. Aggiorna anche i menu a
@@ -237,7 +257,8 @@ public class CatalogController {
 		}
 
 		try {
-			appContext.getMusicLibrary().removeSongFromCatalog(song);
+			Command cmd = new RemoveSongFromCatalogCommand(appContext.getMusicLibrary(), appContext.getPlayer(), song);
+            CommandExecutor.getInstance().execute(cmd);
 			refreshCatalog();
 			AlertManager.showInfo("Traccia eliminata correttamente.");
 		} catch (PersistenceException | IllegalArgumentException e) {
@@ -331,7 +352,8 @@ public class CatalogController {
 	}
 
 	private void enqueueSong(Song song) {
-		appContext.enqueuePlayable(new SongPlayable(song));
+        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new SongPlayable(song));
+        CommandExecutor.getInstance().execute(cmd);
 		AlertManager.showInfo("Traccia aggiunta alla coda.");
 	}
 
@@ -389,4 +411,11 @@ public class CatalogController {
 
 		return song.getTags().stream().map(Tag::getDisplayName).collect(Collectors.joining(", "));
 	}
+
+    @FXML
+    public void onUndoCommand() {
+        CommandExecutor.getInstance().undo();
+        AlertManager.showInfo("L'operazione è stata annullata.");
+        refreshCatalog();
+    }
 }

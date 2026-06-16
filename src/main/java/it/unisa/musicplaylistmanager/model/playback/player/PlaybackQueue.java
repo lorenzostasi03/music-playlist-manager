@@ -2,17 +2,14 @@ package it.unisa.musicplaylistmanager.model.playback.player;
 
 import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Rappresenta la coda degli oggetti riproducibili in attesa.
  */
 public class PlaybackQueue {
 
-	private final Queue<Playable> queue;
+	private final Deque<Playable> queue;
 
 	public PlaybackQueue() {
 		this.queue = new ArrayDeque<>();
@@ -26,9 +23,19 @@ public class PlaybackQueue {
 		queue.add(playable);
 	}
 
-	public Playable dequeue() {
-		return queue.poll();
-	}
+	public Playable dequeue() { return queue.poll(); }
+
+    public void remove(Playable playable){
+        if (queue.isEmpty()) return;
+
+        queue.removeIf(p -> p.equals(playable));
+    }
+
+    public void removeLast() {
+        if (queue.isEmpty()) return;
+
+       queue.removeLast();
+    }
 
 	public void clear() {
 		queue.clear();

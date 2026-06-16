@@ -10,6 +10,7 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -424,6 +425,10 @@ public class HomeController implements Initializable {
     private String formatDuration(Playlist playlist) {
         int totalSeconds = playlist.getSongs().stream().mapToInt(Song::getDuration).sum();
         return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
+    }
+
+    @FXML
+    public void onUndoCommand(ActionEvent actionEvent) {
     }
 
     /**

@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.app;
 
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
 import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
@@ -34,7 +35,6 @@ public class AppContext {
 	private AppContext() {
 		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DatabaseConfig.DB_URL),
 				new SQLitePlaylistDAO(DatabaseConfig.DB_URL));
-		musicLibrary.init();
 
 		player = new Player();
 	}
@@ -81,5 +81,4 @@ public class AppContext {
 	public void clearPlaybackQueue() {
 		player.clearQueue();
 	}
-
 }

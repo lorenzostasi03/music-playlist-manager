@@ -12,6 +12,7 @@ import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -409,4 +410,7 @@ public class PlaybackController implements EventListener {
 		setCurrentPlaybackMode(PlaybackMode.LOOP);
 	}
 
+    @FXML
+    public void onUndoCommand(ActionEvent actionEvent) {
+    }
 }
