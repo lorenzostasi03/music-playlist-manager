@@ -7,8 +7,8 @@ import it.unisa.musicplaylistmanager.model.playback.player.Player;
  * Comando concreto per rimuovere un Playable dalla coda.
  */
 public class RemovePlayableFromQueueCommand implements Command {
-	private final Playable playable;
 	private final Player player;
+	private final Playable playable;
 
 	public RemovePlayableFromQueueCommand(Player player, Playable playable) {
 		if (player == null)

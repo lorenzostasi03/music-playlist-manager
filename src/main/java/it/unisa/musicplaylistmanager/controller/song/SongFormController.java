@@ -48,10 +48,6 @@ public class SongFormController {
 	private CheckBox explicitCheckBox;
 	@FXML
 	private CheckBox newReleaseCheckBox;
-	@FXML
-	private Label yearErrorLabel;
-	@FXML
-	private Label durationErrorLabel;
 
 	@FXML
 	private Button cancelButton;
@@ -192,8 +188,6 @@ public class SongFormController {
 		try {
 			return Integer.parseInt(yearField.getText().trim());
 		} catch (NumberFormatException e) {
-			yearErrorLabel.setVisible(true);
-			yearErrorLabel.setManaged(true);
 			throw new IllegalArgumentException("L'anno deve essere un numero valido.");
 		}
 	}
@@ -219,9 +213,8 @@ public class SongFormController {
 
 			return Integer.parseInt(text);
 		} catch (NumberFormatException e) {
-			durationErrorLabel.setVisible(true);
-			durationErrorLabel.setManaged(true);
-			throw new IllegalArgumentException("La durata deve essere un numero di secondi oppure nel formato mm:ss.");
+			throw new IllegalArgumentException("La durata deve essere un numero intero di secondi " +
+                "oppure nel formato mm:ss.");
 		}
 	}
 

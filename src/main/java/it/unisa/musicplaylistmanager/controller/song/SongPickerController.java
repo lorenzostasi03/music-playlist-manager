@@ -62,6 +62,7 @@ public class SongPickerController {
 		configureCheckColumn();
 		configureTextColumns();
 		confirmButton.disableProperty().bind(hasSelection.not());
+        confirmButton.visibleProperty().bind(hasSelection);
 	}
 
 	/**
