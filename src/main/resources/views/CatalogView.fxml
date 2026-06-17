@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -9,35 +10,37 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="580.0" prefWidth="900.0" stylesheets="@style.css" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.CatalogController">
+<VBox prefHeight="580.0" prefWidth="900.0" style="-fx-background-color: #000000;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.CatalogController">
     <VBox spacing="15">
         <padding><Insets bottom="15" left="25" right="25" top="25" /></padding>
         <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label text="Catalogo" style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" />
+            <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Catalogo" />
             <Region HBox.hgrow="ALWAYS" />
-            <TextField fx:id="searchField" promptText="Cerca brano..." prefWidth="250" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
+            <TextField fx:id="searchField" prefWidth="250" promptText="Cerca brano..." style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
         </HBox>
         <VBox spacing="10">
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <VBox spacing="4">
                     <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Genere" />
-                    <ComboBox fx:id="genreFilter" promptText="Genere" prefWidth="112" styleClass="dark-combo" />
+                    <ComboBox fx:id="genreFilter" prefWidth="112" promptText="Genere" styleClass="dark-combo" />
                 </VBox>
                 <VBox spacing="4">
                     <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Autore" />
-                    <ComboBox fx:id="authorFilter" promptText="Autore" prefWidth="112" styleClass="dark-combo" />
+                    <ComboBox fx:id="authorFilter" prefWidth="112" promptText="Autore" styleClass="dark-combo" />
                 </VBox>
                 <VBox spacing="4">
                     <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Anno" />
-                    <ComboBox fx:id="yearFilter" promptText="Anno" prefWidth="112" styleClass="dark-combo" />
+                    <ComboBox fx:id="yearFilter" prefWidth="112" promptText="Anno" styleClass="dark-combo" />
                 </VBox>
                 <VBox spacing="4">
                     <Label style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="Tag" />
-                    <ComboBox fx:id="tagFilter" promptText="Tag" prefWidth="132" styleClass="dark-combo" />
+                    <ComboBox fx:id="tagFilter" prefWidth="132" promptText="Tag" styleClass="dark-combo" />
                 </VBox>
             </HBox>
             <HBox alignment="CENTER_LEFT">
-                <Button fx:id="addTrackButton" onAction="#onAddTrack" prefWidth="170" styleClass="spotify-btn" text="+ Aggiungi traccia" wrapText="true" />
+                <Button fx:id="addTrackButton" onAction="#onAddSong" prefWidth="170" styleClass="spotify-btn" text="+ Aggiungi traccia" wrapText="true" />
+            <Region prefHeight="36.0" prefWidth="58.0" />
+            <Button fx:id="undoCommandButton" layoutX="10.0" layoutY="10.0" onAction="#onUndoCommand" prefWidth="170" styleClass="spotify-btn" text="Annulla operazione" wrapText="true" />
             </HBox>
         </VBox>
     </VBox>
@@ -45,30 +48,20 @@
     <HBox alignment="CENTER_LEFT" spacing="6" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="10" left="25" right="25" top="10" /></padding>
 
-        <Label minWidth="125" prefWidth="125" maxWidth="125"
-               style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
-               text="TITOLO" />
+        <Label maxWidth="125" minWidth="125" prefWidth="125" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="TITOLO" />
 
-        <Label alignment="CENTER_LEFT" minWidth="60" prefWidth="60" maxWidth="60"
-               style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
-               text="AUTORE" />
+        <Label alignment="CENTER_LEFT" maxWidth="60" minWidth="60" prefWidth="60" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="AUTORE" />
 
-        <Label alignment="CENTER_LEFT" minWidth="55" prefWidth="55" maxWidth="55"
-               style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
-               text="GENERE" />
+        <Label alignment="CENTER_LEFT" maxWidth="55" minWidth="55" prefWidth="55" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="GENERE" />
 
-        <Label alignment="CENTER_LEFT" minWidth="40" prefWidth="40" maxWidth="40"
-               style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
-               text="ANNO" />
+        <Label alignment="CENTER_LEFT" maxWidth="40" minWidth="40" prefWidth="40" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="ANNO" />
 
-        <Label alignment="CENTER_LEFT" minWidth="60" prefWidth="60" maxWidth="60"
-               style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;"
-               text="DURATA" />
+        <Label alignment="CENTER_LEFT" maxWidth="60" minWidth="60" prefWidth="60" style="-fx-text-fill: #B3B3B3; -fx-font-size: 12px; -fx-font-weight: bold;" text="DURATA" />
 
         <Region HBox.hgrow="ALWAYS" />
     </HBox>
 
     <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #000000; -fx-background-color: transparent; -fx-control-inner-background: #000000; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
-        <padding><Insets top="10" left="25" right="25" /></padding>
+        <padding><Insets left="25" right="25" top="10" /></padding>
     </ScrollPane>
 </VBox>

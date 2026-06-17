@@ -12,6 +12,7 @@ import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,6 +34,8 @@ public class MusicLibrary {
 		this.playlistCatalog = new PlaylistCatalog();
 		this.songDAO = songDAO;
 		this.playlistDAO = playlistDAO;
+
+        init();
 	}
 
 	/**
@@ -51,9 +54,7 @@ public class MusicLibrary {
 		for (Playlist playlist : playlists) {
 			List<UUID> songUUIDs = playlistDAO.getSongIds(playlist.getId());
 
-			for (UUID songId : songUUIDs) {
-				playlist.addSong(songCatalog.getSongById(songId));
-			}
+            songUUIDs.stream().map(songCatalog::getSongById).forEach(playlist::addSong);
 
 			playlistCatalog.addPlaylist(playlist);
 		}
@@ -193,7 +194,7 @@ public class MusicLibrary {
 	}
 
 	/**
-	 * Crea e aggiunge una nuova playlist alla collezione.
+	 * Aggiunge una nuova playlist alla collezione.
 	 *
 	 * @param playlist
 	 *            playlist da aggiungere
@@ -304,12 +305,44 @@ public class MusicLibrary {
 	}
 
 	/**
+	 * Sposta una traccia in una nuova posizione della playlist.
+	 *
+	 * @param song
+	 *            traccia da spostare
+	 * @param playlist
+	 *            playlist da modificare
+	 * @param newPosition
+	 *            nuovo indice della traccia nella playlist
+	 * @throws IllegalArgumentException
+	 *             se la traccia, la playlist o la posizione non sono validi
+	 */
+	public void moveSongInPlaylist(Song song, Playlist playlist, int newPosition) {
+		if (playlist == null) {
+			throw new IllegalArgumentException("La playlist non puo' essere null.");
+		}
+
+		playlist.moveSong(song, newPosition);
+		playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+	}
+
+	/**
 	 * Restituisce tutte le playlist della collezione.
 	 *
 	 * @return lista non modificabile di tutte le playlist
 	 */
 	public List<Playlist> getAllPlaylists() {
 		return playlistCatalog.getAllPlaylists();
+	}
+
+	/**
+	 * Cerca playlist in base al nome.
+	 *
+	 * @param query
+	 *            testo da cercare; se vuoto restituisce tutte le playlist
+	 * @return lista delle playlist compatibili con la ricerca
+	 */
+	public List<Playlist> searchPlaylists(String query) {
+		return playlistCatalog.searchPlaylists(query);
 	}
 
 	/**
@@ -328,5 +361,34 @@ public class MusicLibrary {
 
 		return playlistCatalog.getAllPlaylists().stream().filter(p -> p.getPlayCount() > 0)
 				.sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed()).limit(n).toList();
+	}
+
+	public Playlist createAutomaticPlaylist(String name, Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+
+		if (genres == null || years == null || tags == null) {
+			throw new IllegalArgumentException("I criteri non possono essere null.");
+		}
+
+		if (genres.isEmpty() && years.isEmpty() && tags.isEmpty()) {
+			throw new IllegalArgumentException("Selezionare almeno un criterio.");
+		}
+
+		List<Song> matchingSongs = songCatalog.findSongsMatchingAnyCriteria(genres, years, tags);
+
+		if (matchingSongs.isEmpty()) {
+			throw new IllegalArgumentException("Nessuna traccia soddisfa i criteri selezionati.");
+		}
+
+		Playlist playlist = new Playlist(name);
+
+		// Prima registra la playlist nel catalogo e nel database.
+		addPlaylist(playlist);
+
+		// Poi aggiunge le canzoni
+		for (Song song : matchingSongs) {
+			addSongToPlaylist(song, playlist);
+		}
+
+		return playlist;
 	}
 }

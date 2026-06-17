@@ -87,6 +87,24 @@ public class PlaylistCatalog {
 	}
 
 	/**
+	 * Cerca playlist il cui nome contiene il testo indicato.
+	 *
+	 * @param query
+	 *            testo da cercare nel nome; se vuoto restituisce tutte le playlist
+	 * @return lista delle playlist compatibili con la ricerca
+	 */
+	public List<Playlist> searchPlaylists(String query) {
+		String normalizedQuery = query == null ? "" : query.trim().toLowerCase();
+
+		if (normalizedQuery.isEmpty()) {
+			return getAllPlaylists();
+		}
+
+		return playlists.values().stream()
+				.filter(playlist -> playlist.getName().toLowerCase().contains(normalizedQuery)).toList();
+	}
+
+	/**
 	 * Verifica se esiste una playlist con il nome specificato
 	 *
 	 * @param name

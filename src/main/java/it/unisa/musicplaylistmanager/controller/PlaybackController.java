@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
@@ -10,8 +11,11 @@ import it.unisa.musicplaylistmanager.model.playback.player.Player;
 import it.unisa.musicplaylistmanager.model.playback.player.PlayerState;
 import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 import java.util.List;
+
+import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -22,38 +26,21 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-	@FXML
-	private Label trackTitleLabel;
-	@FXML
-	private Label trackArtistLabel;
+    @FXML private Button undoCommandButton;
+    @FXML private Label trackTitleLabel;
+	@FXML private Label trackArtistLabel;
+	@FXML private Slider progressSlider;
+	@FXML private Label currentTimeLabel;
+	@FXML private Label totalTimeLabel;
+	@FXML private Button playPauseButton;
 
-	@FXML
-	private Slider progressSlider;
+	@FXML private ToggleButton sequentialModeButton;
+	@FXML private ToggleButton shuffleModeButton;
+	@FXML private ToggleButton loopModeButton;
 
-	@FXML
-	private Label currentTimeLabel;
-	@FXML
-	private Label totalTimeLabel;
+	@FXML private Label playCountLabel;
 
-	@FXML
-	private Button previousButton;
-	@FXML
-	private Button playPauseButton;
-	@FXML
-	private Button nextButton;
-
-	@FXML
-	private ToggleButton sequentialModeButton;
-	@FXML
-	private ToggleButton shuffleModeButton;
-	@FXML
-	private ToggleButton loopModeButton;
-
-	@FXML
-	private Label playCountLabel;
-
-	@FXML
-	private VBox queueView;
+	@FXML private VBox queueView;
 
 	private Player player;
 	private AudioPlayer audioPlayer;
@@ -62,7 +49,8 @@ public class PlaybackController implements EventListener {
 
 	private Timeline progressTimeline;
 
-	private AppContext appContext = AppContext.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	@FXML
 	private void initialize() {
@@ -98,6 +86,9 @@ public class PlaybackController implements EventListener {
 				startProgressTimeline();
 			}
 		}
+
+        initUndoButton();
+
 		updatePlaybackModeButtons();
 		updateQueueView();
 	}
@@ -198,6 +189,18 @@ public class PlaybackController implements EventListener {
 		currentPlayable.setPlaybackMode(mode);
 		updatePlaybackModeButtons();
 	}
+
+    /**
+     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
+     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
+     */
+    private void initUndoButton() {
+        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+
+        undoCommandButton.visibleProperty().bind(canUndo);
+        undoCommandButton.managedProperty().bind(canUndo);
+        undoCommandButton.disableProperty().bind(canUndo.not());
+    }
 
 	private void updatePlaybackModeButtons() {
 		if (currentPlayable == null) {
@@ -381,10 +384,6 @@ public class PlaybackController implements EventListener {
 	}
 
 	@FXML
-	private void onPrevious() {
-	}
-
-	@FXML
 	private void onNext() {
 		player.skipSong();
 	}
@@ -409,4 +408,15 @@ public class PlaybackController implements EventListener {
 		setCurrentPlaybackMode(PlaybackMode.LOOP);
 	}
 
+    @FXML
+    private void onUndoCommand() {
+        executor.undo();
+        AlertManager.showInfo("L'operazione è stata annullata.");
+    }
+
+    @FXML
+    private void onClearQueue() {
+        player.clearQueue();
+        updateQueueView();
+    }
 }

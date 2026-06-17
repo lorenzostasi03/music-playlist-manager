@@ -153,4 +153,43 @@ class PlaylistCatalogTest {
 	void testGetAllPlaylistsImmutabile() {
 		assertThrows(UnsupportedOperationException.class, () -> catalog.getAllPlaylists().add(p1));
 	}
+
+	/**
+	 * Verifica che la ricerca delle playlist sia case-insensitive e basata sul
+	 * nome.
+	 */
+	@Test
+	void testRicercaPlaylistCaseInsensitive() {
+		catalog.addPlaylist(p1);
+		catalog.addPlaylist(p2);
+
+		assertEquals(List.of(p1), catalog.searchPlaylists("rock"));
+		assertEquals(List.of(p2), catalog.searchPlaylists("POP"));
+	}
+
+	/**
+	 * Verifica che una ricerca senza risultati restituisca una lista vuota.
+	 */
+	@Test
+	void testRicercaPlaylistSenzaRisultati() {
+		catalog.addPlaylist(p1);
+		catalog.addPlaylist(p2);
+
+		assertTrue(catalog.searchPlaylists("jazz").isEmpty());
+	}
+
+	/**
+	 * Verifica che rimuovendo il testo di ricerca venga restituito l'elenco
+	 * completo delle playlist.
+	 */
+	@Test
+	void testRicercaPlaylistQueryVuotaRestituisceTutte() {
+		catalog.addPlaylist(p1);
+		catalog.addPlaylist(p2);
+
+		List<Playlist> result = catalog.searchPlaylists("   ");
+
+		assertEquals(2, result.size());
+		assertTrue(result.containsAll(List.of(p1, p2)));
+	}
 }

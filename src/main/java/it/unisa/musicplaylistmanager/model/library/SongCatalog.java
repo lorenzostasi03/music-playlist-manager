@@ -143,4 +143,30 @@ public class SongCatalog {
 		return songs.isEmpty();
 	}
 
+	/**
+	 * Restituisce le tracce che soddisfano almeno uno dei criteri indicati.
+	 *
+	 * <p>
+	 * I criteri vengono combinati mediante OR: una traccia è inclusa se appartiene
+	 * a uno dei generi selezionati, se è stata pubblicata in uno degli anni
+	 * selezionati oppure se possiede almeno uno dei tag selezionati.
+	 *
+	 * @param genres
+	 *            generi selezionati
+	 * @param years
+	 *            anni selezionati
+	 * @param tags
+	 *            tag selezionati
+	 * @return tracce che soddisfano almeno uno dei criteri
+	 */
+	public List<Song> findSongsMatchingAnyCriteria(Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+
+		if (genres == null || years == null || tags == null) {
+			throw new IllegalArgumentException("I criteri non possono essere null.");
+		}
+
+		return songs.values().stream().filter(song -> genres.contains(song.getGenre()) || years.contains(song.getYear())
+				|| tags.stream().anyMatch(song::hasTag)).toList();
+	}
+
 }

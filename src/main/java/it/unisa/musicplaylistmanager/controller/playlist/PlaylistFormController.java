@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddPlaylistCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.fxml.FXML;
@@ -11,8 +14,7 @@ import javafx.scene.control.TextField;
 import java.util.Set;
 
 /**
- * Controller per la finestra modale dedicata alla creazione di una nuova
- * playlist o alla rinomina di una playlist esistente.
+ * Controller per la finestra per creare o rinominare una playlist.
  */
 public class PlaylistFormController {
 
@@ -36,10 +38,11 @@ public class PlaylistFormController {
 	private Runnable onSave;
 
 	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
-    private final Set<String> defaultPlaylistNames = Set.of("Top 10");
+	private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
-	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
+	 * Inizializza il form.
 	 */
 	@FXML
 	private void initialize() {
@@ -87,17 +90,17 @@ public class PlaylistFormController {
 		try {
 			String name = nameField.getText();
 
-            boolean invalidName = defaultPlaylistNames.stream()
-                .map(String::toLowerCase)
-                .anyMatch(s -> s.equals(name.toLowerCase()));
+			boolean invalidName = defaultPlaylistNames.stream().map(String::toLowerCase)
+					.anyMatch(s -> s.equals(name.toLowerCase()));
 
-            if (invalidName) {
-                AlertManager.showError("Non è possibile creare una playlist con questo nome!");
-                return;
-            }
+			if (invalidName) {
+				AlertManager.showError("Non è possibile creare una playlist con questo nome!");
+				return;
+			}
 
 			if (playlistToEdit == null) {
-				appContext.getMusicLibrary().addPlaylist(new Playlist(name));
+                Command cmd = new AddPlaylistCommand(appContext.getMusicLibrary(), new Playlist(name));
+                executor.execute(cmd);
 				AlertManager.showInfo("Playlist creata correttamente.");
 			} else {
 				appContext.getMusicLibrary().renamePlaylist(playlistToEdit, name);
@@ -109,7 +112,7 @@ public class PlaylistFormController {
 			}
 			closeWindow();
 		} catch (IllegalArgumentException e) {
-            AlertManager.showError(e.getMessage());
+			AlertManager.showError(e.getMessage());
 		}
 	}
 

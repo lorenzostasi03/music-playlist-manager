@@ -89,6 +89,18 @@ public interface PlaylistDAO {
 	void removeSong(UUID playlistId, UUID songId);
 
 	/**
+	 * Sostituisce l'elenco dei brani di una playlist mantenendo l'ordine fornito.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param songIds
+	 *            identificatori dei brani nel nuovo ordine
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento
+	 */
+	void replaceSongs(UUID playlistId, List<UUID> songIds);
+
+	/**
 	 * Recupera gli identificatori dei brani contenuti in una playlist.
 	 *
 	 * @param playlistId

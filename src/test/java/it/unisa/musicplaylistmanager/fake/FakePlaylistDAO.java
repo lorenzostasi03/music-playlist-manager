@@ -8,12 +8,12 @@ import java.util.*;
 public class FakePlaylistDAO implements PlaylistDAO {
 
 	private final List<Playlist> playlists = new ArrayList<>();
-	private final Map<UUID, Set<UUID>> playlistSongs = new HashMap<>();
+	private final Map<UUID, List<UUID>> playlistSongs = new HashMap<>();
 
 	@Override
 	public void save(Playlist playlist) {
 		playlists.add(playlist);
-		playlistSongs.putIfAbsent(playlist.getId(), new HashSet<>());
+		playlistSongs.putIfAbsent(playlist.getId(), new ArrayList<>());
 	}
 
 	@Override
@@ -42,20 +42,25 @@ public class FakePlaylistDAO implements PlaylistDAO {
 
 	@Override
 	public void addSong(UUID playlistId, UUID songId) {
-		playlistSongs.computeIfAbsent(playlistId, k -> new HashSet<>()).add(songId);
+		playlistSongs.computeIfAbsent(playlistId, k -> new ArrayList<>()).add(songId);
 	}
 
 	@Override
 	public void removeSong(UUID playlistId, UUID songId) {
-		Set<UUID> songs = playlistSongs.get(playlistId);
+		List<UUID> songs = playlistSongs.get(playlistId);
 		if (songs != null) {
 			songs.remove(songId);
 		}
 	}
 
 	@Override
+	public void replaceSongs(UUID playlistId, List<UUID> songIds) {
+		playlistSongs.put(playlistId, new ArrayList<>(songIds));
+	}
+
+	@Override
 	public List<UUID> getSongIds(UUID playlistId) {
-		Set<UUID> songs = playlistSongs.get(playlistId);
+		List<UUID> songs = playlistSongs.get(playlistId);
 		if (songs == null)
 			return new ArrayList<>();
 		return new ArrayList<>(songs);

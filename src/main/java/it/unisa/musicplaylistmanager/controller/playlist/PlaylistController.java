@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.*;
 import it.unisa.musicplaylistmanager.controller.song.SongPickerController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
@@ -11,6 +12,7 @@ import it.unisa.musicplaylistmanager.model.playback.playable.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
@@ -19,8 +21,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 
 import java.util.stream.Collectors;
 
@@ -31,53 +37,33 @@ import java.util.stream.Collectors;
  * playlist.
  */
 public class PlaylistController {
+    @FXML private Label playlistNameLabel;
+	@FXML private Label trackCountLabel;
 
-	@FXML
-	private Label playlistNameLabel;
-	@FXML
-	private Label trackCountLabel;
+	@FXML private Button editNameButton;
+	@FXML private Button deletePlaylistButton;
+    @FXML private Button addTrackButton;
+    @FXML private Button removeTrackButton;
+    @FXML private Button undoCommandButton;
 
-	@FXML
-	private Button playButton;
-    @FXML
-    private Button enqueueButton;
-	@FXML
-	private Button editNameButton;
-	@FXML
-	private Button deletePlaylistButton;
+	@FXML private TextField searchField;
 
-	@FXML
-	private TextField searchField;
-	@FXML
-	private ComboBox<String> sortComboBox;
+	@FXML private ComboBox<String> sortComboBox;
 
-	@FXML
-	private Button addTrackButton;
+	@FXML private TableView<Song> tracksTable;
+	@FXML private TableColumn<Song, Integer> indexColumn;
+	@FXML private TableColumn<Song, String> titleColumn;
+	@FXML private TableColumn<Song, String> authorColumn;
+	@FXML private TableColumn<Song, String> durationColumn;
+	@FXML private TableColumn<Song, String> genreColumn;
+	@FXML private TableColumn<Song, Integer> yearColumn;
+	@FXML private TableColumn<Song, String> tagsColumn;
 
-	@FXML
-	private TableView<Song> tracksTable;
-
-	@FXML
-	private TableColumn<Song, Integer> indexColumn;
-	@FXML
-	private TableColumn<Song, String> titleColumn;
-	@FXML
-	private TableColumn<Song, String> authorColumn;
-	@FXML
-	private TableColumn<Song, String> durationColumn;
-	@FXML
-	private TableColumn<Song, String> genreColumn;
-	@FXML
-	private TableColumn<Song, Integer> yearColumn;
-	@FXML
-	private TableColumn<Song, String> tagsColumn;
-
-	@FXML
-	private Button removeTrackButton;
+    private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private Playlist playlist;
-
-	private final AppContext appContext = AppContext.getInstance();
+	private boolean readOnly;
 
 	/**
 	 * Inizializza il controller recuperando la playlist selezionata dallo stato
@@ -86,48 +72,47 @@ public class PlaylistController {
 
 	@FXML
 	private void initialize() {
-        playlist = appContext.getSelectedPlaylist();
-        boolean readOnly = appContext.isSelectedPlaylistReadOnly();
+		playlist = appContext.getSelectedPlaylist();
+		readOnly = appContext.isSelectedPlaylistReadOnly();
 
-        configureTable();
+		configureTable();
 
-        initButtons(readOnly);
+		initButtons(readOnly);
+        initUndoButton();
+		initSort();
 
-        // gestione selezione tabella
-        tracksTable.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, selectedSong) ->
-                removeTrackButton.setDisable(selectedSong == null || readOnly)
-        );
+		tracksTable.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, selectedSong) -> updateSelectionButtons(selectedSong));
 
-        refreshPlaylist();
+		refreshPlaylist();
 	}
 
 	@FXML
 	private void onPlay() {
-        if (playlist == null || playlist.size() == 0) {
+        if (playlist == null || playlist.isEmpty()) {
             AlertManager.showError("La playlist è vuota.");
             return;
         }
 
-        appContext.playPlayable(new PlaylistPlayable(playlist));
-        ViewSwitcher.switchTo("PlaybackView.fxml");
+		appContext.playPlayable(new PlaylistPlayable(playlist));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
     @FXML
     private void onEnqueue() {
-        if (playlist == null || playlist.size() == 0) {
+        if (playlist == null || playlist.isEmpty()) {
             AlertManager.showError("La playlist è vuota.");
             return;
         }
 
-        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new  PlaylistPlayable(playlist));
+        executor.execute(cmd);
         AlertManager.showInfo("Playlist aggiunta alla coda.");
     }
 
 	/**
 	 * Apre la finestra modale per modificare il nome della playlist corrente.
 	 */
-
 	@FXML
 	private void onRename() {
 		if (playlist == null) {
@@ -154,7 +139,8 @@ public class PlaylistController {
 		}
 
 		try {
-			appContext.getMusicLibrary().removePlaylist(playlist);
+            Command cmd = new RemovePlaylistCommand(appContext.getMusicLibrary(), appContext.getPlayer(), playlist);
+            executor.execute(cmd);
 			appContext.setSelectedPlaylist(null);
 			ViewSwitcher.switchTo("HomeView.fxml");
 			AlertManager.showInfo("Playlist eliminata correttamente.");
@@ -170,6 +156,19 @@ public class PlaylistController {
 
 	@FXML
 	private void onSortChanged() {
+		if (playlist == null || sortComboBox.getValue() == null) {
+			return;
+		}
+
+		switch (sortComboBox.getValue()) {
+			case "Titolo" -> playlist.sortSongsByTitle();
+			case "Autore" -> playlist.sortSongsByAuthor();
+			default -> {
+				return;
+			}
+		}
+
+		refreshPlaylist();
 	}
 
 	/**
@@ -200,7 +199,8 @@ public class PlaylistController {
 		}
 
 		try {
-			appContext.getMusicLibrary().removeSongFromPlaylist(selectedSong, playlist);
+            Command cmd = new RemoveSongFromPlaylistCommand(appContext.getMusicLibrary(), playlist, selectedSong);
+            executor.execute(cmd);
 			refreshPlaylist();
 			AlertManager.showInfo("Traccia rimossa dalla playlist.");
 		} catch (IllegalArgumentException | PersistenceException e) {
@@ -208,21 +208,49 @@ public class PlaylistController {
 		}
 	}
 
-    private void initButtons(boolean readOnly) {
-        boolean showButton = (playlist == null || readOnly) ? false : true;
+	private void initButtons(boolean readOnly) {
+		boolean showButton = playlist != null && !readOnly;
 
-        addTrackButton.setDisable(!showButton);
-        addTrackButton.setVisible(showButton);
+		addTrackButton.setDisable(!showButton);
+		addTrackButton.setVisible(showButton);
 
-        editNameButton.setDisable(!showButton);
-        editNameButton.setVisible(showButton);
+		editNameButton.setDisable(!showButton);
+		editNameButton.setVisible(showButton);
 
-        deletePlaylistButton.setDisable(!showButton);
-        deletePlaylistButton.setVisible(showButton);
+		deletePlaylistButton.setDisable(!showButton);
+		deletePlaylistButton.setVisible(showButton);
 
-        removeTrackButton.setDisable(!showButton);
-        removeTrackButton.setVisible(showButton);
+		removeTrackButton.setDisable(!showButton);
+		removeTrackButton.setVisible(showButton);
+	}
+
+    /**
+     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
+     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
+     */
+    private void initUndoButton() {
+        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+
+        undoCommandButton.visibleProperty().bind(canUndo);
+        undoCommandButton.managedProperty().bind(canUndo);
+        undoCommandButton.disableProperty().bind(canUndo.not());
     }
+
+	/**
+	 * Inizializza i criteri disponibili per l'ordinamento automatico della
+	 * playlist.
+	 */
+	private void initSort() {
+		sortComboBox.getItems().setAll("Titolo", "Autore");
+		updateSortState();
+	}
+
+	/**
+	 * Aggiorna lo stato del menu di ordinamento in base alla playlist corrente.
+	 */
+	private void updateSortState() {
+		sortComboBox.setDisable(playlist == null || playlist.isEmpty() || appContext.isSelectedPlaylistReadOnly());
+	}
 
 	/**
 	 * Configura le proprietà della TableView.
@@ -230,6 +258,7 @@ public class PlaylistController {
 	private void configureTable() {
 		configureColumnProperties();
 		configureCellFactories();
+		configureDragAndDrop();
 	}
 
 	private void configureColumnProperties() {
@@ -293,7 +322,7 @@ public class PlaylistController {
 	}
 
 	/**
-	 * Ricarica i dati della playlist selezionata e aggiorna l'interfaccia .
+	 * Ricarica i dati della playlist selezionata e aggiorna l'interfaccia.
 	 * Aggiorna le etichette descrittive, popola la tabella e gestisce la
 	 * visualizzazione del pannello di avviso se la playlist risulta vuota.
 	 */
@@ -305,6 +334,7 @@ public class PlaylistController {
 
 		updatePlaylistInfo();
 		updateTracksTable();
+		updateSortState();
 	}
 
 	private void showNoPlaylistSelectedState() {
@@ -324,8 +354,92 @@ public class PlaylistController {
 		tracksTable.getItems().setAll(playlist.searchSongs(searchField.getText()));
 	}
 
+	private void updateSelectionButtons(Song selectedSong) {
+		boolean disabled = selectedSong == null || readOnly;
+		removeTrackButton.setDisable(disabled);
+	}
+
+	private void configureDragAndDrop() {
+		tracksTable.setRowFactory(table -> {
+			TableRow<Song> row = new TableRow<>();
+
+			row.setOnDragDetected(event -> {
+				if (row.isEmpty() || !canMoveTracks()) {
+					return;
+				}
+
+				Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);
+				ClipboardContent content = new ClipboardContent();
+				content.putString(row.getItem().getId().toString());
+				dragboard.setContent(content);
+				event.consume();
+			});
+
+			row.setOnDragOver(event -> {
+				Dragboard dragboard = event.getDragboard();
+				if (!row.isEmpty() && dragboard.hasString() && canMoveTracks()
+						&& !row.getItem().getId().toString().equals(dragboard.getString())) {
+					event.acceptTransferModes(TransferMode.MOVE);
+				}
+
+				event.consume();
+			});
+
+			row.setOnDragDropped(event -> {
+				boolean completed = false;
+				Dragboard dragboard = event.getDragboard();
+
+				if (!row.isEmpty() && dragboard.hasString() && canMoveTracks()) {
+					completed = moveDraggedSong(dragboard.getString(), row.getItem());
+				}
+
+				event.setDropCompleted(completed);
+				event.consume();
+			});
+
+			return row;
+		});
+	}
+
+	private boolean moveDraggedSong(String draggedSongId, Song targetSong) {
+		if (playlist == null || targetSong == null) {
+			return false;
+		}
+
+		Song draggedSong = findSongById(draggedSongId);
+		if (draggedSong == null || draggedSong.equals(targetSong)) {
+			return false;
+		}
+
+		int targetPosition = playlist.getSongs().indexOf(targetSong);
+		if (targetPosition < 0) {
+			return false;
+		}
+
+		try {
+			appContext.getMusicLibrary().moveSongInPlaylist(draggedSong, playlist, targetPosition);
+			sortComboBox.setValue(null);
+			refreshPlaylist();
+			tracksTable.getSelectionModel().select(draggedSong);
+			return true;
+		} catch (IllegalArgumentException | PersistenceException e) {
+			AlertManager.showError(e.getMessage());
+			return false;
+		}
+	}
+
+	private Song findSongById(String songId) {
+		return playlist.getSongs().stream().filter(song -> song.getId().toString().equals(songId)).findFirst()
+				.orElse(null);
+	}
+
+	private boolean canMoveTracks() {
+		String query = searchField.getText();
+		return !readOnly && (query == null || query.isBlank());
+	}
+
 	/**
-	 * Instanzia e visualizza la finestra per la selezione dei brani.
+	 * Istanzia e visualizza la finestra per la selezione dei brani.
 	 */
 	private void openSongPicker() {
 		if (playlist == null) {
@@ -340,7 +454,7 @@ public class PlaylistController {
 	}
 
 	/**
-	 * Instanzia e visualizza la finestra per la modifica della playlist.
+	 * Istanzia e visualizza la finestra per la modifica della playlist.
 	 */
 	private void openPlaylistForm() {
 		if (playlist == null) {
@@ -362,12 +476,14 @@ public class PlaylistController {
 		return song.getTags().stream().map(this::formatTag).collect(Collectors.joining(", "));
 	}
 
-	// TO DO: da rivedere quando implementeremo i Tags
 	private String formatTag(Tag tag) {
-		return switch (tag) {
-			case FAVOURITE -> "Preferito";
-			case EXPLICIT -> "Esplicito";
-			case NEW_RELEASE -> "Nuova uscita";
-		};
-	}
+        return tag != null ? tag.getLabel() : "";
+    }
+
+    @FXML
+    public void onUndoCommand() {
+        executor.undo();
+        AlertManager.showInfo("L'operazione è stata annullata.");
+        refreshPlaylist();
+    }
 }

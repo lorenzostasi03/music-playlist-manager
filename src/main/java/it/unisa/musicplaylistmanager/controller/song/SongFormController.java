@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.song;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddSongToCatalogCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
@@ -19,7 +22,7 @@ import javafx.stage.Window;
 import java.io.File;
 
 /**
- * Controller per la finestra modale dedicata alla creazione di una nuova
+ * Controller per la finestra dedicata alla creazione di una nuova
  * traccia o alla modifica di una traccia esistente nel catalogo. Gestisce la
  * validazione dei campi di input e l'aggiornamento dei dati.
  */
@@ -45,17 +48,10 @@ public class SongFormController {
 	private CheckBox explicitCheckBox;
 	@FXML
 	private CheckBox newReleaseCheckBox;
-
-	@FXML
-	private Label titleErrorLabel;
-	@FXML
-	private Label authorErrorLabel;
 	@FXML
 	private Label yearErrorLabel;
 	@FXML
 	private Label durationErrorLabel;
-	@FXML
-	private Label globalErrorLabel;
 
 	@FXML
 	private Button cancelButton;
@@ -73,12 +69,10 @@ public class SongFormController {
 	private final AppContext appContext = AppContext.getInstance();
 
 	/**
-	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
+	 * Inizializza il form.
 	 */
 	@FXML
 	private void initialize() {
-		hideErrors();
-
 		genreComboBox.getItems().setAll(java.util.Arrays.stream(Genre.values()).map(Genre::getLabel).toList());
 	}
 
@@ -149,8 +143,6 @@ public class SongFormController {
 	 */
 	@FXML
 	private void onConfirm() {
-		hideErrors();
-
 		try {
 			String title = titleField.getText();
 			String author = authorField.getText();
@@ -159,14 +151,15 @@ public class SongFormController {
 			int duration = parseDuration();
 
 			if (selectedFilePath == null || selectedFilePath.isBlank()) {
-				showGlobalError("Seleziona un file audio.");
+				AlertManager.showError("Seleziona un file audio.");
 				return;
 			}
 
 			if (songToEdit == null) {
 				Song song = new Song(title, author, genre, year, duration, selectedFilePath);
 				applyTags(song);
-				appContext.getMusicLibrary().addSongToCatalog(song);
+				Command cmd = new AddSongToCatalogCommand(appContext.getMusicLibrary(), song);
+                CommandExecutor.getInstance().execute(cmd);
 				AlertManager.showInfo("Traccia aggiunta al catalogo.");
 			} else {
 				songToEdit.setTitle(title);
@@ -184,12 +177,10 @@ public class SongFormController {
 				onSave.run();
 			}
 			closeWindow();
-		} catch (IllegalArgumentException e) {
-			showGlobalError(e.getMessage());
-		} catch (DuplicatedSongException | PersistenceException e) {
+		} catch (IllegalArgumentException | DuplicatedSongException | PersistenceException e) {
 			AlertManager.showError(e.getMessage());
 		}
-	}
+    }
 	/**
 	 * Analizza e valida il testo inserito nel campo dell'anno di pubblicazione.
 	 *
@@ -270,26 +261,6 @@ public class SongFormController {
 		if (newReleaseCheckBox.isSelected()) {
 			song.addTag(Tag.NEW_RELEASE);
 		}
-	}
-
-	private void hideErrors() {
-		titleErrorLabel.setVisible(false);
-		titleErrorLabel.setManaged(false);
-		authorErrorLabel.setVisible(false);
-		authorErrorLabel.setManaged(false);
-		yearErrorLabel.setVisible(false);
-		yearErrorLabel.setManaged(false);
-		durationErrorLabel.setVisible(false);
-		durationErrorLabel.setManaged(false);
-		globalErrorLabel.setVisible(false);
-		globalErrorLabel.setManaged(false);
-	}
-
-	private void showGlobalError(String message) {
-		globalErrorLabel.setText(message);
-		globalErrorLabel.setVisible(true);
-		globalErrorLabel.setManaged(true);
-		AlertManager.showError(message);
 	}
 
 	private void updateFilePathLabel() {

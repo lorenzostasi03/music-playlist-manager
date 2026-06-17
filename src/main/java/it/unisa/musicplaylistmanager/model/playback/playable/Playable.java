@@ -15,7 +15,7 @@ import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
  * completamento della riproduzione.
  */
 public abstract class Playable implements EventListener {
-
+    protected String id;
 	private final EventManager events;
 
 	/**
