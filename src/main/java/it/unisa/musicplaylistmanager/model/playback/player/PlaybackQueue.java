@@ -52,4 +52,14 @@ public class PlaybackQueue {
 	public List<Playable> getSnapshot() {
 		return new ArrayList<>(queue);
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Queue:\n");
+        for (Playable playable : queue) {
+            sb.append(playable).append("\n");
+        }
+
+        return sb.toString();
+    }
 }

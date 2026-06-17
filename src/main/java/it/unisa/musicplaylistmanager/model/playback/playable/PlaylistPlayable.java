@@ -173,7 +173,7 @@ public class PlaylistPlayable extends Playable {
     public boolean equals(Object o) {
         if (o == null) return false;
         if (this == o) return true;
-        if (!(o instanceof SongPlayable)) return false;
+        if (!(o instanceof PlaylistPlayable)) return false;
 
         PlaylistPlayable p = (PlaylistPlayable) o;
         return this.id.equals(p.id);
@@ -182,5 +182,10 @@ public class PlaylistPlayable extends Playable {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return id + " " + playlist.toString();
     }
 }
