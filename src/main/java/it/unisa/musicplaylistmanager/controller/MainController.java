@@ -12,15 +12,7 @@ import javafx.scene.layout.BorderPane;
  */
 public class MainController {
 
-	@FXML
-	private BorderPane root;
-
-	@FXML
-	private Button homeButton;
-	@FXML
-	private Button catalogButton;
-	@FXML
-	private Button playbackButton;
+	@FXML private BorderPane root;
 
 	@FXML
 	private void initialize() {

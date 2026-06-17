@@ -1,6 +1,10 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddPlayableToQueueCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
+import it.unisa.musicplaylistmanager.controller.command.RemovePlaylistCommand;
 import it.unisa.musicplaylistmanager.controller.playlist.AutomaticPlaylistFormController;
 import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
@@ -10,49 +14,68 @@ import it.unisa.musicplaylistmanager.model.playback.playable.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
-import javafx.beans.binding.Bindings;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 
 /**
  * Controller della schermata principale dell'applicazione.
  *
+ * <p>
  * Gestisce la visualizzazione delle playlist presenti nella libreria, delle
  * playlist più riprodotte e della playlist contenente i brani più ascoltati.
- * Inoltre consente la creazione, modifica, eliminazione, riproduzione e
- * accodamento delle playlist.
+ * Inoltre consente la creazione, modifica, eliminazione, riproduzione,
+ * accodamento e annullamento delle operazioni sulle playlist.
  */
 public class HomeController implements Initializable {
 
 	@FXML
+	private Button undoCommandButton;
+
+	@FXML
 	private TextField searchBar;
+
 	@FXML
 	private Button autoCreateBtn;
+
 	@FXML
 	private Button newPlaylistBtn;
+
 	@FXML
 	private ComboBox<String> sortComboBox;
+
 	@FXML
 	private Label countLabel;
+
 	@FXML
 	private Label emptyPlaylistLabel;
+
 	@FXML
 	private Label emptyTopPlaylistLabel;
+
 	@FXML
 	private ListView<PlaylistItem> playlistListView;
+
 	@FXML
 	private ListView<PlaylistItem> mostPlayedListView;
 
 	private final AppContext appContext = AppContext.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private List<Playlist> playlists;
 	private Playlist topSongs;
@@ -64,8 +87,10 @@ public class HomeController implements Initializable {
 	/**
 	 * Inizializza i componenti grafici della schermata.
 	 *
+	 * <p>
 	 * Configura i controlli, inizializza le {@link ListView}, imposta i messaggi
-	 * visualizzati in assenza di contenuti e aggiorna i dati mostrati all'utente.
+	 * visualizzati in assenza di contenuti, configura il pulsante di undo e
+	 * aggiorna i dati mostrati all'utente.
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -77,6 +102,7 @@ public class HomeController implements Initializable {
 
 		initEmptyLabels();
 		initSearch();
+		initUndoButton();
 
 		updateViews();
 	}
@@ -89,6 +115,9 @@ public class HomeController implements Initializable {
 		openPlaylistForm(null);
 	}
 
+	/**
+	 * Aggiorna l'ordinamento delle playlist visualizzate.
+	 */
 	@FXML
 	private void onSortChanged() {
 		refreshPlaylists();
@@ -102,6 +131,7 @@ public class HomeController implements Initializable {
 	/**
 	 * Aggiorna tutte le informazioni visualizzate nella schermata.
 	 *
+	 * <p>
 	 * Ricarica l'elenco delle playlist, aggiorna la sezione delle playlist più
 	 * riprodotte e il contatore totale delle playlist.
 	 */
@@ -129,16 +159,35 @@ public class HomeController implements Initializable {
 	 * modifica di una playlist esistente.
 	 *
 	 * @param playlist
-	 *            playlist da modificare; {@code null} per creare una nuova playlist
+	 *            playlist da modificare; {@code null} per creare una nuova
+	 *            playlist
 	 */
 	private void openPlaylistForm(Playlist playlist) {
-		String title = (playlist == null) ? "Nuova playlist" : "Rinomina playlist";
+		String title = playlist == null
+				? "Nuova playlist"
+				: "Rinomina playlist";
 
-		DialogUtil.open("PlaylistFormView.fxml", title, newPlaylistBtn.getScene().getWindow(),
+		DialogUtil.open(
+				"PlaylistFormView.fxml",
+				title,
+				newPlaylistBtn.getScene().getWindow(),
 				(PlaylistFormController controller) -> {
 					controller.setPlaylistToEdit(playlist);
 					controller.setOnSave(this::updateViews);
 				});
+	}
+
+	/**
+	 * Apre il form per la generazione automatica di una playlist.
+	 */
+	@FXML
+	private void onAutoCreatePlaylist() {
+		DialogUtil.open(
+				"AutomaticPlaylistFormView.fxml",
+				"Playlist automatica",
+				autoCreateBtn.getScene().getWindow(),
+				(AutomaticPlaylistFormController controller) ->
+						controller.setOnSave(this::updateViews));
 	}
 
 	/**
@@ -158,7 +207,7 @@ public class HomeController implements Initializable {
 	}
 
 	/**
-	 * Aggiunge una playlist alla coda di riproduzione.
+	 * Aggiunge una playlist alla coda tramite un comando annullabile.
 	 *
 	 * @param playlist
 	 *            playlist da accodare
@@ -169,28 +218,41 @@ public class HomeController implements Initializable {
 			return;
 		}
 
-		appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+		Command command = new AddPlayableToQueueCommand(
+				appContext.getPlayer(),
+				new PlaylistPlayable(playlist));
+
+		executor.execute(command);
 		AlertManager.showInfo("Playlist aggiunta alla coda.");
 	}
 
 	/**
-	 * Elimina la playlist selezionata dopo conferma dell'utente.
+	 * Elimina la playlist selezionata tramite un comando annullabile.
 	 *
 	 * @param playlist
-	 *            la playlist da eliminare
+	 *            playlist da eliminare
 	 */
 	private void deletePlaylist(Playlist playlist) {
-		if (playlist == null)
+		if (playlist == null) {
 			return;
+		}
 
-		boolean confirmed = AlertManager.showConfirmation("Vuoi eliminare la playlist '" + playlist.getName() + "'?");
+		boolean confirmed = AlertManager.showConfirmation(
+				"Vuoi eliminare la playlist '" + playlist.getName() + "'?");
 
-		if (!confirmed)
+		if (!confirmed) {
 			return;
+		}
 
 		try {
-			appContext.getMusicLibrary().removePlaylist(playlist);
+			Command command = new RemovePlaylistCommand(
+					appContext.getMusicLibrary(),
+					appContext.getPlayer(),
+					playlist);
+
+			executor.execute(command);
 			updateViews();
+
 			AlertManager.showInfo("Playlist eliminata correttamente.");
 		} catch (PersistenceException | IllegalArgumentException e) {
 			AlertManager.showError(e.getMessage());
@@ -199,15 +261,18 @@ public class HomeController implements Initializable {
 
 	/**
 	 * Ricarica dalla libreria musicale l'elenco completo delle playlist e aggiorna
-	 * la relativa list view.
+	 * la relativa lista.
 	 */
 	private void refreshPlaylists() {
-		playlists = new ArrayList<>(appContext.getMusicLibrary().searchPlaylists(searchBar.getText()));
+		playlists = new ArrayList<>(
+				appContext.getMusicLibrary().searchPlaylists(searchBar.getText()));
+
 		sortPlaylists();
 
 		List<PlaylistItem> items = new ArrayList<>();
 
-		playlists.forEach(playlist -> items.add(new PlaylistItem(playlist, false, true)));
+		playlists.forEach(
+				playlist -> items.add(new PlaylistItem(playlist, false, true)));
 
 		playlistListView.getItems().setAll(items);
 	}
@@ -222,11 +287,21 @@ public class HomeController implements Initializable {
 			return;
 		}
 
-		Comparator<Playlist> byName = Comparator.comparing(Playlist::getName, String.CASE_INSENSITIVE_ORDER);
+		Comparator<Playlist> byName = Comparator.comparing(
+				Playlist::getName,
+				String.CASE_INSENSITIVE_ORDER);
 
 		Comparator<Playlist> comparator = switch (selectedSort) {
-			case "Numero brani" -> Comparator.comparingInt(Playlist::size).reversed().thenComparing(byName);
-			case "Riproduzioni" -> Comparator.comparingInt(Playlist::getPlayCount).reversed().thenComparing(byName);
+			case "Numero brani" ->
+				Comparator.comparingInt(Playlist::size)
+						.reversed()
+						.thenComparing(byName);
+
+			case "Riproduzioni" ->
+				Comparator.comparingInt(Playlist::getPlayCount)
+						.reversed()
+						.thenComparing(byName);
+
 			default -> byName;
 		};
 
@@ -244,8 +319,35 @@ public class HomeController implements Initializable {
 	}
 
 	/**
+	 * Configura il pulsante di annullamento.
+	 *
+	 * <p>
+	 * Il pulsante è visibile, gestito dal layout e utilizzabile soltanto quando
+	 * il {@link CommandExecutor} contiene almeno un comando annullabile.
+	 */
+	private void initUndoButton() {
+		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+
+		undoCommandButton.visibleProperty().bind(canUndo);
+		undoCommandButton.managedProperty().bind(canUndo);
+		undoCommandButton.disableProperty().bind(canUndo.not());
+	}
+
+	/**
+	 * Annulla l'ultimo comando eseguito e aggiorna le informazioni visualizzate.
+	 */
+	@FXML
+	private void onUndoCommand() {
+		executor.undo();
+		updateViews();
+
+		AlertManager.showInfo("L'operazione è stata annullata.");
+	}
+
+	/**
 	 * Aggiorna la sezione dedicata ai contenuti più riprodotti.
 	 *
+	 * <p>
 	 * Include la playlist dei brani più ascoltati e le playlist con il maggior
 	 * numero di riproduzioni.
 	 */
@@ -253,13 +355,16 @@ public class HomeController implements Initializable {
 		List<PlaylistItem> items = new ArrayList<>();
 
 		topSongs = buildTopSongsPlaylist();
+
 		if (topSongs != null) {
 			items.add(new PlaylistItem(topSongs, true, false));
 		}
 
 		topPlaylists = getTopPlaylists();
+
 		if (topPlaylists != null) {
-			topPlaylists.forEach(playlist -> items.add(new PlaylistItem(playlist, false, true)));
+			topPlaylists.forEach(
+					playlist -> items.add(new PlaylistItem(playlist, false, true)));
 		}
 
 		mostPlayedListView.getItems().setAll(items);
@@ -269,28 +374,35 @@ public class HomeController implements Initializable {
 	 * Costruisce una playlist temporanea contenente i brani più riprodotti presenti
 	 * nella libreria.
 	 *
-	 * @return una playlist contenente i primi {@code TOP_SONGS} brani più ascoltati
+	 * @return playlist contenente i primi {@code TOP_SONGS} brani più ascoltati,
 	 *         oppure {@code null} se non esistono
 	 */
 	private Playlist buildTopSongsPlaylist() {
 		List<Song> songs = appContext.getMusicLibrary().getTopSongs(TOP_SONGS);
-		if (songs.isEmpty())
+
+		if (songs.isEmpty()) {
 			return null;
+		}
 
 		Playlist playlist = new Playlist("Top " + TOP_SONGS);
 		songs.forEach(playlist::addSong);
+
 		return playlist;
 	}
 
 	/**
 	 * Recupera le playlist più riprodotte presenti nella libreria.
 	 *
-	 * @return una lista contenente le prime {@code TOP_PLAYLISTS} playlist più
-	 *         ascoltate oppure {@code null} se non esistono
+	 * @return lista contenente le prime {@code TOP_PLAYLISTS} playlist più
+	 *         ascoltate, oppure {@code null} se non esistono
 	 */
 	private List<Playlist> getTopPlaylists() {
-		List<Playlist> list = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
-		return list.isEmpty() ? null : new ArrayList<>(list);
+		List<Playlist> list = appContext.getMusicLibrary()
+				.getTopPlaylists(TOP_PLAYLISTS);
+
+		return list.isEmpty()
+				? null
+				: new ArrayList<>(list);
 	}
 
 	/**
@@ -300,21 +412,28 @@ public class HomeController implements Initializable {
 		emptyPlaylistLabel.setText("Nessuna playlist disponibile.");
 		emptyTopPlaylistLabel.setText("Riproduci un brano o una playlist.");
 
-		emptyPlaylistLabel.visibleProperty().bind(Bindings.isEmpty(playlistListView.getItems()));
-		emptyPlaylistLabel.managedProperty().bind(emptyPlaylistLabel.visibleProperty());
+		emptyPlaylistLabel.visibleProperty()
+				.bind(Bindings.isEmpty(playlistListView.getItems()));
 
-		emptyTopPlaylistLabel.visibleProperty().bind(Bindings.isEmpty(mostPlayedListView.getItems()));
-		emptyTopPlaylistLabel.managedProperty().bind(emptyTopPlaylistLabel.visibleProperty());
+		emptyPlaylistLabel.managedProperty()
+				.bind(emptyPlaylistLabel.visibleProperty());
+
+		emptyTopPlaylistLabel.visibleProperty()
+				.bind(Bindings.isEmpty(mostPlayedListView.getItems()));
+
+		emptyTopPlaylistLabel.managedProperty()
+				.bind(emptyTopPlaylistLabel.visibleProperty());
 	}
 
 	/**
-	 * Configura le liste di playlist da visualizzare.
+	 * Configura una lista di playlist.
 	 *
 	 * @param listView
-	 *            lista da inizializzare.
+	 *            lista da inizializzare
 	 */
 	private void initListView(ListView<PlaylistItem> listView) {
 		listView.setCellFactory(view -> new ListCell<>() {
+
 			@Override
 			protected void updateItem(PlaylistItem item, boolean empty) {
 				super.updateItem(item, empty);
@@ -330,13 +449,11 @@ public class HomeController implements Initializable {
 	}
 
 	/**
-	 * Crea una riga grafica per rappresentare una playlist all'interno di una list
-	 * view.
+	 * Crea una riga grafica che rappresenta una playlist.
 	 *
 	 * @param item
 	 *            elemento da rappresentare
-	 * @return un oggetto HBox formattato contenente le informazioni e i comandi
-	 *         della playlist
+	 * @return riga configurata con informazioni e pulsanti di azione
 	 */
 	private HBox createPlaylistRow(PlaylistItem item) {
 		Playlist playlist = item.playlist;
@@ -354,28 +471,61 @@ public class HomeController implements Initializable {
 		durationLabel.getStyleClass().add("row-meta");
 		durationLabel.setPrefWidth(80);
 
-		Label playCountLabel = new Label(item.showPlayCount ? String.valueOf(playlist.getPlayCount()) : "");
+		Label playCountLabel = new Label(
+				item.showPlayCount
+						? String.valueOf(playlist.getPlayCount())
+						: "");
+
 		playCountLabel.getStyleClass().add("row-meta");
 		playCountLabel.setPrefWidth(90);
 
-		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
-		Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
+		Button playButton = createButton(
+				"▶",
+				"Riproduci playlist",
+				() -> playPlaylist(playlist));
+
+		Button enqueueButton = createButton(
+				"+",
+				"Aggiungi playlist alla coda",
+				() -> enqueuePlaylist(playlist));
 
 		HBox row;
 
 		if (!readOnly) {
-			Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
-			Button deleteButton = createButton("x", "Elimina playlist", () -> deletePlaylist(playlist));
+			Button renameButton = createButton(
+					"✎",
+					"Rinomina playlist",
+					() -> openPlaylistForm(playlist));
 
-			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
-					renameButton, deleteButton);
+			Button deleteButton = createButton(
+					"x",
+					"Elimina playlist",
+					() -> deletePlaylist(playlist));
+
+			row = new HBox(
+					8,
+					nameLabel,
+					songsLabel,
+					durationLabel,
+					playCountLabel,
+					playButton,
+					enqueueButton,
+					renameButton,
+					deleteButton);
 		} else {
 			Region actionPlaceholder = new Region();
 			actionPlaceholder.setMinWidth(72);
 			actionPlaceholder.setPrefWidth(72);
 			actionPlaceholder.setMaxWidth(72);
 
-			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+			row = new HBox(
+					8,
+					nameLabel,
+					songsLabel,
+					durationLabel,
+					playCountLabel,
+					playButton,
+					enqueueButton,
 					actionPlaceholder);
 		}
 
@@ -397,17 +547,23 @@ public class HomeController implements Initializable {
 	 *            operazione eseguita alla pressione del pulsante
 	 * @return pulsante configurato
 	 */
-	private Button createButton(String text, String tooltip, Runnable action) {
+	private Button createButton(
+			String text,
+			String tooltip,
+			Runnable action) {
+
 		Button button = new Button(text);
 		button.getStyleClass().add("row-action");
 		button.setTooltip(new Tooltip(tooltip));
 		button.setMinWidth(32);
 		button.setPrefWidth(32);
 		button.setMaxWidth(32);
+
 		button.setOnAction(event -> {
 			event.consume();
 			action.run();
 		});
+
 		button.setFocusTraversable(false);
 
 		return button;
@@ -421,30 +577,28 @@ public class HomeController implements Initializable {
 	 * @return durata espressa nel formato {@code mm:ss}
 	 */
 	private String formatDuration(Playlist playlist) {
-		int totalSeconds = playlist.getSongs().stream().mapToInt(Song::getDuration).sum();
-		return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
-	}
+		int totalSeconds = playlist.getSongs().stream()
+				.mapToInt(Song::getDuration)
+				.sum();
 
-	/**
-	 * Apre il form per la generazione automatica di una playlist.
-	 */
-	@FXML
-	private void onAutoCreatePlaylist() {
-		DialogUtil.open("AutomaticPlaylistFormView.fxml", "Playlist automatica", autoCreateBtn.getScene().getWindow(),
-				(AutomaticPlaylistFormController controller) -> controller.setOnSave(this::updateViews));
+		return String.format(
+				"%d:%02d",
+				totalSeconds / 60,
+				totalSeconds % 60);
 	}
 
 	/**
 	 * Rappresenta un elemento visualizzato nelle liste della schermata Home.
 	 *
+	 * <p>
 	 * Associa una playlist alle informazioni necessarie per determinarne il
-	 * comportamento nell'interfaccia grafica, come la possibilità di modifica e la
-	 * visualizzazione del numero di riproduzioni.
+	 * comportamento nell'interfaccia grafica.
 	 */
 	private static class PlaylistItem {
-		final Playlist playlist;
-		final boolean readOnly;
-		final boolean showPlayCount;
+
+		private final Playlist playlist;
+		private final boolean readOnly;
+		private final boolean showPlayCount;
 
 		/**
 		 * Crea un nuovo elemento per la visualizzazione di una playlist.
@@ -452,17 +606,18 @@ public class HomeController implements Initializable {
 		 * @param playlist
 		 *            playlist associata all'elemento
 		 * @param readOnly
-		 *            {@code true} se la playlist non può essere modificata,
-		 *            {@code false} altrimenti
+		 *            {@code true} se la playlist non può essere modificata
 		 * @param showPlayCount
-		 *            {@code true} se deve essere mostrato il numero di riproduzioni
-		 *            della playlist, {@code false} altrimenti
+		 *            {@code true} se deve essere mostrato il play count
 		 */
-		PlaylistItem(Playlist playlist, boolean readOnly, boolean showPlayCount) {
+		PlaylistItem(
+				Playlist playlist,
+				boolean readOnly,
+				boolean showPlayCount) {
+
 			this.playlist = playlist;
 			this.readOnly = readOnly;
 			this.showPlayCount = showPlayCount;
 		}
 	}
-
 }

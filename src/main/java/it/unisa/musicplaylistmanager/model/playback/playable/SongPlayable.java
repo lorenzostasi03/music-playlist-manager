@@ -6,6 +6,8 @@ import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 
+import java.util.Objects;
+
 /**
  * Adatta una singola traccia al concetto di oggetto riproducibile.
  *
@@ -35,6 +37,7 @@ public class SongPlayable extends Playable {
 		}
 
 		this.song = song;
+        this.id = "song-" + song.getId();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
@@ -182,4 +185,26 @@ public class SongPlayable extends Playable {
 			subscribed = false;
 		}
 	}
+
+    public String getId() { return id; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+        if (!  (o instanceof SongPlayable)) return false;
+
+        SongPlayable s = (SongPlayable) o;
+        return this.id.equals(s.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return id + " " + song.toString();
+    }
 }

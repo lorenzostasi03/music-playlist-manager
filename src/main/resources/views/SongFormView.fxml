@@ -14,39 +14,78 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<VBox prefWidth="480" spacing="0" style="-fx-background-color: #1C1C1E;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.song.SongFormController">
+<VBox prefWidth="480"
+      spacing="0"
+      style="-fx-background-color: #1C1C1E;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unisa.musicplaylistmanager.controller.song.SongFormController">
+
     <VBox spacing="4" style="-fx-border-color: #2C2C2E; -fx-border-width: 0 0 1 0;">
-        <padding><Insets bottom="16" left="24" right="24" top="20" /></padding>
-        <Label fx:id="formTitleLabel" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="Nuova Traccia" />
+        <padding>
+            <Insets bottom="16" left="24" right="24" top="20" />
+        </padding>
+
+        <Label fx:id="formTitleLabel"
+               style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;"
+               text="Nuova Traccia" />
     </VBox>
+
     <Separator style="-fx-opacity: 0; -fx-padding: 0;" />
-    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS" style="-fx-background: #1C1C1E; -fx-background-color: transparent; -fx-control-inner-background: #1C1C1E; -fx-border-color: transparent;">
+
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER"
+                vbarPolicy="AS_NEEDED"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background: #1C1C1E; -fx-background-color: transparent; -fx-control-inner-background: #1C1C1E; -fx-border-color: transparent;">
+
         <VBox spacing="16">
-            <padding><Insets bottom="12" left="24" right="24" top="20" /></padding>
+            <padding>
+                <Insets bottom="12" left="24" right="24" top="20" />
+            </padding>
+
             <GridPane hgap="16" vgap="12">
+
                 <columnConstraints>
                     <ColumnConstraints minWidth="140" prefWidth="140" />
                     <ColumnConstraints hgrow="ALWAYS" />
                 </columnConstraints>
+
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0">
                     <HBox alignment="CENTER_LEFT" spacing="2">
-                        <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Titolo" />
-                        <Label style="-fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold;" text="*" />
+                        <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                               text="Titolo" />
+                        <Label style="-fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold;"
+                               text="*" />
                     </HBox>
-                    <TextField fx:id="titleField" promptText="es. Bohemian Rhapsody" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
-                    <Label fx:id="titleErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px;" text="Il titolo è obbligatorio" visible="false" />
+
+                    <TextField fx:id="titleField"
+                               promptText="es. Bohemian Rhapsody"
+                               style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                 </VBox>
+
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1">
                     <HBox alignment="CENTER_LEFT" spacing="2">
-                        <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Autore" />
-                        <Label style="-fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold;" text="*" />
+                        <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                               text="Autore" />
+                        <Label style="-fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold;"
+                               text="*" />
                     </HBox>
-                    <TextField fx:id="authorField" promptText="es. Queen" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
-                    <Label fx:id="authorErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px;" text="L'autore è obbligatorio" visible="false" />
+
+                    <TextField fx:id="authorField"
+                               promptText="es. Queen"
+                               style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                 </VBox>
+
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Genere" />
-                    <ComboBox fx:id="genreComboBox" maxWidth="Infinity" promptText="Seleziona…" style="-fx-background-color: #000000; -fx-background-radius: 8; -fx-font-size: 14px; -fx-cursor: hand;">
+                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                           text="Genere" />
+
+                    <ComboBox fx:id="genreComboBox"
+                              maxWidth="Infinity"
+                              promptText="Seleziona…"
+                              style="-fx-background-color: #000000; -fx-background-radius: 8; -fx-font-size: 14px; -fx-cursor: hand;">
+
                         <items>
                             <FXCollections fx:factory="observableArrayList">
                                 <String fx:value="Pop" />
@@ -67,23 +106,43 @@
                         </items>
                     </ComboBox>
                 </VBox>
+
                 <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Anno di pubblicazione" />
-                    <TextField fx:id="yearField" promptText="es. 1975" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
-                    <Label fx:id="yearErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px;" text="Anno non valido" visible="false" />
+                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                           text="Anno di pubblicazione" />
+
+                    <TextField fx:id="yearField"
+                               promptText="es. 1975"
+                               style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                 </VBox>
+
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3">
-                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Durata (in secondi)" />
-                    <TextField fx:id="durationField" promptText="es. 120" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
-                    <Label fx:id="durationErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px;" text="Formato non valido (mm:ss)" visible="false" />
+                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                           text="Durata (in secondi)" />
+
+                    <TextField fx:id="durationField"
+                               promptText="es. 120"
+                               style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                 </VBox>
+
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4">
-                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="File audio" />
+                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                           text="File audio" />
+
                     <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Button fx:id="chooseFileButton" onAction="#onChooseFile" style="-fx-background-color: #000000; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;" text="Scegli file" />
-                        <Label fx:id="filePathLabel" maxWidth="260" style="-fx-text-fill: #8E8E93; -fx-font-size: 12px;" text="Nessun file selezionato" textOverrun="ELLIPSIS" />
+                        <Button fx:id="chooseFileButton"
+                                onAction="#onChooseFile"
+                                style="-fx-background-color: #000000; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;"
+                                text="Scegli file" />
+
+                        <Label fx:id="filePathLabel"
+                               maxWidth="260"
+                               style="-fx-text-fill: #8E8E93; -fx-font-size: 12px;"
+                               text="Nessun file selezionato"
+                               textOverrun="ELLIPSIS" />
                     </HBox>
                 </VBox>
+
                 <rowConstraints>
                     <RowConstraints />
                     <RowConstraints />
@@ -91,29 +150,60 @@
                     <RowConstraints />
                     <RowConstraints />
                 </rowConstraints>
+
             </GridPane>
-            <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Tag">
+
+            <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;"
+                   text="Tag">
                 <VBox.margin>
                     <Insets top="10" />
                 </VBox.margin>
             </Label>
+
             <VBox spacing="10">
-                <CheckBox fx:id="favouriteCheckBox" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;" text="Preferito" />
-                <CheckBox fx:id="explicitCheckBox" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;" text="Esplicito" />
-                <CheckBox fx:id="newReleaseCheckBox" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;" text="Nuova uscita" />
+                <CheckBox fx:id="favouriteCheckBox"
+                          style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;"
+                          text="Preferito" />
+
+                <CheckBox fx:id="explicitCheckBox"
+                          style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;"
+                          text="Esplicito" />
+
+                <CheckBox fx:id="newReleaseCheckBox"
+                          style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-cursor: hand;"
+                          text="Nuova uscita" />
             </VBox>
-            <Label style="-fx-text-fill: #8E8E93; -fx-font-size: 12px;" text="* Campi obbligatori">
+
+            <Label style="-fx-text-fill: #8E8E93; -fx-font-size: 12px;"
+                   text="* Campi obbligatori">
                 <VBox.margin>
                     <Insets top="10" />
                 </VBox.margin>
             </Label>
-            <Label fx:id="globalErrorLabel" managed="false" style="-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold;" text="" visible="false" wrapText="true" />
+
         </VBox>
     </ScrollPane>
+
     <Separator style="-fx-opacity: 0; -fx-padding: 0;" />
-    <HBox alignment="CENTER_RIGHT" spacing="12" style="-fx-border-color: #2C2C2E; -fx-border-width: 1 0 0 0;">
-        <padding><Insets bottom="16" left="24" right="24" top="16" /></padding>
-        <Button fx:id="cancelButton" onAction="#onCancel" style="-fx-background-color: transparent; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" text="Annulla" />
-        <Button fx:id="confirmButton" defaultButton="true" onAction="#onConfirm" style="-fx-background-color: #1DB954; -fx-text-fill: #000000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20 8 20; -fx-cursor: hand;" text="Salva traccia" />
+
+    <HBox alignment="CENTER_RIGHT"
+          spacing="12"
+          style="-fx-border-color: #2C2C2E; -fx-border-width: 1 0 0 0;">
+
+        <padding>
+            <Insets bottom="16" left="24" right="24" top="16" />
+        </padding>
+
+        <Button fx:id="cancelButton"
+                onAction="#onCancel"
+                style="-fx-background-color: transparent; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
+                text="Annulla" />
+
+        <Button fx:id="confirmButton"
+                defaultButton="true"
+                onAction="#onConfirm"
+                style="-fx-background-color: #1DB954; -fx-text-fill: #000000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 20 8 20; -fx-cursor: hand;"
+                text="Salva traccia" />
     </HBox>
+
 </VBox>

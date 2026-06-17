@@ -1,6 +1,10 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddPlayableToQueueCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
+import it.unisa.musicplaylistmanager.controller.command.RemoveSongFromCatalogCommand;
 import it.unisa.musicplaylistmanager.controller.song.SongFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
@@ -11,6 +15,7 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -35,27 +40,19 @@ import java.util.stream.Collectors;
  */
 public class CatalogController {
 
-	@FXML
-	private TextField searchField;
-
-	@FXML
-	private ComboBox<String> genreFilter;
-	@FXML
-	private ComboBox<String> authorFilter;
-	@FXML
-	private ComboBox<String> yearFilter;
-	@FXML
-	private ComboBox<String> tagFilter;
-
-	@FXML
-	private Button addTrackButton;
-
-	@FXML
-	private ScrollPane scrollPane;
+    @FXML public Button undoCommandButton;
+    @FXML private TextField searchField;
+	@FXML private ComboBox<String> genreFilter;
+	@FXML private ComboBox<String> authorFilter;
+	@FXML private ComboBox<String> yearFilter;
+	@FXML private ComboBox<String> tagFilter;
+	@FXML private Button addTrackButton;
+	@FXML private ScrollPane scrollPane;
 
 	private final VBox catalogRows = new VBox(6);
 
 	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private final String ALL = "TUTTI";
 	private boolean updatingFilters;
@@ -77,15 +74,17 @@ public class CatalogController {
 		yearFilter.setOnAction(event -> refreshCatalogIfReady());
 		tagFilter.setOnAction(event -> refreshCatalogIfReady());
 
+        initUndoButton();
+
 		refreshCatalog();
 	}
 
-	/**
+    /**
 	 * Apre la schermata del form per l'inserimento di una nuova traccia nel
 	 * catalogo.
 	 */
 	@FXML
-	private void onAddTrack() {
+	private void onAddSong() {
 		openSongForm(null);
 	}
 
@@ -103,9 +102,21 @@ public class CatalogController {
 	 */
 	private void initTagFilter() {
 		tagFilter.getItems().addFirst(ALL);
-		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getDisplayName).toList());
+		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getLabel).toList());
 		tagFilter.setValue(ALL);
 	}
+
+    /**
+     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
+     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
+     */
+    private void initUndoButton() {
+        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+
+        undoCommandButton.visibleProperty().bind(canUndo);
+        undoCommandButton.managedProperty().bind(canUndo);
+        undoCommandButton.disableProperty().bind(canUndo.not());
+    }
 
 	/**
 	 * Ricarica e ridisegna la lista delle tracce a schermo. Aggiorna anche i menu a
@@ -190,9 +201,9 @@ public class CatalogController {
 		Button button = new Button(text);
 		button.getStyleClass().add("row-action");
 		button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
-		button.setMinWidth(24);
-		button.setPrefWidth(24);
-		button.setMaxWidth(24);
+		button.setMinWidth(32);
+		button.setPrefWidth(32);
+		button.setMaxWidth(32);
 		button.setOnAction(event -> {
 			event.consume();
 			action.run();
@@ -237,7 +248,8 @@ public class CatalogController {
 		}
 
 		try {
-			appContext.getMusicLibrary().removeSongFromCatalog(song);
+			Command cmd = new RemoveSongFromCatalogCommand(appContext.getMusicLibrary(), appContext.getPlayer(), song);
+            executor.execute(cmd);
 			refreshCatalog();
 			AlertManager.showInfo("Traccia eliminata correttamente.");
 		} catch (PersistenceException | IllegalArgumentException e) {
@@ -329,7 +341,8 @@ public class CatalogController {
 	}
 
 	private void enqueueSong(Song song) {
-		appContext.enqueuePlayable(new SongPlayable(song));
+        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new SongPlayable(song));
+        executor.execute(cmd);
 		AlertManager.showInfo("Traccia aggiunta alla coda.");
 	}
 
@@ -376,7 +389,7 @@ public class CatalogController {
 			return null;
 		}
 
-		return Arrays.stream(Tag.values()).filter(tag -> tag.getDisplayName().equals(value)).findFirst()
+		return Arrays.stream(Tag.values()).filter(tag -> tag.getLabel().equals(value)).findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("Tag non valido: " + value));
 	}
 
@@ -385,6 +398,13 @@ public class CatalogController {
 			return "-";
 		}
 
-		return song.getTags().stream().map(Tag::getDisplayName).collect(Collectors.joining(", "));
+		return song.getTags().stream().map(Tag::getLabel).collect(Collectors.joining(", "));
 	}
+
+    @FXML
+    public void onUndoCommand() {
+        executor.undo();
+        AlertManager.showInfo("L'operazione è stata annullata.");
+        refreshCatalog();
+    }
 }
