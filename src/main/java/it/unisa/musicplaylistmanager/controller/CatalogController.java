@@ -102,7 +102,7 @@ public class CatalogController {
 	 */
 	private void initTagFilter() {
 		tagFilter.getItems().addFirst(ALL);
-		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getDisplayName).toList());
+		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getLabel).toList());
 		tagFilter.setValue(ALL);
 	}
 
@@ -391,7 +391,7 @@ public class CatalogController {
 			return null;
 		}
 
-		return Arrays.stream(Tag.values()).filter(tag -> tag.getDisplayName().equals(value)).findFirst()
+		return Arrays.stream(Tag.values()).filter(tag -> tag.getLabel().equals(value)).findFirst()
 				.orElseThrow(() -> new IllegalArgumentException("Tag non valido: " + value));
 	}
 
@@ -400,7 +400,7 @@ public class CatalogController {
 			return "-";
 		}
 
-		return song.getTags().stream().map(Tag::getDisplayName).collect(Collectors.joining(", "));
+		return song.getTags().stream().map(Tag::getLabel).collect(Collectors.joining(", "));
 	}
 
     @FXML

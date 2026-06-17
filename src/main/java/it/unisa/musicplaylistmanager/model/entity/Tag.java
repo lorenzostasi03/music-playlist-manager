@@ -4,15 +4,17 @@ package it.unisa.musicplaylistmanager.model.entity;
  */
 public enum Tag {
 
-	FAVOURITE("Preferito"), EXPLICIT("Esplicito"), NEW_RELEASE("Nuova uscita");
+	FAVOURITE("Preferito"),
+    EXPLICIT("Esplicito"),
+    NEW_RELEASE("Nuova uscita");
 
-	private final String displayName;
+	private final String label;
 
-	Tag(String displayName) {
-		this.displayName = displayName;
+	Tag(String label) {
+		this.label = label;
 	}
 
-	public String getDisplayName() {
-		return displayName;
+	public String getLabel() {
+		return label;
 	}
 }

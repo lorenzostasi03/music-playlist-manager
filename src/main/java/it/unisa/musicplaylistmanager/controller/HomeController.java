@@ -12,7 +12,6 @@ import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -37,7 +36,6 @@ public class HomeController implements Initializable {
 
     @FXML public Button undoCommandButton;
     @FXML private TextField searchBar;
-    @FXML private MenuButton autoCreateBtn;
     @FXML private Button newPlaylistBtn;
     @FXML private ComboBox<String> sortComboBox;
     @FXML private Label countLabel;
@@ -448,7 +446,7 @@ public class HomeController implements Initializable {
     }
 
     @FXML
-    public void onUndoCommand(ActionEvent actionEvent) {
+    public void onUndoCommand() {
         executor.undo();
         AlertManager.showInfo("L'operazione è stata annullata.");
         updateViews();

@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.song;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddSongsToPlaylistCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
@@ -21,41 +24,23 @@ import java.util.List;
  * selezione multipla per l'aggiunta in blocco.
  */
 public class SongPickerController {
+	@FXML private TableView<SelectableSong> tracksTable;
+	@FXML private TableColumn<SelectableSong, Boolean> checkColumn;
+	@FXML private TableColumn<SelectableSong, String> titleColumn;
+	@FXML private TableColumn<SelectableSong, String> authorColumn;
+	@FXML private TableColumn<SelectableSong, String> genreColumn;
+	@FXML private TableColumn<SelectableSong, String> yearColumn;
 
-	@FXML
-	private TextField searchField;
+	@FXML private VBox emptyStateBox;
 
-	@FXML
-	private Button selectAllButton;
-	@FXML
-	private Button deselectAllButton;
+	@FXML private Button cancelButton;
+	@FXML private Button confirmButton;
 
-	@FXML
-	private TableView<SelectableSong> tracksTable;
-
-	@FXML
-	private TableColumn<SelectableSong, Boolean> checkColumn;
-	@FXML
-	private TableColumn<SelectableSong, String> titleColumn;
-	@FXML
-	private TableColumn<SelectableSong, String> authorColumn;
-	@FXML
-	private TableColumn<SelectableSong, String> genreColumn;
-	@FXML
-	private TableColumn<SelectableSong, String> yearColumn;
-
-	@FXML
-	private VBox emptyStateBox;
-
-	@FXML
-	private Button cancelButton;
-	@FXML
-	private Button confirmButton;
+    private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private Playlist playlist;
 	private Runnable onSave;
-
-	private final AppContext appContext = AppContext.getInstance();
 
 	private final BooleanProperty hasSelection = new SimpleBooleanProperty(false);
 
@@ -224,12 +209,11 @@ public class SongPickerController {
 
 	private void addSongsToPlaylist(List<Song> songs) {
 		try {
-			for (Song song : songs)
-				appContext.getMusicLibrary().addSongToPlaylist(song, playlist);
+            Command cmd = new AddSongsToPlaylistCommand(appContext.getMusicLibrary(), playlist, songs);
+            executor.execute(cmd);
 		} catch (PersistenceException | IllegalArgumentException e) {
 			AlertManager.showError(e.getMessage());
 		}
-
 	}
 
 	/**
