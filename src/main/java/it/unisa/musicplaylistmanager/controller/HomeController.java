@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.*;
 import it.unisa.musicplaylistmanager.controller.playlist.PlaylistFormController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
@@ -10,6 +11,7 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,6 +35,7 @@ import java.util.ResourceBundle;
  */
 public class HomeController implements Initializable {
 
+    @FXML public Button undoCommandButton;
     @FXML private TextField searchBar;
     @FXML private MenuButton autoCreateBtn;
     @FXML private Button newPlaylistBtn;
@@ -44,6 +47,7 @@ public class HomeController implements Initializable {
     @FXML private ListView<PlaylistItem> mostPlayedListView;
 
     private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
     private List<Playlist> playlists;
     private Playlist topSongs;
@@ -69,6 +73,8 @@ public class HomeController implements Initializable {
 
         initEmptyLabels();
         initSearch();
+
+        initUndoButton();
 
         updateViews();
     }
@@ -175,7 +181,8 @@ public class HomeController implements Initializable {
             return;
         }
 
-        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new PlaylistPlayable(playlist));
+        executor.execute(cmd);
         AlertManager.showInfo("Playlist aggiunta alla coda.");
     }
 
@@ -194,7 +201,8 @@ public class HomeController implements Initializable {
         if (!confirmed) return;
 
         try {
-            appContext.getMusicLibrary().removePlaylist(playlist);
+            Command cmd = new RemovePlaylistCommand(appContext.getMusicLibrary(), appContext.getPlayer(), playlist);
+            executor.execute(cmd);
             updateViews();
             AlertManager.showInfo("Playlist eliminata correttamente.");
         } catch (PersistenceException | IllegalArgumentException e) {
@@ -250,10 +258,22 @@ public class HomeController implements Initializable {
     }
 
     /**
+     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
+     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
+     */
+    private void initUndoButton() {
+        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+
+        undoCommandButton.visibleProperty().bind(canUndo);
+        undoCommandButton.managedProperty().bind(canUndo);
+        undoCommandButton.disableProperty().bind(canUndo.not());
+    }
+
+    /**
      * Aggiorna la sezione dedicata ai contenuti più riprodotti.
      *
-     * Include la playlist dei brani più ascoltati e le playlist
-     * con il maggior numero di riproduzioni.
+     * Include la playlist dei {@value HomeController#TOP_SONGS} brani più ascoltati
+     * e le {@value HomeController#TOP_PLAYLISTS} playlist più riprodotte.
      */
     private void refreshMostPlayed() {
         List<PlaylistItem> items = new ArrayList<>();
@@ -275,7 +295,7 @@ public class HomeController implements Initializable {
      * Costruisce una playlist temporanea contenente i brani
      * più riprodotti presenti nella libreria.
      *
-     * @return una playlist contenente i primi {@code TOP_SONGS}
+     * @return una playlist contenente i primi {@value HomeController#TOP_SONGS}
      *         brani più ascoltati oppure {@code null} se non esistono
      */
     private Playlist buildTopSongsPlaylist() {
@@ -302,7 +322,7 @@ public class HomeController implements Initializable {
      * Configura le etichette visualizzate quando le liste risultano vuote.
      */
     private void initEmptyLabels() {
-        emptyPlaylistLabel.setText("Crea la tua prima playlist.");
+        emptyPlaylistLabel.setText("Nessuna playlist trovata.");
         emptyTopPlaylistLabel.setText("Riproduci un brano o una playlist.");
 
         emptyPlaylistLabel.visibleProperty().bind(Bindings.isEmpty(playlistListView.getItems()));
@@ -429,6 +449,9 @@ public class HomeController implements Initializable {
 
     @FXML
     public void onUndoCommand(ActionEvent actionEvent) {
+        executor.undo();
+        AlertManager.showInfo("L'operazione è stata annullata.");
+        updateViews();
     }
 
     /**

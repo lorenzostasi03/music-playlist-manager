@@ -23,38 +23,21 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-	@FXML
-	private Label trackTitleLabel;
-	@FXML
-	private Label trackArtistLabel;
+    @FXML public Button undoCommandButton;
+    @FXML private Label trackTitleLabel;
+	@FXML private Label trackArtistLabel;
+	@FXML private Slider progressSlider;
+	@FXML private Label currentTimeLabel;
+	@FXML private Label totalTimeLabel;
+	@FXML private Button playPauseButton;
 
-	@FXML
-	private Slider progressSlider;
+	@FXML private ToggleButton sequentialModeButton;
+	@FXML private ToggleButton shuffleModeButton;
+	@FXML private ToggleButton loopModeButton;
 
-	@FXML
-	private Label currentTimeLabel;
-	@FXML
-	private Label totalTimeLabel;
+	@FXML private Label playCountLabel;
 
-	@FXML
-	private Button previousButton;
-	@FXML
-	private Button playPauseButton;
-	@FXML
-	private Button nextButton;
-
-	@FXML
-	private ToggleButton sequentialModeButton;
-	@FXML
-	private ToggleButton shuffleModeButton;
-	@FXML
-	private ToggleButton loopModeButton;
-
-	@FXML
-	private Label playCountLabel;
-
-	@FXML
-	private VBox queueView;
+	@FXML private VBox queueView;
 
 	private Player player;
 	private AudioPlayer audioPlayer;
@@ -63,7 +46,7 @@ public class PlaybackController implements EventListener {
 
 	private Timeline progressTimeline;
 
-	private AppContext appContext = AppContext.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
 
 	@FXML
 	private void initialize() {

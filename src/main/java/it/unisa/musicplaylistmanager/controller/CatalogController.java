@@ -40,28 +40,19 @@ import java.util.stream.Collectors;
  */
 public class CatalogController {
 
-    public Button undoCommandButton;
-    @FXML
-	private TextField searchField;
-
-	@FXML
-	private ComboBox<String> genreFilter;
-	@FXML
-	private ComboBox<String> authorFilter;
-	@FXML
-	private ComboBox<String> yearFilter;
-	@FXML
-	private ComboBox<String> tagFilter;
-
-	@FXML
-	private Button addTrackButton;
-
-	@FXML
-	private ScrollPane scrollPane;
+    @FXML public Button undoCommandButton;
+    @FXML private TextField searchField;
+	@FXML private ComboBox<String> genreFilter;
+	@FXML private ComboBox<String> authorFilter;
+	@FXML private ComboBox<String> yearFilter;
+	@FXML private ComboBox<String> tagFilter;
+	@FXML private Button addTrackButton;
+	@FXML private ScrollPane scrollPane;
 
 	private final VBox catalogRows = new VBox(6);
 
 	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private final String ALL = "TUTTI";
 	private boolean updatingFilters;
@@ -120,7 +111,7 @@ public class CatalogController {
      * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
      */
     private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = CommandExecutor.getInstance().canUndoProperty();
+        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
 
         undoCommandButton.visibleProperty().bind(canUndo);
         undoCommandButton.managedProperty().bind(canUndo);
@@ -210,9 +201,9 @@ public class CatalogController {
 		Button button = new Button(text);
 		button.getStyleClass().add("row-action");
 		button.setTooltip(new javafx.scene.control.Tooltip(tooltip));
-		button.setMinWidth(24);
-		button.setPrefWidth(24);
-		button.setMaxWidth(24);
+		button.setMinWidth(32);
+		button.setPrefWidth(32);
+		button.setMaxWidth(32);
 		button.setOnAction(event -> {
 			event.consume();
 			action.run();
@@ -258,7 +249,7 @@ public class CatalogController {
 
 		try {
 			Command cmd = new RemoveSongFromCatalogCommand(appContext.getMusicLibrary(), appContext.getPlayer(), song);
-            CommandExecutor.getInstance().execute(cmd);
+            executor.execute(cmd);
 			refreshCatalog();
 			AlertManager.showInfo("Traccia eliminata correttamente.");
 		} catch (PersistenceException | IllegalArgumentException e) {
@@ -353,7 +344,7 @@ public class CatalogController {
 
 	private void enqueueSong(Song song) {
         Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new SongPlayable(song));
-        CommandExecutor.getInstance().execute(cmd);
+        executor.execute(cmd);
 		AlertManager.showInfo("Traccia aggiunta alla coda.");
 	}
 
@@ -414,7 +405,7 @@ public class CatalogController {
 
     @FXML
     public void onUndoCommand() {
-        CommandExecutor.getInstance().undo();
+        executor.undo();
         AlertManager.showInfo("L'operazione è stata annullata.");
         refreshCatalog();
     }

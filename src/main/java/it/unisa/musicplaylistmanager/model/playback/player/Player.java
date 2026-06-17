@@ -69,7 +69,6 @@ public class Player implements EventListener {
 
     /**
      * Rimuove l'ultimo Playable aggiunto alla coda.
-     * @return l'ultimo Playable aggiunto alla coda, {@code null} se la coda è vuota
      */
     public void removeLast() {
         queue.removeLast();

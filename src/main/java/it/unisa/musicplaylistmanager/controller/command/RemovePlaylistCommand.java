@@ -14,12 +14,13 @@ public class RemovePlaylistCommand implements Command {
     private final Player player;
     private Playlist playlist;
 
-    public RemovePlaylistCommand(MusicLibrary musicLibrary, Player player) {
+    public RemovePlaylistCommand(MusicLibrary musicLibrary, Player player, Playlist playlist) {
         if (musicLibrary == null) throw new IllegalArgumentException("MusicLibrary non può essere null!");
         if (player == null) throw new IllegalArgumentException("Player non può essere null!");
 
         this.musicLibrary = musicLibrary;
         this.player = player;
+        this.playlist = playlist;
     }
 
     @Override

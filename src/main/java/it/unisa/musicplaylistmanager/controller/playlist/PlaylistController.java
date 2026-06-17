@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
  */
 public class PlaylistController {
 
-	@FXML
+    @FXML public Button undoCommandButton;
+    @FXML
 	private Label playlistNameLabel;
 	@FXML
 	private Label trackCountLabel;

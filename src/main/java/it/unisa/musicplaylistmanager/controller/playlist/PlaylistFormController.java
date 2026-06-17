@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddPlaylistCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.fxml.FXML;
@@ -36,6 +39,7 @@ public class PlaylistFormController {
 	private Runnable onSave;
 
 	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
     private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
@@ -97,7 +101,8 @@ public class PlaylistFormController {
             }
 
 			if (playlistToEdit == null) {
-				appContext.getMusicLibrary().addPlaylist(new Playlist(name));
+                Command cmd = new AddPlaylistCommand(appContext.getMusicLibrary(), new Playlist(name));
+                executor.execute(cmd);
 				AlertManager.showInfo("Playlist creata correttamente.");
 			} else {
 				appContext.getMusicLibrary().renamePlaylist(playlistToEdit, name);
