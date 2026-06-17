@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Facciata che espone un'interfaccia unificata per tutte le operazioni sul
+ * Facade che espone un'interfaccia unificata per tutte le operazioni sul
  * catalogo musicale e sulle playlist.
  */
 public class MusicLibrary {
@@ -290,7 +290,7 @@ public class MusicLibrary {
 	public void removeSongFromPlaylist(Song song, Playlist playlist) {
 		playlist.removeSong(song);
 		playlistDAO.removeSong(playlist.getId(), song.getId());
-        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+		playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
 	}
 
 	/**
@@ -334,32 +334,38 @@ public class MusicLibrary {
 		return playlistCatalog.searchPlaylists(query);
 	}
 
-    /**
-     * Ordina i brani all'interno della playlist selezionata in base al titolo.
-     *
-     * @param playlist playlist da ordinare
-     * @throws IllegalArgumentException se la playlist è {@code null}
-     */
-    public void sortPlaylistSongsByTitle(Playlist playlist) {
-        if (playlist == null) throw new IllegalArgumentException("La playlist non può essere null!");
+	/**
+	 * Ordina i brani all'interno della playlist selezionata in base al titolo.
+	 *
+	 * @param playlist
+	 *            playlist da ordinare
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null}
+	 */
+	public void sortPlaylistSongsByTitle(Playlist playlist) {
+		if (playlist == null)
+			throw new IllegalArgumentException("La playlist non può essere null!");
 
-        playlist.sortSongsByTitle();
-        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+		playlist.sortSongsByTitle();
+		playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
 
-    }
+	}
 
-    /**
-     * Ordina i brani all'interno della playlist selezionata in base all'autore.
-     *
-     * @param playlist playlist da ordinare
-     * @throws IllegalArgumentException se la playlist è {@code null}
-     */
-    public void sortPlaylistSongsByAuthor(Playlist playlist) {
-        if (playlist == null) throw new IllegalArgumentException("La playlist non può essere null!");
+	/**
+	 * Ordina i brani all'interno della playlist selezionata in base all'autore.
+	 *
+	 * @param playlist
+	 *            playlist da ordinare
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null}
+	 */
+	public void sortPlaylistSongsByAuthor(Playlist playlist) {
+		if (playlist == null)
+			throw new IllegalArgumentException("La playlist non può essere null!");
 
-        playlist.sortSongsByAuthor();
-        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
-    }
+		playlist.sortSongsByAuthor();
+		playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+	}
 
 	/**
 	 * Recupera le prime {@code n} playlist più riprodotte del catalogo, ordinate

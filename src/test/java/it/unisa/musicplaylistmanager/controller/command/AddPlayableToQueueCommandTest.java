@@ -14,6 +14,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test della classe {@link AddPlayableToQueueCommand}.
+ */
 class AddPlayableToQueueCommandTest {
 
 	private Player player;

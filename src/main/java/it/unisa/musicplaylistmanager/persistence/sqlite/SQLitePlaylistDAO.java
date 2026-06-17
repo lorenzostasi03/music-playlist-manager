@@ -15,7 +15,7 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		super(DB_URL);
 	}
 
-    // CRUD Playlist
+	// CRUD Playlist
 
 	@Override
 	public void save(Playlist playlist) {
@@ -28,33 +28,33 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 			throw new PersistenceException("Si è verificato un errore durante il salvataggio della playlist!");
 		}
 	}
 
-    @Override
-    public List<Playlist> getPlaylists() {
-        List<Playlist> playlists = new ArrayList<>();
-        String query = "SELECT * FROM playlist ORDER BY name ASC";
+	@Override
+	public List<Playlist> getPlaylists() {
+		List<Playlist> playlists = new ArrayList<>();
+		String query = "SELECT * FROM playlist ORDER BY name ASC";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+		try (Connection conn = getConnection();
+				PreparedStatement stmt = conn.prepareStatement(query);
+				ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                UUID id = UUID.fromString(rs.getString("id"));
-                String name = rs.getString("name");
-                int playCount = rs.getInt("play_count");
-                playlists.add(new Playlist(id, name, playCount));
-            }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new PersistenceException("Si è verificato un errore durante il caricamento delle playlist!");
-        }
+			while (rs.next()) {
+				UUID id = UUID.fromString(rs.getString("id"));
+				String name = rs.getString("name");
+				int playCount = rs.getInt("play_count");
+				playlists.add(new Playlist(id, name, playCount));
+			}
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+			throw new PersistenceException("Si è verificato un errore durante il caricamento delle playlist!");
+		}
 
-        return playlists;
-    }
+		return playlists;
+	}
 
 	@Override
 	public void update(Playlist playlist) {
@@ -67,27 +67,27 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 			throw new PersistenceException("Si è verificato un errore durante la modifica della playlist!");
 		}
 	}
 
-    @Override
-    public void delete(UUID playlistId) {
-        String query = "DELETE FROM playlist WHERE id = ?";
+	@Override
+	public void delete(UUID playlistId) {
+		String query = "DELETE FROM playlist WHERE id = ?";
 
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, playlistId.toString());
+			stmt.setString(1, playlistId.toString());
 
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new PersistenceException("Si è verificato un errore durante l'eliminazione della playlist!");
-        }
-    }
+			stmt.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+			throw new PersistenceException("Si è verificato un errore durante l'eliminazione della playlist!");
+		}
+	}
 
-    // Gestione play count
+	// Gestione play count
 
 	@Override
 	public void updatePlayCount(UUID playlistId, int playCount) {
@@ -100,7 +100,7 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 			stmt.executeUpdate();
 
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 			throw new PersistenceException(
 					"Si è verificato un errore durante l'aggiornamento del play count della playlist!");
 		}
@@ -110,24 +110,24 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 	@Override
 	public void addSong(UUID playlistId, UUID songId) {
-        String query = """
-                        INSERT INTO playlist_song (playlist_id, song_id, position)
-                        VALUES (?, ?, (
-                            SELECT COALESCE(MAX(position), -1) + 1
-                            FROM playlist_song
-                            WHERE playlist_id = ?
-                        ))
-                        """;
+		String query = """
+				INSERT INTO playlist_song (playlist_id, song_id, position)
+				VALUES (?, ?, (
+				    SELECT COALESCE(MAX(position), -1) + 1
+				    FROM playlist_song
+				    WHERE playlist_id = ?
+				))
+				""";
 
 		try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
 			stmt.setString(1, playlistId.toString());
 			stmt.setString(2, songId.toString());
-            stmt.setString(3, playlistId.toString());
+			stmt.setString(3, playlistId.toString());
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
-			throw new PersistenceException("Si è verificato un errore durante l'aggiunta del brano alla playlist!" );
+			System.err.println(e.getMessage());
+			throw new PersistenceException("Si è verificato un errore durante l'aggiunta del brano alla playlist!");
 		}
 	}
 
@@ -142,60 +142,58 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 			stmt.executeUpdate();
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 			throw new PersistenceException("Si è verificato un errore durante la rimozione del brano dalla playlist!");
 		}
 	}
 
-    @Override
-    public void replaceSongs(UUID playlistId, List<UUID> songIds) {
+	@Override
+	public void replaceSongs(UUID playlistId, List<UUID> songIds) {
 
-        String query =
-            "UPDATE playlist_song SET position = ? " +
-                "WHERE playlist_id = ? AND song_id = ?";
+		String query = "UPDATE playlist_song SET position = ? " + "WHERE playlist_id = ? AND song_id = ?";
 
-        Connection conn = null;
+		Connection conn = null;
 
-        try {
-            conn = getConnection();
-            conn.setAutoCommit(false);
+		try {
+			conn = getConnection();
+			conn.setAutoCommit(false);
 
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+			try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
-                for (int i = 0; i < songIds.size(); i++) {
-                    stmt.setInt(1, i);
-                    stmt.setString(2, playlistId.toString());
-                    stmt.setString(3, songIds.get(i).toString());
-                    stmt.addBatch();
-                }
+				for (int i = 0; i < songIds.size(); i++) {
+					stmt.setInt(1, i);
+					stmt.setString(2, playlistId.toString());
+					stmt.setString(3, songIds.get(i).toString());
+					stmt.addBatch();
+				}
 
-                stmt.executeBatch();
-                conn.commit();
-            }
+				stmt.executeBatch();
+				conn.commit();
+			}
 
-        } catch (SQLException e) {
+		} catch (SQLException e) {
 
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException rollbackEx) {
-                    e.addSuppressed(rollbackEx);
-                }
-            }
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException rollbackEx) {
+					e.addSuppressed(rollbackEx);
+				}
+			}
 
-            System.err.println(e.getMessage());
-            throw new PersistenceException("Si è verificato un errore durante il riordinamento della playlist!");
+			System.err.println(e.getMessage());
+			throw new PersistenceException("Si è verificato un errore durante il riordinamento della playlist!");
 
-        } finally {
+		} finally {
 
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                }
-            }
-        }
-    }
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException ignored) {
+				}
+			}
+		}
+	}
 
 	@Override
 	public List<UUID> getSongIds(UUID playlistId) {
@@ -211,7 +209,7 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 				songIds.add(id);
 			}
 		} catch (SQLException e) {
-            System.err.println(e.getMessage());
+			System.err.println(e.getMessage());
 			throw new PersistenceException(
 					"Si è verificato un errore durante il caricamento dei brani delle playlist!");
 		}

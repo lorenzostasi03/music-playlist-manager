@@ -26,10 +26,10 @@ public class PlaylistCatalog {
 	 *
 	 * @param playlist
 	 *            playlist da aggiungere;
-     * @throws IllegalArgumentException
-     *            se la playlist è {@code null}
-     * @throws DuplicatedPlaylistException
-     *             se esiste già una playlist con lo stesso nome
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null}
+	 * @throws DuplicatedPlaylistException
+	 *             se esiste già una playlist con lo stesso nome
 	 */
 	public void addPlaylist(Playlist playlist) {
 		if (playlist == null) {
@@ -49,8 +49,9 @@ public class PlaylistCatalog {
 	 *
 	 * @param playlist
 	 *            playlist da rimuovere;
-     * @throws IllegalArgumentException
-     *            se la playlist è {@code null} o se non è presente nella collezione
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null} o se non è presente nella
+	 *             collezione
 	 */
 	public void removePlaylist(Playlist playlist) {
 		if (playlist == null) {

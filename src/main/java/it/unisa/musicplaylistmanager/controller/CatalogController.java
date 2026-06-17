@@ -185,13 +185,13 @@ public class CatalogController {
 		Label genreLabel = createMetaLabel(song.getGenre().getLabel(), 55);
 		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 40);
 		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 60);
-        Label playCountLabel = createMetaLabel(String.valueOf(song.getPlayCount()), 90);
+		Label playCountLabel = createMetaLabel(String.valueOf(song.getPlayCount()), 90);
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, playCountLabel, spacer, playButton,
-				enqueueButton, editButton, deleteButton);
+		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, playCountLabel,
+				spacer, playButton, enqueueButton, editButton, deleteButton);
 
 		mainRow.setMaxWidth(Double.MAX_VALUE);
 
@@ -235,7 +235,7 @@ public class CatalogController {
 	 */
 	private Label createMetaLabel(String text, double width) {
 		Label label = new Label(text);
-        label.setTextAlignment(TextAlignment.CENTER);
+		label.setTextAlignment(TextAlignment.CENTER);
 		label.getStyleClass().add("row-meta");
 		label.setMinWidth(width);
 		label.setPrefWidth(width);
