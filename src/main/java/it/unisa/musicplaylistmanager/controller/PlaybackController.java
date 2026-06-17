@@ -384,10 +384,6 @@ public class PlaybackController implements EventListener {
 	}
 
 	@FXML
-	private void onPrevious() {
-	}
-
-	@FXML
 	private void onNext() {
 		player.skipSong();
 	}
@@ -413,8 +409,14 @@ public class PlaybackController implements EventListener {
 	}
 
     @FXML
-    public void onUndoCommand() {
+    private void onUndoCommand() {
         executor.undo();
         AlertManager.showInfo("L'operazione è stata annullata.");
+    }
+
+    @FXML
+    private void onClearQueue() {
+        player.clearQueue();
+        updateQueueView();
     }
 }

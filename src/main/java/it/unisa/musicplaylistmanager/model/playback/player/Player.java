@@ -94,6 +94,8 @@ public class Player implements EventListener {
 	 * Svuota la coda di riproduzione.
 	 */
 	public void clearQueue() {
+        if  (queue.isEmpty()) return;
+
 		queue.clear();
 		notifyQueueChanged();
 	}

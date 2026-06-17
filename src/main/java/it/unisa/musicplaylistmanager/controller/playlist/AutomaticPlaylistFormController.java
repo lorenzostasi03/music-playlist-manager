@@ -1,6 +1,9 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.AddAutomaticPlaylistCommand;
+import it.unisa.musicplaylistmanager.controller.command.Command;
+import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
@@ -51,6 +54,7 @@ public class AutomaticPlaylistFormController {
 	private Button cancelButton;
 
 	private final AppContext appContext = AppContext.getInstance();
+    private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	/*
 	 * Associano ogni criterio alla relativa CheckBox, permettendo di recuperare
@@ -300,11 +304,13 @@ public class AutomaticPlaylistFormController {
 		}
 
 		try {
-			appContext.getMusicLibrary().createAutomaticPlaylist(
-					name,
-					selectedGenres,
-					selectedYears,
-					selectedTags);
+            Command cmd = new AddAutomaticPlaylistCommand(appContext.getMusicLibrary(),
+                                                                        name,
+                                                                        selectedGenres,
+                                                                        selectedYears,
+                                                                        selectedTags);
+
+            executor.execute(cmd);
 
 			AlertManager.showInfo("Playlist automatica creata correttamente.");
 
