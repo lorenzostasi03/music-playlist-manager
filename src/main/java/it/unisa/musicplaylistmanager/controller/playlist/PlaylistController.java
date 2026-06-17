@@ -185,11 +185,13 @@ public class PlaylistController {
 			return;
 		}
 		switch (sortComboBox.getValue()) {
-			case "Titolo" -> playlist.sortSongsByTitle();
-			case "Autore" -> playlist.sortSongsByAuthor();
+			case "Titolo" -> appContext.getMusicLibrary().sortPlaylistSongsByTitle(playlist);
+			case "Autore" -> appContext.getMusicLibrary().sortPlaylistSongsByAuthor(playlist);
 			default -> {
 				return;
 			}
+
+
 		}
 		refreshPlaylist();
 	}

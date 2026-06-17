@@ -1,7 +1,9 @@
 package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.command.Command;
 import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
+import it.unisa.musicplaylistmanager.controller.command.RemovePlayableFromQueueCommand;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
 import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
@@ -21,6 +23,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -270,7 +274,7 @@ public class PlaybackController implements EventListener {
 		queueView.getChildren().add(createQueueHeaderLabel("In riproduzione"));
 
 		if (current == null) {
-			queueView.getChildren().add(createQueueItemLabel("Nessun elemento in riproduzione"));
+			queueView.getChildren().add(createPlaceholderLabel("Nessun elemento in riproduzione"));
 		} else {
 			queueView.getChildren().add(createCurrentQueueItemLabel(current.getTitle()));
 		}
@@ -280,14 +284,13 @@ public class PlaybackController implements EventListener {
 		List<Playable> queuedPlayables = player.getQueueSnapshot();
 
 		if (queuedPlayables.isEmpty()) {
-			queueView.getChildren().add(createQueueItemLabel("Coda vuota"));
+			queueView.getChildren().add(createPlaceholderLabel("Coda vuota"));
 			return;
 		}
 
 		for (int i = 0; i < queuedPlayables.size(); i++) {
 			Playable playable = queuedPlayables.get(i);
-			String text = (i + 1) + ". " + playable.getTitle();
-			queueView.getChildren().add(createQueueItemLabel(text));
+			queueView.getChildren().add(createQueueItemLabel(i + 1, playable));
 		}
 	}
 
@@ -299,25 +302,43 @@ public class PlaybackController implements EventListener {
 		return label;
 	}
 
-	private Label createCurrentQueueItemLabel(String text) {
-		Label label = new Label(text);
-		label.setWrapText(true);
-		label.setPrefWidth(220);
-		label.setMaxWidth(220);
-		label.setStyle("-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold; "
-				+ "-fx-padding: 8 10 8 10; -fx-background-color: #121212; -fx-background-radius: 6;");
-		return label;
-	}
+    private Label createCurrentQueueItemLabel(String text) {
+        Label label = new Label(text);
+        label.setWrapText(true);
+        label.setPrefWidth(220);
+        label.setMaxWidth(220);
+        label.setStyle("-fx-text-fill: #1DB954; -fx-font-size: 12px; -fx-font-weight: bold; "
+            + "-fx-padding: 8 10 8 10; -fx-background-color: #121212; -fx-background-radius: 6;");
+        return label;
+    }
 
-	private Label createQueueItemLabel(String text) {
-		Label label = new Label(text);
-		label.setWrapText(true);
-		label.setPrefWidth(220);
-		label.setMaxWidth(220);
-		label.setStyle("-fx-text-fill: #B3B3B3; -fx-font-size: 12px; "
-				+ "-fx-padding: 8 10 8 10; -fx-background-color: #121212; -fx-background-radius: 6;");
-		return label;
-	}
+    private HBox createQueueItemLabel(int index, Playable playable) {
+        Label label = new Label((index + 1) + ". " + playable.getTitle());
+        label.setPrefWidth(150);
+        label.setMaxWidth(150);
+
+        Button deleteButton = new Button("x");
+        deleteButton.getStyleClass().add("row-action");
+        deleteButton.setMinWidth(25);
+        deleteButton.setPrefWidth(25);
+        deleteButton.setMaxWidth(25);
+        deleteButton.setFocusTraversable(false);
+
+        deleteButton.setOnAction(e -> removeFromQueue(playable));
+
+        HBox box = new HBox(4, label, deleteButton);
+        HBox.setHgrow(label, Priority.ALWAYS);
+        box.setMaxWidth(Double.MAX_VALUE);
+
+        return box;
+    }
+
+    private Label createPlaceholderLabel(String text) {
+        Label label = new Label(text);
+        label.setMaxWidth(Double.MAX_VALUE);
+
+        return label;
+    }
 
 	private void subscribeToCurrentPlayable() {
 		if (currentPlayable != null && !subscribedToCurrentPlayable) {
@@ -396,6 +417,13 @@ public class PlaybackController implements EventListener {
 		return String.format("%d:%02d", minutes, remainingSeconds);
 	}
 
+    private void removeFromQueue(Playable playable) {
+        Command cmd = new RemovePlayableFromQueueCommand(player, playable);
+        executor.execute(cmd);
+        AlertManager.showInfo("L'elemento è stato rimosso dalla coda.");
+        updateQueueView();
+    }
+
 	@FXML
 	private void onNext() {
 		player.skipSong();
@@ -425,11 +453,13 @@ public class PlaybackController implements EventListener {
 	private void onUndoCommand() {
 		executor.undo();
 		AlertManager.showInfo("L'operazione è stata annullata.");
+        updateQueueView();
 	}
 
 	@FXML
 	private void onClearQueue() {
 		player.clearQueue();
+        AlertManager.showInfo("La coda è stata svuotata.");
 		updateQueueView();
 	}
 }

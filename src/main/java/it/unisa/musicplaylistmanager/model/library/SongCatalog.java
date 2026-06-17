@@ -62,23 +62,6 @@ public class SongCatalog {
 	}
 
 	/**
-	 * Cerca tracce il cui titolo contenga la stringa specificata
-	 *
-	 * @param query
-	 *            testo da cercare;
-	 * @return lista delle tracce
-     * @throws IllegalArgumentException
-     *          se la query di ricerca è vuota
-	 */
-	public List<Song> searchSong(String query) throws IllegalArgumentException {
-		if (query == null) {
-			throw new IllegalArgumentException("La query di ricerca non può essere null.");
-		}
-		String queryLower = query.trim().toLowerCase();
-		return songs.values().stream().filter(s -> s.getTitle().toLowerCase().contains(queryLower)).toList();
-	}
-
-	/**
 	 * Filtra le tracce del catalogo combinando testo, autore, genere, anno e tag.
 	 *
 	 * @param query

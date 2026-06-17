@@ -79,37 +79,6 @@ class SongCatalogTest {
 	}
 
 	/**
-	 * Verifica che la ricerca di una query restituisca i brani il cui titolo
-	 * contiene la query .
-	 */
-	@Test
-	void testRicercaPerTitoloParziale() {
-		catalog.addSong(song1);
-		catalog.addSong(song2);
-		List<Song> result = catalog.searchSong("bohemian");
-		assertEquals(1, result.size());
-		assertTrue(result.contains(song1));
-	}
-
-	/**
-	 * Verifica che una ricerca senza corrispondenze restituisca una lista vuota.
-	 */
-	@Test
-	void testRicercaNessunRisultato() {
-		catalog.addSong(song1);
-		List<Song> result = catalog.searchSong("zzz-inesistente");
-		assertTrue(result.isEmpty());
-	}
-
-	/**
-	 * Verifica che una ricerca con query null lanci un'eccezione.
-	 */
-	@Test
-	void testRicercaQueryNullLanciaEccezione() {
-		assertThrows(IllegalArgumentException.class, () -> catalog.searchSong(null));
-	}
-
-	/**
 	 * Verifica che vengano restituite tutte le tracce presenti nel catalogo.
 	 */
 	@Test
@@ -137,16 +106,6 @@ class SongCatalogTest {
 	@Test
 	void testContainsNull() {
 		assertFalse(catalog.contains(null));
-	}
-	/**
-	 * Verifica che la ricerca sia case-insensitive.
-	 */
-	@Test
-	void testRicercaCaseInsensitive() {
-		catalog.addSong(song1);
-		List<Song> result = catalog.searchSong("BOHEMIAN");
-		assertEquals(1, result.size());
-		assertTrue(result.contains(song1));
 	}
 
 	/**

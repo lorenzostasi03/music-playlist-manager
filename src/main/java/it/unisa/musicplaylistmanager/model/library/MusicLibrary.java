@@ -125,18 +125,6 @@ public class MusicLibrary {
 	public void updateSongPlayCount(Song song) {
 		songDAO.updatePlayCount(song.getId(), song.getPlayCount());
 	}
-
-	/**
-	 * Cerca tracce nel catalogo per titolo e artista.
-	 *
-	 * @param query
-	 *            testo da cercare
-	 * @return lista delle tracce che corrispondono alla ricerca
-	 */
-	public List<Song> searchSong(String query) {
-		return songCatalog.searchSong(query);
-	}
-
 	/**
 	 * Filtra le tracce del catalogo globale.
 	 *
@@ -345,6 +333,33 @@ public class MusicLibrary {
 	public List<Playlist> searchPlaylists(String query) {
 		return playlistCatalog.searchPlaylists(query);
 	}
+
+    /**
+     * Ordina i brani all'interno della playlist selezionata in base al titolo.
+     *
+     * @param playlist playlist da ordinare
+     * @throws IllegalArgumentException se la playlist è {@code null}
+     */
+    public void sortPlaylistSongsByTitle(Playlist playlist) {
+        if (playlist == null) throw new IllegalArgumentException("La playlist non può essere null!");
+
+        playlist.sortSongsByTitle();
+        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+
+    }
+
+    /**
+     * Ordina i brani all'interno della playlist selezionata in base all'autore.
+     *
+     * @param playlist playlist da ordinare
+     * @throws IllegalArgumentException se la playlist è {@code null}
+     */
+    public void sortPlaylistSongsByAuthor(Playlist playlist) {
+        if (playlist == null) throw new IllegalArgumentException("La playlist non può essere null!");
+
+        playlist.sortSongsByAuthor();
+        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
+    }
 
 	/**
 	 * Recupera le prime {@code n} playlist più riprodotte del catalogo, ordinate
