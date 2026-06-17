@@ -22,9 +22,9 @@ import javafx.stage.Window;
 import java.io.File;
 
 /**
- * Controller per la finestra dedicata alla creazione di una nuova
- * traccia o alla modifica di una traccia esistente nel catalogo. Gestisce la
- * validazione dei campi di input e l'aggiornamento dei dati.
+ * Controller per la finestra dedicata alla creazione di una nuova traccia o
+ * alla modifica di una traccia esistente nel catalogo. Gestisce la validazione
+ * dei campi di input e l'aggiornamento dei dati.
  */
 public class SongFormController {
 
@@ -159,7 +159,7 @@ public class SongFormController {
 				Song song = new Song(title, author, genre, year, duration, selectedFilePath);
 				applyTags(song);
 				Command cmd = new AddSongToCatalogCommand(appContext.getMusicLibrary(), song);
-                CommandExecutor.getInstance().execute(cmd);
+				CommandExecutor.getInstance().execute(cmd);
 				AlertManager.showInfo("Traccia aggiunta al catalogo.");
 			} else {
 				songToEdit.setTitle(title);
@@ -180,7 +180,7 @@ public class SongFormController {
 		} catch (IllegalArgumentException | DuplicatedSongException | PersistenceException e) {
 			AlertManager.showError(e.getMessage());
 		}
-    }
+	}
 	/**
 	 * Analizza e valida il testo inserito nel campo dell'anno di pubblicazione.
 	 *

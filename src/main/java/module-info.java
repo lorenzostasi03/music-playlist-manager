@@ -14,7 +14,7 @@ module it.unisa.musicplaylistmanager {
 	exports it.unisa.musicplaylistmanager.controller to javafx.fxml;
 	exports it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
 	exports it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
-    exports it.unisa.musicplaylistmanager.controller.command;
+	exports it.unisa.musicplaylistmanager.controller.command;
 
 	exports it.unisa.musicplaylistmanager.model.entity;
 	exports it.unisa.musicplaylistmanager.model.library;

@@ -23,19 +23,23 @@ public class PlaybackQueue {
 		queue.add(playable);
 	}
 
-	public Playable dequeue() { return queue.poll(); }
+	public Playable dequeue() {
+		return queue.poll();
+	}
 
-    public void remove(Playable playable){
-        if (queue.isEmpty()) return;
+	public void remove(Playable playable) {
+		if (queue.isEmpty())
+			return;
 
-        queue.removeIf(p -> p.equals(playable));
-    }
+		queue.removeIf(p -> p.equals(playable));
+	}
 
-    public void removeLast() {
-        if (queue.isEmpty()) return;
+	public void removeLast() {
+		if (queue.isEmpty())
+			return;
 
-       queue.removeLast();
-    }
+		queue.removeLast();
+	}
 
 	public void clear() {
 		queue.clear();
@@ -53,13 +57,13 @@ public class PlaybackQueue {
 		return new ArrayList<>(queue);
 	}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("Queue:\n");
-        for (Playable playable : queue) {
-            sb.append(playable).append("\n");
-        }
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("Queue:\n");
+		for (Playable playable : queue) {
+			sb.append(playable).append("\n");
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 }

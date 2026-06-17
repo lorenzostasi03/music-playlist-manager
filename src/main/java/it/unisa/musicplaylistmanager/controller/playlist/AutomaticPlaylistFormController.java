@@ -27,8 +27,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 /**
- * Controller della finestra dedicata alla creazione automatica di una
- * playlist.
+ * Controller della finestra dedicata alla creazione automatica di una playlist.
  *
  * <p>
  * Il controller recupera dal catalogo i generi, gli anni e i tag disponibili e
@@ -54,7 +53,7 @@ public class AutomaticPlaylistFormController {
 	private Button cancelButton;
 
 	private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	/*
 	 * Associano ogni criterio alla relativa CheckBox, permettendo di recuperare
@@ -67,8 +66,8 @@ public class AutomaticPlaylistFormController {
 	private Runnable onSave;
 
 	/**
-	 * Inizializza il form recuperando le tracce presenti nel catalogo e popolando
-	 * i menu dei criteri disponibili.
+	 * Inizializza il form recuperando le tracce presenti nel catalogo e popolando i
+	 * menu dei criteri disponibili.
 	 */
 	@FXML
 	private void initialize() {
@@ -90,25 +89,17 @@ public class AutomaticPlaylistFormController {
 	}
 
 	/**
-	 * Estrae dal catalogo i generi disponibili, li ordina alfabeticamente e
-	 * popola il relativo menu.
+	 * Estrae dal catalogo i generi disponibili, li ordina alfabeticamente e popola
+	 * il relativo menu.
 	 *
 	 * @param songs
 	 *            tracce presenti nel catalogo
 	 */
 	private void populateGenres(List<Song> songs) {
-		List<Genre> genres = songs.stream()
-				.map(Song::getGenre)
-				.distinct()
-				.sorted(Comparator.comparing(Genre::getLabel))
+		List<Genre> genres = songs.stream().map(Song::getGenre).distinct().sorted(Comparator.comparing(Genre::getLabel))
 				.toList();
 
-		populateCriteriaMenu(
-				genresMenuButton,
-				"Seleziona generi",
-				genres,
-				Genre::getLabel,
-				genreCheckBoxes);
+		populateCriteriaMenu(genresMenuButton, "Seleziona generi", genres, Genre::getLabel, genreCheckBoxes);
 	}
 
 	/**
@@ -119,18 +110,9 @@ public class AutomaticPlaylistFormController {
 	 *            tracce presenti nel catalogo
 	 */
 	private void populateYears(List<Song> songs) {
-		List<Integer> years = songs.stream()
-				.map(Song::getYear)
-				.distinct()
-				.sorted(Comparator.reverseOrder())
-				.toList();
+		List<Integer> years = songs.stream().map(Song::getYear).distinct().sorted(Comparator.reverseOrder()).toList();
 
-		populateCriteriaMenu(
-				yearsMenuButton,
-				"Seleziona anni",
-				years,
-				String::valueOf,
-				yearCheckBoxes);
+		populateCriteriaMenu(yearsMenuButton, "Seleziona anni", years, String::valueOf, yearCheckBoxes);
 	}
 
 	/**
@@ -141,18 +123,10 @@ public class AutomaticPlaylistFormController {
 	 *            tracce presenti nel catalogo
 	 */
 	private void populateTags(List<Song> songs) {
-		List<Tag> tags = songs.stream()
-				.flatMap(song -> song.getTags().stream())
-				.distinct()
-				.sorted(Comparator.comparing(Tag::getLabel))
-				.toList();
+		List<Tag> tags = songs.stream().flatMap(song -> song.getTags().stream()).distinct()
+				.sorted(Comparator.comparing(Tag::getLabel)).toList();
 
-		populateCriteriaMenu(
-				tagsMenuButton,
-				"Seleziona tag",
-				tags,
-				Tag::getLabel,
-				tagCheckBoxes);
+		populateCriteriaMenu(tagsMenuButton, "Seleziona tag", tags, Tag::getLabel, tagCheckBoxes);
 	}
 
 	/**
@@ -171,12 +145,8 @@ public class AutomaticPlaylistFormController {
 	 * @param checkBoxes
 	 *            mappa in cui registrare le checkbox create
 	 */
-	private <T> void populateCriteriaMenu(
-			MenuButton menuButton,
-			String defaultText,
-			List<T> values,
-			Function<T, String> labelProvider,
-			Map<T, CheckBox> checkBoxes) {
+	private <T> void populateCriteriaMenu(MenuButton menuButton, String defaultText, List<T> values,
+			Function<T, String> labelProvider, Map<T, CheckBox> checkBoxes) {
 
 		checkBoxes.clear();
 		menuButton.getItems().clear();
@@ -193,12 +163,11 @@ public class AutomaticPlaylistFormController {
 			checkBoxes.put(value, checkBox);
 
 			/*
-			 * Aggiorna il testo del MenuButton ogni volta che cambia il numero
-			 * di criteri selezionati.
+			 * Aggiorna il testo del MenuButton ogni volta che cambia il numero di criteri
+			 * selezionati.
 			 */
 			checkBox.selectedProperty().addListener(
-					(observable, oldValue, selected) ->
-							updateMenuButtonText(menuButton, defaultText, checkBoxes));
+					(observable, oldValue, selected) -> updateMenuButtonText(menuButton, defaultText, checkBoxes));
 
 			optionsBox.getChildren().add(checkBox);
 		}
@@ -246,14 +215,9 @@ public class AutomaticPlaylistFormController {
 	 * @param checkBoxes
 	 *            checkbox associate al menu
 	 */
-	private void updateMenuButtonText(
-			MenuButton menuButton,
-			String defaultText,
-			Map<?, CheckBox> checkBoxes) {
+	private void updateMenuButtonText(MenuButton menuButton, String defaultText, Map<?, CheckBox> checkBoxes) {
 
-		long selectedCount = checkBoxes.values().stream()
-				.filter(CheckBox::isSelected)
-				.count();
+		long selectedCount = checkBoxes.values().stream().filter(CheckBox::isSelected).count();
 
 		if (selectedCount == 0) {
 			menuButton.setText(defaultText);
@@ -271,46 +235,33 @@ public class AutomaticPlaylistFormController {
 	 */
 	@FXML
 	private void onGenerate() {
-		String name = nameField.getText() == null
-				? ""
-				: nameField.getText().trim();
+		String name = nameField.getText() == null ? "" : nameField.getText().trim();
 
 		if (name.isBlank()) {
 			AlertManager.showError("Inserire il nome della playlist.");
 			return;
 		}
 
-		Set<Genre> selectedGenres = genreCheckBoxes.entrySet().stream()
-				.filter(entry -> entry.getValue().isSelected())
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toSet());
+		Set<Genre> selectedGenres = genreCheckBoxes.entrySet().stream().filter(entry -> entry.getValue().isSelected())
+				.map(Map.Entry::getKey).collect(Collectors.toSet());
 
-		Set<Integer> selectedYears = yearCheckBoxes.entrySet().stream()
-				.filter(entry -> entry.getValue().isSelected())
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toSet());
+		Set<Integer> selectedYears = yearCheckBoxes.entrySet().stream().filter(entry -> entry.getValue().isSelected())
+				.map(Map.Entry::getKey).collect(Collectors.toSet());
 
-		Set<Tag> selectedTags = tagCheckBoxes.entrySet().stream()
-				.filter(entry -> entry.getValue().isSelected())
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toSet());
+		Set<Tag> selectedTags = tagCheckBoxes.entrySet().stream().filter(entry -> entry.getValue().isSelected())
+				.map(Map.Entry::getKey).collect(Collectors.toSet());
 
-		if (selectedGenres.isEmpty()
-				&& selectedYears.isEmpty()
-				&& selectedTags.isEmpty()) {
+		if (selectedGenres.isEmpty() && selectedYears.isEmpty() && selectedTags.isEmpty()) {
 
 			AlertManager.showError("Selezionare almeno un criterio.");
 			return;
 		}
 
 		try {
-            Command cmd = new AddAutomaticPlaylistCommand(appContext.getMusicLibrary(),
-                                                                        name,
-                                                                        selectedGenres,
-                                                                        selectedYears,
-                                                                        selectedTags);
+			Command cmd = new AddAutomaticPlaylistCommand(appContext.getMusicLibrary(), name, selectedGenres,
+					selectedYears, selectedTags);
 
-            executor.execute(cmd);
+			executor.execute(cmd);
 
 			AlertManager.showInfo("Playlist automatica creata correttamente.");
 

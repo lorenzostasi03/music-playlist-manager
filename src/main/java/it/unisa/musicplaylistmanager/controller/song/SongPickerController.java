@@ -19,25 +19,34 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 /**
- * Controller per la finestra che permette di visualizzare i brani del
- * catalogo non ancora presenti in una specifica playlist, consentendone la
- * selezione multipla per l'aggiunta in blocco.
+ * Controller per la finestra che permette di visualizzare i brani del catalogo
+ * non ancora presenti in una specifica playlist, consentendone la selezione
+ * multipla per l'aggiunta in blocco.
  */
 public class SongPickerController {
-	@FXML private TableView<SelectableSong> tracksTable;
-	@FXML private TableColumn<SelectableSong, Boolean> checkColumn;
-	@FXML private TableColumn<SelectableSong, String> titleColumn;
-	@FXML private TableColumn<SelectableSong, String> authorColumn;
-	@FXML private TableColumn<SelectableSong, String> genreColumn;
-	@FXML private TableColumn<SelectableSong, String> yearColumn;
+	@FXML
+	private TableView<SelectableSong> tracksTable;
+	@FXML
+	private TableColumn<SelectableSong, Boolean> checkColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> titleColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> authorColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> genreColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> yearColumn;
 
-	@FXML private VBox emptyStateBox;
+	@FXML
+	private VBox emptyStateBox;
 
-	@FXML private Button cancelButton;
-	@FXML private Button confirmButton;
+	@FXML
+	private Button cancelButton;
+	@FXML
+	private Button confirmButton;
 
-    private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private Playlist playlist;
 	private Runnable onSave;
@@ -209,8 +218,8 @@ public class SongPickerController {
 
 	private void addSongsToPlaylist(List<Song> songs) {
 		try {
-            Command cmd = new AddSongsToPlaylistCommand(appContext.getMusicLibrary(), playlist, songs);
-            executor.execute(cmd);
+			Command cmd = new AddSongsToPlaylistCommand(appContext.getMusicLibrary(), playlist, songs);
+			executor.execute(cmd);
 		} catch (PersistenceException | IllegalArgumentException e) {
 			AlertManager.showError(e.getMessage());
 		}

@@ -4,9 +4,7 @@ package it.unisa.musicplaylistmanager.model.entity;
  */
 public enum Tag {
 
-	FAVOURITE("Preferito"),
-    EXPLICIT("Esplicito"),
-    NEW_RELEASE("Nuova uscita");
+	FAVOURITE("Preferito"), EXPLICIT("Esplicito"), NEW_RELEASE("Nuova uscita");
 
 	private final String label;
 
