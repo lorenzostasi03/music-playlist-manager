@@ -22,38 +22,26 @@ class AddSongToCatalogCommandTest {
 
 	@BeforeEach
 	void setUp() {
-		musicLibrary = new MusicLibrary(
-				new FakeSongDAO(),
-				new FakePlaylistDAO());
+		musicLibrary = new MusicLibrary(new FakeSongDAO(), new FakePlaylistDAO());
 
-		song = new Song(
-				"Yesterday",
-				"Beatles",
-				Genre.POP,
-				1965,
-				125,
-				"/yesterday.mp3");
+		song = new Song("Yesterday", "Beatles", Genre.POP, 1965, 125, "/yesterday.mp3");
 
 		command = new AddSongToCatalogCommand(musicLibrary, song);
 	}
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new AddSongToCatalogCommand(null, song));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeAggiungeBranoAlCatalogo() {
 		command.execute();
 
-		assertAll(
-				() -> assertTrue(musicLibrary.catalogContains(song)),
+		assertAll(() -> assertTrue(musicLibrary.catalogContains(song)),
 				() -> assertEquals(1, musicLibrary.getAllSongs().size()));
 	}
 
@@ -63,8 +51,7 @@ class AddSongToCatalogCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertFalse(musicLibrary.catalogContains(song)),
+		assertAll(() -> assertFalse(musicLibrary.catalogContains(song)),
 				() -> assertTrue(musicLibrary.getAllSongs().isEmpty()));
 	}
 
@@ -79,11 +66,9 @@ class AddSongToCatalogCommandTest {
 	}
 
 	@Test
-void executeDueVolteLanciaEccezionePerBranoDuplicato() {
-	command.execute();
+	void executeDueVolteLanciaEccezionePerBranoDuplicato() {
+		command.execute();
 
-	assertThrows(
-			DuplicatedSongException.class,
-			command::execute);
-}
+		assertThrows(DuplicatedSongException.class, command::execute);
+	}
 }

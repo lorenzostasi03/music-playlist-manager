@@ -35,13 +35,9 @@ class CommandExecutorTest {
 
 	@Test
 	void executeConComandoNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> executor.execute(null));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> executor.execute(null));
 
-		assertEquals(
-				"Il comando non può essere null!",
-				exception.getMessage());
+		assertEquals("Il comando non può essere null!", exception.getMessage());
 	}
 
 	@Test
@@ -50,9 +46,7 @@ class CommandExecutorTest {
 
 		executor.execute(command);
 
-		assertAll(
-				() -> assertEquals(1, command.getExecuteCount()),
-				() -> assertEquals(0, command.getUndoCount()));
+		assertAll(() -> assertEquals(1, command.getExecuteCount()), () -> assertEquals(0, command.getUndoCount()));
 	}
 
 	@Test
@@ -71,9 +65,7 @@ class CommandExecutorTest {
 		executor.execute(command);
 		executor.undo();
 
-		assertAll(
-				() -> assertEquals(1, command.getExecuteCount()),
-				() -> assertEquals(1, command.getUndoCount()),
+		assertAll(() -> assertEquals(1, command.getExecuteCount()), () -> assertEquals(1, command.getUndoCount()),
 				() -> assertFalse(executor.canUndoProperty().get()));
 	}
 
@@ -90,13 +82,7 @@ class CommandExecutorTest {
 		executor.undo();
 		executor.undo();
 
-		assertEquals(
-				List.of(
-						"execute-primo",
-						"execute-secondo",
-						"undo-secondo",
-						"undo-primo"),
-				operations);
+		assertEquals(List.of("execute-primo", "execute-secondo", "undo-secondo", "undo-primo"), operations);
 	}
 
 	@Test
@@ -109,8 +95,7 @@ class CommandExecutorTest {
 
 		executor.undo();
 
-		assertAll(
-				() -> assertEquals(0, firstCommand.getUndoCount()),
+		assertAll(() -> assertEquals(0, firstCommand.getUndoCount()),
 				() -> assertEquals(1, secondCommand.getUndoCount()),
 				() -> assertTrue(executor.canUndoProperty().get()));
 	}

@@ -20,9 +20,7 @@ class AddPlaylistCommandTest {
 
 	@BeforeEach
 	void setUp() {
-		musicLibrary = new MusicLibrary(
-				new FakeSongDAO(),
-				new FakePlaylistDAO());
+		musicLibrary = new MusicLibrary(new FakeSongDAO(), new FakePlaylistDAO());
 
 		playlist = new Playlist("Playlist di test");
 		command = new AddPlaylistCommand(musicLibrary, playlist);
@@ -30,25 +28,18 @@ class AddPlaylistCommandTest {
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
 				() -> new AddPlaylistCommand(null, playlist));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeAggiungePlaylistAllaLibreria() {
 		command.execute();
 
-		assertAll(
-				() -> assertTrue(
-						musicLibrary.getAllPlaylists().contains(playlist)),
-				() -> assertEquals(
-						1,
-						musicLibrary.getAllPlaylists().size()));
+		assertAll(() -> assertTrue(musicLibrary.getAllPlaylists().contains(playlist)),
+				() -> assertEquals(1, musicLibrary.getAllPlaylists().size()));
 	}
 
 	@Test
@@ -57,11 +48,8 @@ class AddPlaylistCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertFalse(
-						musicLibrary.getAllPlaylists().contains(playlist)),
-				() -> assertTrue(
-						musicLibrary.getAllPlaylists().isEmpty()));
+		assertAll(() -> assertFalse(musicLibrary.getAllPlaylists().contains(playlist)),
+				() -> assertTrue(musicLibrary.getAllPlaylists().isEmpty()));
 	}
 
 	@Test
@@ -71,8 +59,6 @@ class AddPlaylistCommandTest {
 		command.execute();
 		command.undo();
 
-		assertEquals(
-				initialSize,
-				musicLibrary.getAllPlaylists().size());
+		assertEquals(initialSize, musicLibrary.getAllPlaylists().size());
 	}
 }

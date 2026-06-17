@@ -27,25 +27,11 @@ class AddSongsToPlaylistCommandTest {
 
 	@BeforeEach
 	void setUp() {
-		musicLibrary = new MusicLibrary(
-				new FakeSongDAO(),
-				new FakePlaylistDAO());
+		musicLibrary = new MusicLibrary(new FakeSongDAO(), new FakePlaylistDAO());
 
-		firstSong = new Song(
-				"Yesterday",
-				"Beatles",
-				Genre.POP,
-				1965,
-				125,
-				"/yesterday.mp3");
+		firstSong = new Song("Yesterday", "Beatles", Genre.POP, 1965, 125, "/yesterday.mp3");
 
-		secondSong = new Song(
-				"Come Together",
-				"Beatles",
-				Genre.ROCK,
-				1969,
-				259,
-				"/come-together.mp3");
+		secondSong = new Song("Come Together", "Beatles", Genre.ROCK, 1969, 259, "/come-together.mp3");
 
 		playlist = new Playlist("Beatles");
 
@@ -53,33 +39,22 @@ class AddSongsToPlaylistCommandTest {
 		musicLibrary.addSongToCatalog(secondSong);
 		musicLibrary.addPlaylist(playlist);
 
-		command = new AddSongsToPlaylistCommand(
-				musicLibrary,
-				playlist,
-				List.of(firstSong, secondSong));
+		command = new AddSongsToPlaylistCommand(musicLibrary, playlist, List.of(firstSong, secondSong));
 	}
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new AddSongsToPlaylistCommand(
-						null,
-						playlist,
-						List.of(firstSong, secondSong)));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new AddSongsToPlaylistCommand(null, playlist, List.of(firstSong, secondSong)));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeAggiungeTuttiIBraniAllaPlaylist() {
 		command.execute();
 
-		assertAll(
-				() -> assertEquals(2, playlist.size()),
-				() -> assertTrue(playlist.contains(firstSong)),
+		assertAll(() -> assertEquals(2, playlist.size()), () -> assertTrue(playlist.contains(firstSong)),
 				() -> assertTrue(playlist.contains(secondSong)));
 	}
 
@@ -87,8 +62,7 @@ class AddSongsToPlaylistCommandTest {
 	void executeMantieneOrdineDeiBrani() {
 		command.execute();
 
-		assertAll(
-				() -> assertEquals(firstSong, playlist.getSongAt(0)),
+		assertAll(() -> assertEquals(firstSong, playlist.getSongAt(0)),
 				() -> assertEquals(secondSong, playlist.getSongAt(1)));
 	}
 
@@ -98,9 +72,7 @@ class AddSongsToPlaylistCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertTrue(playlist.isEmpty()),
-				() -> assertFalse(playlist.contains(firstSong)),
+		assertAll(() -> assertTrue(playlist.isEmpty()), () -> assertFalse(playlist.contains(firstSong)),
 				() -> assertFalse(playlist.contains(secondSong)));
 	}
 
@@ -116,11 +88,7 @@ class AddSongsToPlaylistCommandTest {
 
 	@Test
 	void executeConListaVuotaNonModificaLaPlaylist() {
-		AddSongsToPlaylistCommand emptyCommand =
-				new AddSongsToPlaylistCommand(
-						musicLibrary,
-						playlist,
-						List.of());
+		AddSongsToPlaylistCommand emptyCommand = new AddSongsToPlaylistCommand(musicLibrary, playlist, List.of());
 
 		assertDoesNotThrow(emptyCommand::execute);
 		assertTrue(playlist.isEmpty());

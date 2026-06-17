@@ -33,21 +33,9 @@ class RemoveSongFromPlaylistCommandTest {
 
 		musicLibrary = new MusicLibrary(songDAO, playlistDAO);
 
-		song = new Song(
-				"Yesterday",
-				"Beatles",
-				Genre.POP,
-				1965,
-				125,
-				"/yesterday.mp3");
+		song = new Song("Yesterday", "Beatles", Genre.POP, 1965, 125, "/yesterday.mp3");
 
-		otherSong = new Song(
-				"Whole lotta love",
-				"Led Zeppelin",
-				Genre.ROCK,
-				1969,
-				280,
-				"/whole-lotta-love.mp3");
+		otherSong = new Song("Whole lotta love", "Led Zeppelin", Genre.ROCK, 1969, 280, "/whole-lotta-love.mp3");
 
 		playlist = new Playlist("Mia playlist");
 
@@ -57,50 +45,36 @@ class RemoveSongFromPlaylistCommandTest {
 		musicLibrary.addSongToPlaylist(song, playlist);
 		musicLibrary.addSongToPlaylist(otherSong, playlist);
 
-		command = new RemoveSongFromPlaylistCommand(
-				musicLibrary,
-				playlist,
-				song);
+		command = new RemoveSongFromPlaylistCommand(musicLibrary, playlist, song);
 	}
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemoveSongFromPlaylistCommand(
-						null,
-						playlist,
-						song));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemoveSongFromPlaylistCommand(null, playlist, song));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeRimuoveBranoDallaPlaylist() {
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(playlist.contains(song)),
-				() -> assertEquals(1, playlist.size()));
+		assertAll(() -> assertFalse(playlist.contains(song)), () -> assertEquals(1, playlist.size()));
 	}
 
 	@Test
 	void executeNonRimuoveGliAltriBraniDallaPlaylist() {
 		command.execute();
 
-		assertAll(
-				() -> assertTrue(playlist.contains(otherSong)),
-				() -> assertEquals(otherSong, playlist.getSongAt(0)));
+		assertAll(() -> assertTrue(playlist.contains(otherSong)), () -> assertEquals(otherSong, playlist.getSongAt(0)));
 	}
 
 	@Test
 	void executeNonRimuoveBranoDalCatalogo() {
 		command.execute();
 
-		assertAll(
-				() -> assertTrue(musicLibrary.catalogContains(song)),
+		assertAll(() -> assertTrue(musicLibrary.catalogContains(song)),
 				() -> assertEquals(2, musicLibrary.getAllSongs().size()));
 	}
 
@@ -110,9 +84,7 @@ class RemoveSongFromPlaylistCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertTrue(playlist.contains(song)),
-				() -> assertEquals(2, playlist.size()));
+		assertAll(() -> assertTrue(playlist.contains(song)), () -> assertEquals(2, playlist.size()));
 	}
 
 	@Test
@@ -129,9 +101,7 @@ class RemoveSongFromPlaylistCommandTest {
 	void executeRimuoveAssociazioneDalPlaylistDAO() {
 		command.execute();
 
-		assertFalse(
-				playlistDAO.getSongIds(playlist.getId())
-						.contains(song.getId()));
+		assertFalse(playlistDAO.getSongIds(playlist.getId()).contains(song.getId()));
 	}
 
 	@Test
@@ -139,9 +109,6 @@ class RemoveSongFromPlaylistCommandTest {
 		command.execute();
 		command.undo();
 
-		assertTrue(
-				playlistDAO.getSongIds(playlist.getId())
-						.contains(song.getId()));
+		assertTrue(playlistDAO.getSongIds(playlist.getId()).contains(song.getId()));
 	}
 }
-

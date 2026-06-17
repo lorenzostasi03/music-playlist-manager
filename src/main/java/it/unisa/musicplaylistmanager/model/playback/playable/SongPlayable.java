@@ -9,7 +9,7 @@ import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 import java.util.Objects;
 
 /**
- * Adatta una singola traccia al concetto di oggetto riproducibile.
+ * Adatta una singola traccia al playable.
  *
  * <p>
  * La classe utilizza {@link AudioPlayer} per riprodurre il file audio associato
@@ -24,7 +24,7 @@ public class SongPlayable extends Playable {
 	private boolean subscribed;
 
 	/**
-	 * Crea un nuovo oggetto riproducibile a partire da una traccia.
+	 * Crea un nuovo playable a partire da una traccia.
 	 *
 	 * @param song
 	 *            traccia da rendere riproducibile
@@ -92,7 +92,7 @@ public class SongPlayable extends Playable {
 	}
 
 	/**
-	 * Restituisce la traccia associata a questo oggetto riproducibile.
+	 * Restituisce la traccia associata a questo playable.
 	 *
 	 * @return traccia corrente
 	 */

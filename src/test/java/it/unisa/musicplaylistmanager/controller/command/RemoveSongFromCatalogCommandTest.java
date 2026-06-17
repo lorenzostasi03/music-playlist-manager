@@ -27,19 +27,11 @@ class RemoveSongFromCatalogCommandTest {
 
 	@BeforeEach
 	void setUp() {
-		musicLibrary = new MusicLibrary(
-				new FakeSongDAO(),
-				new FakePlaylistDAO());
+		musicLibrary = new MusicLibrary(new FakeSongDAO(), new FakePlaylistDAO());
 
 		player = new Player();
 
-		song = new Song(
-				"Come Together",
-				"Beatles",
-				Genre.ROCK,
-				1969,
-				259,
-				"/come-together.mp3");
+		song = new Song("Come Together", "Beatles", Genre.ROCK, 1969, 259, "/come-together.mp3");
 
 		playlist = new Playlist("Beatles");
 
@@ -47,46 +39,30 @@ class RemoveSongFromCatalogCommandTest {
 		musicLibrary.addPlaylist(playlist);
 		musicLibrary.addSongToPlaylist(song, playlist);
 
-		command = new RemoveSongFromCatalogCommand(
-				musicLibrary,
-				player,
-				song);
+		command = new RemoveSongFromCatalogCommand(musicLibrary, player, song);
 	}
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemoveSongFromCatalogCommand(
-						null,
-						player,
-						song));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemoveSongFromCatalogCommand(null, player, song));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void costruttoreConPlayerNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemoveSongFromCatalogCommand(
-						musicLibrary,
-						null,
-						song));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemoveSongFromCatalogCommand(musicLibrary, null, song));
 
-		assertEquals(
-				"Player non può essere null!",
-				exception.getMessage());
+		assertEquals("Player non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeRimuoveBranoDalCatalogo() {
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(musicLibrary.catalogContains(song)),
+		assertAll(() -> assertFalse(musicLibrary.catalogContains(song)),
 				() -> assertTrue(musicLibrary.getAllSongs().isEmpty()));
 	}
 
@@ -96,9 +72,7 @@ class RemoveSongFromCatalogCommandTest {
 
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(playlist.contains(song)),
-				() -> assertTrue(playlist.isEmpty()));
+		assertAll(() -> assertFalse(playlist.contains(song)), () -> assertTrue(playlist.isEmpty()));
 	}
 
 	@Test
@@ -108,11 +82,8 @@ class RemoveSongFromCatalogCommandTest {
 
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(
-						player.getQueueSnapshot().contains(queuedPlayable)),
-				() -> assertTrue(
-						player.getQueueSnapshot().isEmpty()));
+		assertAll(() -> assertFalse(player.getQueueSnapshot().contains(queuedPlayable)),
+				() -> assertTrue(player.getQueueSnapshot().isEmpty()));
 	}
 
 	@Test
@@ -130,13 +101,7 @@ class RemoveSongFromCatalogCommandTest {
 
 	@Test
 	void executeNonRimuoveAltriBraniDallaCoda() {
-		Song otherSong = new Song(
-				"Yesterday",
-				"Beatles",
-				Genre.POP,
-				1965,
-				125,
-				"/yesterday.mp3");
+		Song otherSong = new Song("Yesterday", "Beatles", Genre.POP, 1965, 125, "/yesterday.mp3");
 
 		SongPlayable targetPlayable = new SongPlayable(song);
 		SongPlayable otherPlayable = new SongPlayable(otherSong);
@@ -146,29 +111,19 @@ class RemoveSongFromCatalogCommandTest {
 
 		command.execute();
 
-		assertEquals(
-				List.of(otherPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(otherPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
 	void executeConBranoNonPresenteInCodaNonModificaGliAltriElementi() {
-		Song otherSong = new Song(
-				"Yesterday",
-				"Beatles",
-				Genre.POP,
-				1965,
-				125,
-				"/yesterday.mp3");
+		Song otherSong = new Song("Yesterday", "Beatles", Genre.POP, 1965, 125, "/yesterday.mp3");
 
 		SongPlayable otherPlayable = new SongPlayable(otherSong);
 		player.enqueue(otherPlayable);
 
 		command.execute();
 
-		assertEquals(
-				List.of(otherPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(otherPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -177,8 +132,7 @@ class RemoveSongFromCatalogCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertTrue(musicLibrary.catalogContains(song)),
+		assertAll(() -> assertTrue(musicLibrary.catalogContains(song)),
 				() -> assertEquals(1, musicLibrary.getAllSongs().size()));
 	}
 

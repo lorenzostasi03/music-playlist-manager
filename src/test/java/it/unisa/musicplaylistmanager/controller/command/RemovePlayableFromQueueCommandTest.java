@@ -30,22 +30,15 @@ class RemovePlayableFromQueueCommandTest {
 		playableToRemove = new TestPlayable("Da rimuovere");
 		lastPlayable = new TestPlayable("Ultimo");
 
-		command = new RemovePlayableFromQueueCommand(
-				player,
-				playableToRemove);
+		command = new RemovePlayableFromQueueCommand(player, playableToRemove);
 	}
 
 	@Test
 	void costruttoreConPlayerNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemovePlayableFromQueueCommand(
-						null,
-						playableToRemove));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemovePlayableFromQueueCommand(null, playableToRemove));
 
-		assertEquals(
-				"Player non può essere null!",
-				exception.getMessage());
+		assertEquals("Player non può essere null!", exception.getMessage());
 	}
 
 	@Test
@@ -56,9 +49,7 @@ class RemovePlayableFromQueueCommandTest {
 
 		command.execute();
 
-		assertEquals(
-				List.of(firstPlayable, lastPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(firstPlayable, lastPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -69,13 +60,9 @@ class RemovePlayableFromQueueCommandTest {
 
 		command.execute();
 
-		assertAll(
-				() -> assertTrue(
-						player.getQueueSnapshot().contains(firstPlayable)),
-				() -> assertTrue(
-						player.getQueueSnapshot().contains(lastPlayable)),
-				() -> assertFalse(
-						player.getQueueSnapshot().contains(playableToRemove)));
+		assertAll(() -> assertTrue(player.getQueueSnapshot().contains(firstPlayable)),
+				() -> assertTrue(player.getQueueSnapshot().contains(lastPlayable)),
+				() -> assertFalse(player.getQueueSnapshot().contains(playableToRemove)));
 	}
 
 	@Test
@@ -86,9 +73,7 @@ class RemovePlayableFromQueueCommandTest {
 
 		command.execute();
 
-		assertEquals(
-				List.of(firstPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(firstPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -98,9 +83,7 @@ class RemovePlayableFromQueueCommandTest {
 
 		assertDoesNotThrow(command::execute);
 
-		assertEquals(
-				List.of(firstPlayable, lastPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(firstPlayable, lastPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -112,9 +95,7 @@ class RemovePlayableFromQueueCommandTest {
 		command.execute();
 		command.undo();
 
-		assertEquals(
-				List.of(firstPlayable, lastPlayable, playableToRemove),
-				player.getQueueSnapshot());
+		assertEquals(List.of(firstPlayable, lastPlayable, playableToRemove), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -129,8 +110,8 @@ class RemovePlayableFromQueueCommandTest {
 	}
 
 	/**
-	 * Implementazione minimale di {@link Playable} utilizzata esclusivamente
-	 * nei test del comando.
+	 * Implementazione minimale di {@link Playable} utilizzata esclusivamente nei
+	 * test del comando.
 	 */
 	private static class TestPlayable extends Playable {
 

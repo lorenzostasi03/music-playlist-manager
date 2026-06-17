@@ -31,26 +31,20 @@ class PlaybackQueueTest {
 
 	@Test
 	void nuovaCodaEVuota() {
-		assertAll(
-				() -> assertTrue(queue.isEmpty()),
-				() -> assertEquals(0, queue.size()));
+		assertAll(() -> assertTrue(queue.isEmpty()), () -> assertEquals(0, queue.size()));
 	}
 
 	@Test
 	void enqueueAggiungePlayableAllaCoda() {
 		queue.enqueue(firstPlayable);
 
-		assertAll(
-				() -> assertFalse(queue.isEmpty()),
-				() -> assertEquals(1, queue.size()),
+		assertAll(() -> assertFalse(queue.isEmpty()), () -> assertEquals(1, queue.size()),
 				() -> assertEquals(firstPlayable, queue.getSnapshot().get(0)));
 	}
 
 	@Test
 	void enqueueConPlayableNullLanciaEccezione() {
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> queue.enqueue(null));
+		assertThrows(IllegalArgumentException.class, () -> queue.enqueue(null));
 	}
 
 	@Test
@@ -59,10 +53,8 @@ class PlaybackQueueTest {
 		queue.enqueue(secondPlayable);
 		queue.enqueue(thirdPlayable);
 
-		assertAll(
-				() -> assertEquals(firstPlayable, queue.dequeue()),
-				() -> assertEquals(secondPlayable, queue.dequeue()),
-				() -> assertEquals(thirdPlayable, queue.dequeue()),
+		assertAll(() -> assertEquals(firstPlayable, queue.dequeue()),
+				() -> assertEquals(secondPlayable, queue.dequeue()), () -> assertEquals(thirdPlayable, queue.dequeue()),
 				() -> assertTrue(queue.isEmpty()));
 	}
 
@@ -79,9 +71,7 @@ class PlaybackQueueTest {
 
 		queue.remove(secondPlayable);
 
-		assertEquals(
-				List.of(firstPlayable, thirdPlayable),
-				queue.getSnapshot());
+		assertEquals(List.of(firstPlayable, thirdPlayable), queue.getSnapshot());
 	}
 
 	@Test
@@ -92,9 +82,7 @@ class PlaybackQueueTest {
 
 		queue.remove(firstPlayable);
 
-		assertEquals(
-				List.of(secondPlayable),
-				queue.getSnapshot());
+		assertEquals(List.of(secondPlayable), queue.getSnapshot());
 	}
 
 	@Test
@@ -104,9 +92,7 @@ class PlaybackQueueTest {
 
 		queue.remove(thirdPlayable);
 
-		assertEquals(
-				List.of(firstPlayable, secondPlayable),
-				queue.getSnapshot());
+		assertEquals(List.of(firstPlayable, secondPlayable), queue.getSnapshot());
 	}
 
 	@Test
@@ -124,9 +110,7 @@ class PlaybackQueueTest {
 
 		queue.removeLast();
 
-		assertEquals(
-				List.of(firstPlayable, secondPlayable),
-				queue.getSnapshot());
+		assertEquals(List.of(firstPlayable, secondPlayable), queue.getSnapshot());
 	}
 
 	@Test
@@ -144,9 +128,7 @@ class PlaybackQueueTest {
 
 		queue.clear();
 
-		assertAll(
-				() -> assertTrue(queue.isEmpty()),
-				() -> assertEquals(0, queue.size()),
+		assertAll(() -> assertTrue(queue.isEmpty()), () -> assertEquals(0, queue.size()),
 				() -> assertTrue(queue.getSnapshot().isEmpty()));
 	}
 
@@ -158,9 +140,7 @@ class PlaybackQueueTest {
 
 		List<Playable> snapshot = queue.getSnapshot();
 
-		assertEquals(
-				List.of(firstPlayable, secondPlayable, thirdPlayable),
-				snapshot);
+		assertEquals(List.of(firstPlayable, secondPlayable, thirdPlayable), snapshot);
 	}
 
 	@Test
@@ -171,11 +151,8 @@ class PlaybackQueueTest {
 		List<Playable> snapshot = queue.getSnapshot();
 		snapshot.clear();
 
-		assertAll(
-				() -> assertEquals(2, queue.size()),
-				() -> assertEquals(
-						List.of(firstPlayable, secondPlayable),
-						queue.getSnapshot()));
+		assertAll(() -> assertEquals(2, queue.size()),
+				() -> assertEquals(List.of(firstPlayable, secondPlayable), queue.getSnapshot()));
 	}
 
 	@Test
@@ -185,9 +162,7 @@ class PlaybackQueueTest {
 
 		String result = queue.toString();
 
-		assertEquals(
-				"Queue:\nPrima playlist\nSeconda playlist\n",
-				result);
+		assertEquals("Queue:\nPrima playlist\nSeconda playlist\n", result);
 	}
 
 	/**

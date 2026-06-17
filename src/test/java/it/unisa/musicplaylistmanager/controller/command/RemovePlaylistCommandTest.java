@@ -27,19 +27,11 @@ class RemovePlaylistCommandTest {
 
 	@BeforeEach
 	void setUp() {
-		musicLibrary = new MusicLibrary(
-				new FakeSongDAO(),
-				new FakePlaylistDAO());
+		musicLibrary = new MusicLibrary(new FakeSongDAO(), new FakePlaylistDAO());
 
 		player = new Player();
 
-		song = new Song(
-				"Come Together",
-				"Beatles",
-				Genre.ROCK,
-				1969,
-				259,
-				"/come-together.mp3");
+		song = new Song("Come Together", "Beatles", Genre.ROCK, 1969, 259, "/come-together.mp3");
 
 		playlist = new Playlist("Beatles");
 
@@ -47,74 +39,50 @@ class RemovePlaylistCommandTest {
 		musicLibrary.addPlaylist(playlist);
 		musicLibrary.addSongToPlaylist(song, playlist);
 
-		command = new RemovePlaylistCommand(
-				musicLibrary,
-				player,
-				playlist);
+		command = new RemovePlaylistCommand(musicLibrary, player, playlist);
 	}
 
 	@Test
 	void costruttoreConMusicLibraryNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemovePlaylistCommand(
-						null,
-						player,
-						playlist));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemovePlaylistCommand(null, player, playlist));
 
-		assertEquals(
-				"MusicLibrary non può essere null!",
-				exception.getMessage());
+		assertEquals("MusicLibrary non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void costruttoreConPlayerNullLanciaEccezione() {
-		IllegalArgumentException exception = assertThrows(
-				IllegalArgumentException.class,
-				() -> new RemovePlaylistCommand(
-						musicLibrary,
-						null,
-						playlist));
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+				() -> new RemovePlaylistCommand(musicLibrary, null, playlist));
 
-		assertEquals(
-				"Player non può essere null!",
-				exception.getMessage());
+		assertEquals("Player non può essere null!", exception.getMessage());
 	}
 
 	@Test
 	void executeRimuovePlaylistDallaLibreria() {
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(
-						musicLibrary.getAllPlaylists().contains(playlist)),
-				() -> assertTrue(
-						musicLibrary.getAllPlaylists().isEmpty()));
+		assertAll(() -> assertFalse(musicLibrary.getAllPlaylists().contains(playlist)),
+				() -> assertTrue(musicLibrary.getAllPlaylists().isEmpty()));
 	}
 
 	@Test
 	void executeRimuovePlaylistDallaCoda() {
-		PlaylistPlayable queuedPlayable =
-				new PlaylistPlayable(playlist);
+		PlaylistPlayable queuedPlayable = new PlaylistPlayable(playlist);
 
 		player.enqueue(queuedPlayable);
 
 		command.execute();
 
-		assertAll(
-				() -> assertFalse(
-						player.getQueueSnapshot().contains(queuedPlayable)),
-				() -> assertTrue(
-						player.getQueueSnapshot().isEmpty()));
+		assertAll(() -> assertFalse(player.getQueueSnapshot().contains(queuedPlayable)),
+				() -> assertTrue(player.getQueueSnapshot().isEmpty()));
 	}
 
 	@Test
 	void executeRimuoveTutteLeOccorrenzeDellaPlaylistDallaCoda() {
-		PlaylistPlayable firstOccurrence =
-				new PlaylistPlayable(playlist);
+		PlaylistPlayable firstOccurrence = new PlaylistPlayable(playlist);
 
-		PlaylistPlayable secondOccurrence =
-				new PlaylistPlayable(playlist);
+		PlaylistPlayable secondOccurrence = new PlaylistPlayable(playlist);
 
 		player.enqueue(firstOccurrence);
 		player.enqueue(secondOccurrence);
@@ -129,20 +97,16 @@ class RemovePlaylistCommandTest {
 		Playlist otherPlaylist = new Playlist("Workout");
 		otherPlaylist.addSong(song);
 
-		PlaylistPlayable targetPlayable =
-				new PlaylistPlayable(playlist);
+		PlaylistPlayable targetPlayable = new PlaylistPlayable(playlist);
 
-		PlaylistPlayable otherPlayable =
-				new PlaylistPlayable(otherPlaylist);
+		PlaylistPlayable otherPlayable = new PlaylistPlayable(otherPlaylist);
 
 		player.enqueue(targetPlayable);
 		player.enqueue(otherPlayable);
 
 		command.execute();
 
-		assertEquals(
-				List.of(otherPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(otherPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -150,16 +114,13 @@ class RemovePlaylistCommandTest {
 		Playlist otherPlaylist = new Playlist("Workout");
 		otherPlaylist.addSong(song);
 
-		PlaylistPlayable otherPlayable =
-				new PlaylistPlayable(otherPlaylist);
+		PlaylistPlayable otherPlayable = new PlaylistPlayable(otherPlaylist);
 
 		player.enqueue(otherPlayable);
 
 		command.execute();
 
-		assertEquals(
-				List.of(otherPlayable),
-				player.getQueueSnapshot());
+		assertEquals(List.of(otherPlayable), player.getQueueSnapshot());
 	}
 
 	@Test
@@ -168,12 +129,8 @@ class RemovePlaylistCommandTest {
 
 		command.undo();
 
-		assertAll(
-				() -> assertTrue(
-						musicLibrary.getAllPlaylists().contains(playlist)),
-				() -> assertEquals(
-						1,
-						musicLibrary.getAllPlaylists().size()));
+		assertAll(() -> assertTrue(musicLibrary.getAllPlaylists().contains(playlist)),
+				() -> assertEquals(1, musicLibrary.getAllPlaylists().size()));
 	}
 
 	@Test
@@ -183,8 +140,6 @@ class RemovePlaylistCommandTest {
 		command.execute();
 		command.undo();
 
-		assertEquals(
-				initialSize,
-				musicLibrary.getAllPlaylists().size());
+		assertEquals(initialSize, musicLibrary.getAllPlaylists().size());
 	}
 }

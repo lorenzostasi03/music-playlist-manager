@@ -20,13 +20,7 @@ class PlaylistPlayableTest {
 
 	@BeforeEach
 	void setUp() {
-		song = new Song(
-				"Immigrant song",
-				"Led Zeppelin",
-				Genre.ROCK,
-				1970,
-				259,
-				"/immigrant-song.mp3");
+		song = new Song("Immigrant song", "Led Zeppelin", Genre.ROCK, 1970, 259, "/immigrant-song.mp3");
 
 		playlist = new Playlist("Mia playlist");
 		playlist.addSong(song);
@@ -36,25 +30,19 @@ class PlaylistPlayableTest {
 
 	@Test
 	void costruttoreConPlaylistNullLanciaEccezione() {
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> new PlaylistPlayable(null));
+		assertThrows(IllegalArgumentException.class, () -> new PlaylistPlayable(null));
 	}
 
 	@Test
 	void costruttoreConPlaylistVuotaLanciaEccezione() {
 		Playlist emptyPlaylist = new Playlist("Playlist vuota");
 
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> new PlaylistPlayable(emptyPlaylist));
+		assertThrows(IllegalArgumentException.class, () -> new PlaylistPlayable(emptyPlaylist));
 	}
 
 	@Test
 	void modalitaPredefinitaSequenziale() {
-		assertEquals(
-				PlaybackMode.SEQUENTIAL,
-				playable.getPlaybackMode());
+		assertEquals(PlaybackMode.SEQUENTIAL, playable.getPlaybackMode());
 	}
 
 	@Test
@@ -71,16 +59,11 @@ class PlaylistPlayableTest {
 
 	@Test
 	void impostazioneModalitaNullLanciaEccezione() {
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> playable.setPlaybackMode(null));
+		assertThrows(IllegalArgumentException.class, () -> playable.setPlaybackMode(null));
 	}
 
 	@Test
 	void impostazioneStrategiaNullLanciaEccezione() {
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> playable.setIteratorStrategy(null));
+		assertThrows(IllegalArgumentException.class, () -> playable.setIteratorStrategy(null));
 	}
 }
-

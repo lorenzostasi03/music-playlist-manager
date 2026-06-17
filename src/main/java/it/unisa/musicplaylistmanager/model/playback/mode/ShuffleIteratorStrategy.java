@@ -18,6 +18,7 @@ public class ShuffleIteratorStrategy implements PlaylistIteratorStrategy {
 	public int nextIndex(int currentIndex, List<Song> songs, Set<UUID> playedSongIds) {
 		List<Integer> availableIndexes = new ArrayList<>();
 
+		// Costruisce l'elenco degli indici dei brani non ancora riprodotti.
 		for (int i = 0; i < songs.size(); i++) {
 			Song song = songs.get(i);
 
@@ -30,6 +31,7 @@ public class ShuffleIteratorStrategy implements PlaylistIteratorStrategy {
 			return -1;
 		}
 
+		// Seleziona casualmente uno degli indici ancora disponibili.
 		return availableIndexes.get(random.nextInt(availableIndexes.size()));
 	}
 }
