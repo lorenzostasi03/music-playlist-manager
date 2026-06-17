@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 public class CatalogController {
 
-    @FXML public Button undoCommandButton;
+    @FXML private Button undoCommandButton;
     @FXML private TextField searchField;
 	@FXML private ComboBox<String> genreFilter;
 	@FXML private ComboBox<String> authorFilter;

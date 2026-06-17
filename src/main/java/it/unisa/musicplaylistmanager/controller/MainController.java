@@ -2,7 +2,6 @@ package it.unisa.musicplaylistmanager.controller;
 
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 
 /**

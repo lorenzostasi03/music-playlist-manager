@@ -44,7 +44,7 @@ public class PlaylistController {
 	@FXML private Button deletePlaylistButton;
     @FXML private Button addTrackButton;
     @FXML private Button removeTrackButton;
-    @FXML public Button undoCommandButton;
+    @FXML private Button undoCommandButton;
 
 	@FXML private TextField searchField;
 
