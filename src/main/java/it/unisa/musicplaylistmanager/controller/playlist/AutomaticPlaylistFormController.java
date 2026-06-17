@@ -140,14 +140,14 @@ public class AutomaticPlaylistFormController {
 		List<Tag> tags = songs.stream()
 				.flatMap(song -> song.getTags().stream())
 				.distinct()
-				.sorted(Comparator.comparing(Tag::getDisplayName))
+				.sorted(Comparator.comparing(Tag::getLabel))
 				.toList();
 
 		populateCriteriaMenu(
 				tagsMenuButton,
 				"Seleziona tag",
 				tags,
-				Tag::getDisplayName,
+				Tag::getLabel,
 				tagCheckBoxes);
 	}
 
