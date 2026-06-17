@@ -11,7 +11,8 @@ import javafx.scene.layout.BorderPane;
  */
 public class MainController {
 
-	@FXML private BorderPane root;
+	@FXML
+	private BorderPane root;
 
 	@FXML
 	private void initialize() {

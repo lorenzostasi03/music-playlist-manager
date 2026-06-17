@@ -35,7 +35,7 @@ public class MusicLibrary {
 		this.songDAO = songDAO;
 		this.playlistDAO = playlistDAO;
 
-        init();
+		init();
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class MusicLibrary {
 		for (Playlist playlist : playlists) {
 			List<UUID> songUUIDs = playlistDAO.getSongIds(playlist.getId());
 
-            songUUIDs.stream().map(songCatalog::getSongById).forEach(playlist::addSong);
+			songUUIDs.stream().map(songCatalog::getSongById).forEach(playlist::addSong);
 
 			playlistCatalog.addPlaylist(playlist);
 		}

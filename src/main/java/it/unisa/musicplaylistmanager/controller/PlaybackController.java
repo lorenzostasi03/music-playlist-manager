@@ -26,21 +26,33 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-    @FXML private Button undoCommandButton;
-    @FXML private Label trackTitleLabel;
-	@FXML private Label trackArtistLabel;
-	@FXML private Slider progressSlider;
-	@FXML private Label currentTimeLabel;
-	@FXML private Label totalTimeLabel;
-	@FXML private Button playPauseButton;
+	@FXML
+	private Button undoCommandButton;
+	@FXML
+	private Label trackTitleLabel;
+	@FXML
+	private Label trackArtistLabel;
+	@FXML
+	private Slider progressSlider;
+	@FXML
+	private Label currentTimeLabel;
+	@FXML
+	private Label totalTimeLabel;
+	@FXML
+	private Button playPauseButton;
 
-	@FXML private ToggleButton sequentialModeButton;
-	@FXML private ToggleButton shuffleModeButton;
-	@FXML private ToggleButton loopModeButton;
+	@FXML
+	private ToggleButton sequentialModeButton;
+	@FXML
+	private ToggleButton shuffleModeButton;
+	@FXML
+	private ToggleButton loopModeButton;
 
-	@FXML private Label playCountLabel;
+	@FXML
+	private Label playCountLabel;
 
-	@FXML private VBox queueView;
+	@FXML
+	private VBox queueView;
 
 	private Player player;
 	private AudioPlayer audioPlayer;
@@ -50,7 +62,7 @@ public class PlaybackController implements EventListener {
 	private Timeline progressTimeline;
 
 	private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	@FXML
 	private void initialize() {
@@ -87,7 +99,7 @@ public class PlaybackController implements EventListener {
 			}
 		}
 
-        initUndoButton();
+		initUndoButton();
 
 		updatePlaybackModeButtons();
 		updateQueueView();
@@ -190,17 +202,18 @@ public class PlaybackController implements EventListener {
 		updatePlaybackModeButtons();
 	}
 
-    /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+	/**
+	 * Inizializza il pulsante per annullare l'ultima operazione effettuata. Il
+	 * pulsante è visibile e cliccabile solo se sono presenti operazioni da
+	 * annullare.
+	 */
+	private void initUndoButton() {
+		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
 
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
+		undoCommandButton.visibleProperty().bind(canUndo);
+		undoCommandButton.managedProperty().bind(canUndo);
+		undoCommandButton.disableProperty().bind(canUndo.not());
+	}
 
 	private void updatePlaybackModeButtons() {
 		if (currentPlayable == null) {
@@ -408,15 +421,15 @@ public class PlaybackController implements EventListener {
 		setCurrentPlaybackMode(PlaybackMode.LOOP);
 	}
 
-    @FXML
-    private void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
-    }
+	@FXML
+	private void onUndoCommand() {
+		executor.undo();
+		AlertManager.showInfo("L'operazione è stata annullata.");
+	}
 
-    @FXML
-    private void onClearQueue() {
-        player.clearQueue();
-        updateQueueView();
-    }
+	@FXML
+	private void onClearQueue() {
+		player.clearQueue();
+		updateQueueView();
+	}
 }

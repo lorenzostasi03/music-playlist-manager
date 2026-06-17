@@ -159,18 +159,12 @@ public class HomeController implements Initializable {
 	 * modifica di una playlist esistente.
 	 *
 	 * @param playlist
-	 *            playlist da modificare; {@code null} per creare una nuova
-	 *            playlist
+	 *            playlist da modificare; {@code null} per creare una nuova playlist
 	 */
 	private void openPlaylistForm(Playlist playlist) {
-		String title = playlist == null
-				? "Nuova playlist"
-				: "Rinomina playlist";
+		String title = playlist == null ? "Nuova playlist" : "Rinomina playlist";
 
-		DialogUtil.open(
-				"PlaylistFormView.fxml",
-				title,
-				newPlaylistBtn.getScene().getWindow(),
+		DialogUtil.open("PlaylistFormView.fxml", title, newPlaylistBtn.getScene().getWindow(),
 				(PlaylistFormController controller) -> {
 					controller.setPlaylistToEdit(playlist);
 					controller.setOnSave(this::updateViews);
@@ -182,12 +176,8 @@ public class HomeController implements Initializable {
 	 */
 	@FXML
 	private void onAutoCreatePlaylist() {
-		DialogUtil.open(
-				"AutomaticPlaylistFormView.fxml",
-				"Playlist automatica",
-				autoCreateBtn.getScene().getWindow(),
-				(AutomaticPlaylistFormController controller) ->
-						controller.setOnSave(this::updateViews));
+		DialogUtil.open("AutomaticPlaylistFormView.fxml", "Playlist automatica", autoCreateBtn.getScene().getWindow(),
+				(AutomaticPlaylistFormController controller) -> controller.setOnSave(this::updateViews));
 	}
 
 	/**
@@ -218,9 +208,7 @@ public class HomeController implements Initializable {
 			return;
 		}
 
-		Command command = new AddPlayableToQueueCommand(
-				appContext.getPlayer(),
-				new PlaylistPlayable(playlist));
+		Command command = new AddPlayableToQueueCommand(appContext.getPlayer(), new PlaylistPlayable(playlist));
 
 		executor.execute(command);
 		AlertManager.showInfo("Playlist aggiunta alla coda.");
@@ -237,18 +225,14 @@ public class HomeController implements Initializable {
 			return;
 		}
 
-		boolean confirmed = AlertManager.showConfirmation(
-				"Vuoi eliminare la playlist '" + playlist.getName() + "'?");
+		boolean confirmed = AlertManager.showConfirmation("Vuoi eliminare la playlist '" + playlist.getName() + "'?");
 
 		if (!confirmed) {
 			return;
 		}
 
 		try {
-			Command command = new RemovePlaylistCommand(
-					appContext.getMusicLibrary(),
-					appContext.getPlayer(),
-					playlist);
+			Command command = new RemovePlaylistCommand(appContext.getMusicLibrary(), appContext.getPlayer(), playlist);
 
 			executor.execute(command);
 			updateViews();
@@ -264,15 +248,13 @@ public class HomeController implements Initializable {
 	 * la relativa lista.
 	 */
 	private void refreshPlaylists() {
-		playlists = new ArrayList<>(
-				appContext.getMusicLibrary().searchPlaylists(searchBar.getText()));
+		playlists = new ArrayList<>(appContext.getMusicLibrary().searchPlaylists(searchBar.getText()));
 
 		sortPlaylists();
 
 		List<PlaylistItem> items = new ArrayList<>();
 
-		playlists.forEach(
-				playlist -> items.add(new PlaylistItem(playlist, false, true)));
+		playlists.forEach(playlist -> items.add(new PlaylistItem(playlist, false, true)));
 
 		playlistListView.getItems().setAll(items);
 	}
@@ -287,20 +269,12 @@ public class HomeController implements Initializable {
 			return;
 		}
 
-		Comparator<Playlist> byName = Comparator.comparing(
-				Playlist::getName,
-				String.CASE_INSENSITIVE_ORDER);
+		Comparator<Playlist> byName = Comparator.comparing(Playlist::getName, String.CASE_INSENSITIVE_ORDER);
 
 		Comparator<Playlist> comparator = switch (selectedSort) {
-			case "Numero brani" ->
-				Comparator.comparingInt(Playlist::size)
-						.reversed()
-						.thenComparing(byName);
+			case "Numero brani" -> Comparator.comparingInt(Playlist::size).reversed().thenComparing(byName);
 
-			case "Riproduzioni" ->
-				Comparator.comparingInt(Playlist::getPlayCount)
-						.reversed()
-						.thenComparing(byName);
+			case "Riproduzioni" -> Comparator.comparingInt(Playlist::getPlayCount).reversed().thenComparing(byName);
 
 			default -> byName;
 		};
@@ -322,8 +296,8 @@ public class HomeController implements Initializable {
 	 * Configura il pulsante di annullamento.
 	 *
 	 * <p>
-	 * Il pulsante è visibile, gestito dal layout e utilizzabile soltanto quando
-	 * il {@link CommandExecutor} contiene almeno un comando annullabile.
+	 * Il pulsante è visibile, gestito dal layout e utilizzabile soltanto quando il
+	 * {@link CommandExecutor} contiene almeno un comando annullabile.
 	 */
 	private void initUndoButton() {
 		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
@@ -363,8 +337,7 @@ public class HomeController implements Initializable {
 		topPlaylists = getTopPlaylists();
 
 		if (topPlaylists != null) {
-			topPlaylists.forEach(
-					playlist -> items.add(new PlaylistItem(playlist, false, true)));
+			topPlaylists.forEach(playlist -> items.add(new PlaylistItem(playlist, false, true)));
 		}
 
 		mostPlayedListView.getItems().setAll(items);
@@ -397,12 +370,9 @@ public class HomeController implements Initializable {
 	 *         ascoltate, oppure {@code null} se non esistono
 	 */
 	private List<Playlist> getTopPlaylists() {
-		List<Playlist> list = appContext.getMusicLibrary()
-				.getTopPlaylists(TOP_PLAYLISTS);
+		List<Playlist> list = appContext.getMusicLibrary().getTopPlaylists(TOP_PLAYLISTS);
 
-		return list.isEmpty()
-				? null
-				: new ArrayList<>(list);
+		return list.isEmpty() ? null : new ArrayList<>(list);
 	}
 
 	/**
@@ -412,17 +382,13 @@ public class HomeController implements Initializable {
 		emptyPlaylistLabel.setText("Nessuna playlist disponibile.");
 		emptyTopPlaylistLabel.setText("Riproduci un brano o una playlist.");
 
-		emptyPlaylistLabel.visibleProperty()
-				.bind(Bindings.isEmpty(playlistListView.getItems()));
+		emptyPlaylistLabel.visibleProperty().bind(Bindings.isEmpty(playlistListView.getItems()));
 
-		emptyPlaylistLabel.managedProperty()
-				.bind(emptyPlaylistLabel.visibleProperty());
+		emptyPlaylistLabel.managedProperty().bind(emptyPlaylistLabel.visibleProperty());
 
-		emptyTopPlaylistLabel.visibleProperty()
-				.bind(Bindings.isEmpty(mostPlayedListView.getItems()));
+		emptyTopPlaylistLabel.visibleProperty().bind(Bindings.isEmpty(mostPlayedListView.getItems()));
 
-		emptyTopPlaylistLabel.managedProperty()
-				.bind(emptyTopPlaylistLabel.visibleProperty());
+		emptyTopPlaylistLabel.managedProperty().bind(emptyTopPlaylistLabel.visibleProperty());
 	}
 
 	/**
@@ -471,61 +437,31 @@ public class HomeController implements Initializable {
 		durationLabel.getStyleClass().add("row-meta");
 		durationLabel.setPrefWidth(80);
 
-		Label playCountLabel = new Label(
-				item.showPlayCount
-						? String.valueOf(playlist.getPlayCount())
-						: "");
+		Label playCountLabel = new Label(item.showPlayCount ? String.valueOf(playlist.getPlayCount()) : "");
 
 		playCountLabel.getStyleClass().add("row-meta");
 		playCountLabel.setPrefWidth(90);
 
-		Button playButton = createButton(
-				"▶",
-				"Riproduci playlist",
-				() -> playPlaylist(playlist));
+		Button playButton = createButton("▶", "Riproduci playlist", () -> playPlaylist(playlist));
 
-		Button enqueueButton = createButton(
-				"+",
-				"Aggiungi playlist alla coda",
-				() -> enqueuePlaylist(playlist));
+		Button enqueueButton = createButton("+", "Aggiungi playlist alla coda", () -> enqueuePlaylist(playlist));
 
 		HBox row;
 
 		if (!readOnly) {
-			Button renameButton = createButton(
-					"✎",
-					"Rinomina playlist",
-					() -> openPlaylistForm(playlist));
+			Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
 
-			Button deleteButton = createButton(
-					"x",
-					"Elimina playlist",
-					() -> deletePlaylist(playlist));
+			Button deleteButton = createButton("x", "Elimina playlist", () -> deletePlaylist(playlist));
 
-			row = new HBox(
-					8,
-					nameLabel,
-					songsLabel,
-					durationLabel,
-					playCountLabel,
-					playButton,
-					enqueueButton,
-					renameButton,
-					deleteButton);
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
+					renameButton, deleteButton);
 		} else {
 			Region actionPlaceholder = new Region();
 			actionPlaceholder.setMinWidth(72);
 			actionPlaceholder.setPrefWidth(72);
 			actionPlaceholder.setMaxWidth(72);
 
-			row = new HBox(
-					8,
-					nameLabel,
-					songsLabel,
-					durationLabel,
-					playCountLabel,
-					playButton,
-					enqueueButton,
+			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
 					actionPlaceholder);
 		}
 
@@ -547,10 +483,7 @@ public class HomeController implements Initializable {
 	 *            operazione eseguita alla pressione del pulsante
 	 * @return pulsante configurato
 	 */
-	private Button createButton(
-			String text,
-			String tooltip,
-			Runnable action) {
+	private Button createButton(String text, String tooltip, Runnable action) {
 
 		Button button = new Button(text);
 		button.getStyleClass().add("row-action");
@@ -577,14 +510,9 @@ public class HomeController implements Initializable {
 	 * @return durata espressa nel formato {@code mm:ss}
 	 */
 	private String formatDuration(Playlist playlist) {
-		int totalSeconds = playlist.getSongs().stream()
-				.mapToInt(Song::getDuration)
-				.sum();
+		int totalSeconds = playlist.getSongs().stream().mapToInt(Song::getDuration).sum();
 
-		return String.format(
-				"%d:%02d",
-				totalSeconds / 60,
-				totalSeconds % 60);
+		return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
 	}
 
 	/**
@@ -610,10 +538,7 @@ public class HomeController implements Initializable {
 		 * @param showPlayCount
 		 *            {@code true} se deve essere mostrato il play count
 		 */
-		PlaylistItem(
-				Playlist playlist,
-				boolean readOnly,
-				boolean showPlayCount) {
+		PlaylistItem(Playlist playlist, boolean readOnly, boolean showPlayCount) {
 
 			this.playlist = playlist;
 			this.readOnly = readOnly;

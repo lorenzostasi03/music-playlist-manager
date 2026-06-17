@@ -41,19 +41,27 @@ import java.util.stream.Collectors;
  */
 public class CatalogController {
 
-    @FXML private Button undoCommandButton;
-    @FXML private TextField searchField;
-	@FXML private ComboBox<String> genreFilter;
-	@FXML private ComboBox<String> authorFilter;
-	@FXML private ComboBox<String> yearFilter;
-	@FXML private ComboBox<String> tagFilter;
-	@FXML private Button addTrackButton;
-	@FXML private ScrollPane scrollPane;
+	@FXML
+	private Button undoCommandButton;
+	@FXML
+	private TextField searchField;
+	@FXML
+	private ComboBox<String> genreFilter;
+	@FXML
+	private ComboBox<String> authorFilter;
+	@FXML
+	private ComboBox<String> yearFilter;
+	@FXML
+	private ComboBox<String> tagFilter;
+	@FXML
+	private Button addTrackButton;
+	@FXML
+	private ScrollPane scrollPane;
 
 	private final VBox catalogRows = new VBox(6);
 
 	private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private final String ALL = "TUTTI";
 	private boolean updatingFilters;
@@ -75,12 +83,12 @@ public class CatalogController {
 		yearFilter.setOnAction(event -> refreshCatalogIfReady());
 		tagFilter.setOnAction(event -> refreshCatalogIfReady());
 
-        initUndoButton();
+		initUndoButton();
 
 		refreshCatalog();
 	}
 
-    /**
+	/**
 	 * Apre la schermata del form per l'inserimento di una nuova traccia nel
 	 * catalogo.
 	 */
@@ -107,17 +115,18 @@ public class CatalogController {
 		tagFilter.setValue(ALL);
 	}
 
-    /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+	/**
+	 * Inizializza il pulsante per annullare l'ultima operazione effettuata. Il
+	 * pulsante è visibile e cliccabile solo se sono presenti operazioni da
+	 * annullare.
+	 */
+	private void initUndoButton() {
+		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
 
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
+		undoCommandButton.visibleProperty().bind(canUndo);
+		undoCommandButton.managedProperty().bind(canUndo);
+		undoCommandButton.disableProperty().bind(canUndo.not());
+	}
 
 	/**
 	 * Ricarica e ridisegna la lista delle tracce a schermo. Aggiorna anche i menu a
@@ -147,9 +156,9 @@ public class CatalogController {
 	}
 
 	/**
-	 * Crea una riga per rappresentare visivamente una singola traccia nel
-	 * catalogo, popolandola con i metadati della canzone e i pulsanti di
-	 * riproduzione, modifica ed eliminazione.
+	 * Crea una riga per rappresentare visivamente una singola traccia nel catalogo,
+	 * popolandola con i metadati della canzone e i pulsanti di riproduzione,
+	 * modifica ed eliminazione.
 	 *
 	 * @param song
 	 *            la traccia musicale da visualizzare nella riga
@@ -252,7 +261,7 @@ public class CatalogController {
 
 		try {
 			Command cmd = new RemoveSongFromCatalogCommand(appContext.getMusicLibrary(), appContext.getPlayer(), song);
-            executor.execute(cmd);
+			executor.execute(cmd);
 			refreshCatalog();
 			AlertManager.showInfo("Traccia eliminata correttamente.");
 		} catch (PersistenceException | IllegalArgumentException e) {
@@ -344,8 +353,8 @@ public class CatalogController {
 	}
 
 	private void enqueueSong(Song song) {
-        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new SongPlayable(song));
-        executor.execute(cmd);
+		Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new SongPlayable(song));
+		executor.execute(cmd);
 		AlertManager.showInfo("Traccia aggiunta alla coda.");
 	}
 
@@ -404,10 +413,10 @@ public class CatalogController {
 		return song.getTags().stream().map(Tag::getLabel).collect(Collectors.joining(", "));
 	}
 
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
-        refreshCatalog();
-    }
+	@FXML
+	public void onUndoCommand() {
+		executor.undo();
+		AlertManager.showInfo("L'operazione è stata annullata.");
+		refreshCatalog();
+	}
 }

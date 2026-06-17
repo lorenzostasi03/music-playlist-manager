@@ -38,7 +38,7 @@ public class PlaylistFormController {
 	private Runnable onSave;
 
 	private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
@@ -99,8 +99,8 @@ public class PlaylistFormController {
 			}
 
 			if (playlistToEdit == null) {
-                Command cmd = new AddPlaylistCommand(appContext.getMusicLibrary(), new Playlist(name));
-                executor.execute(cmd);
+				Command cmd = new AddPlaylistCommand(appContext.getMusicLibrary(), new Playlist(name));
+				executor.execute(cmd);
 				AlertManager.showInfo("Playlist creata correttamente.");
 			} else {
 				appContext.getMusicLibrary().renamePlaylist(playlistToEdit, name);

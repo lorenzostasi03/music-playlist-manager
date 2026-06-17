@@ -30,7 +30,7 @@ public class PlaylistPlayable extends Playable {
 		}
 
 		this.playlist = playlist;
-        this.id = "playlist-" + playlist.getName();
+		this.id = "playlist-" + playlist.getName();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.iteratorStrategy = new SequentialIteratorStrategy();
@@ -167,25 +167,30 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
-    public String getId() { return id; }
+	public String getId() {
+		return id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!(o instanceof PlaylistPlayable)) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof PlaylistPlayable))
+			return false;
 
-        PlaylistPlayable p = (PlaylistPlayable) o;
-        return this.id.equals(p.id);
-    }
+		PlaylistPlayable p = (PlaylistPlayable) o;
+		return this.id.equals(p.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-    @Override
-    public String toString() {
-        return id + " " + playlist.toString();
-    }
+	@Override
+	public String toString() {
+		return id + " " + playlist.toString();
+	}
 }

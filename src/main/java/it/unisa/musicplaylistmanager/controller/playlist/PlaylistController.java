@@ -37,30 +37,49 @@ import java.util.stream.Collectors;
  * playlist.
  */
 public class PlaylistController {
-    @FXML private Label playlistNameLabel;
-	@FXML private Label trackCountLabel;
+	@FXML
+	private Label playlistNameLabel;
+	@FXML
+	private Label trackCountLabel;
 
-	@FXML private Button editNameButton;
-	@FXML private Button deletePlaylistButton;
-    @FXML private Button addTrackButton;
-    @FXML private Button removeTrackButton;
-    @FXML private Button undoCommandButton;
+	@FXML
+	private Button editNameButton;
+	@FXML
+	private Button deletePlaylistButton;
+	@FXML
+	private Button addTrackButton;
+	@FXML
+	private Button removeTrackButton;
+	@FXML
+	private Button undoCommandButton;
 
-	@FXML private TextField searchField;
+	@FXML
+	private TextField searchField;
 
-	@FXML private ComboBox<String> sortComboBox;
+	@FXML
+	private Button sortButton;
+	@FXML
+	private ComboBox<String> sortComboBox;
 
-	@FXML private TableView<Song> tracksTable;
-	@FXML private TableColumn<Song, Integer> indexColumn;
-	@FXML private TableColumn<Song, String> titleColumn;
-	@FXML private TableColumn<Song, String> authorColumn;
-	@FXML private TableColumn<Song, String> durationColumn;
-	@FXML private TableColumn<Song, String> genreColumn;
-	@FXML private TableColumn<Song, Integer> yearColumn;
-	@FXML private TableColumn<Song, String> tagsColumn;
+	@FXML
+	private TableView<Song> tracksTable;
+	@FXML
+	private TableColumn<Song, Integer> indexColumn;
+	@FXML
+	private TableColumn<Song, String> titleColumn;
+	@FXML
+	private TableColumn<Song, String> authorColumn;
+	@FXML
+	private TableColumn<Song, String> durationColumn;
+	@FXML
+	private TableColumn<Song, String> genreColumn;
+	@FXML
+	private TableColumn<Song, Integer> yearColumn;
+	@FXML
+	private TableColumn<Song, String> tagsColumn;
 
-    private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private Playlist playlist;
 	private boolean readOnly;
@@ -78,7 +97,7 @@ public class PlaylistController {
 		configureTable();
 
 		initButtons(readOnly);
-        initUndoButton();
+		initUndoButton();
 		initSort();
 
 		tracksTable.getSelectionModel().selectedItemProperty()
@@ -89,26 +108,26 @@ public class PlaylistController {
 
 	@FXML
 	private void onPlay() {
-        if (playlist == null || playlist.isEmpty()) {
-            AlertManager.showError("La playlist è vuota.");
-            return;
-        }
+		if (playlist == null || playlist.isEmpty()) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
 
 		appContext.playPlayable(new PlaylistPlayable(playlist));
 		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
-    @FXML
-    private void onEnqueue() {
-        if (playlist == null || playlist.isEmpty()) {
-            AlertManager.showError("La playlist è vuota.");
-            return;
-        }
+	@FXML
+	private void onEnqueue() {
+		if (playlist == null || playlist.isEmpty()) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
 
-        Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new  PlaylistPlayable(playlist));
-        executor.execute(cmd);
-        AlertManager.showInfo("Playlist aggiunta alla coda.");
-    }
+		Command cmd = new AddPlayableToQueueCommand(appContext.getPlayer(), new PlaylistPlayable(playlist));
+		executor.execute(cmd);
+		AlertManager.showInfo("Playlist aggiunta alla coda.");
+	}
 
 	/**
 	 * Apre la finestra modale per modificare il nome della playlist corrente.
@@ -139,8 +158,8 @@ public class PlaylistController {
 		}
 
 		try {
-            Command cmd = new RemovePlaylistCommand(appContext.getMusicLibrary(), appContext.getPlayer(), playlist);
-            executor.execute(cmd);
+			Command cmd = new RemovePlaylistCommand(appContext.getMusicLibrary(), appContext.getPlayer(), playlist);
+			executor.execute(cmd);
 			appContext.setSelectedPlaylist(null);
 			ViewSwitcher.switchTo("HomeView.fxml");
 			AlertManager.showInfo("Playlist eliminata correttamente.");
@@ -154,12 +173,17 @@ public class PlaylistController {
 		refreshPlaylist();
 	}
 
+	/**
+	 * * Ordina le tracce della playlist secondo il criterio selezionato. * *
+	 * <p>
+	 * * La selezione del criterio nel menu non applica immediatamente *
+	 * l'ordinamento, che viene eseguito solamente alla pressione del pulsante.
+	 */
 	@FXML
-	private void onSortChanged() {
+	private void onSort() {
 		if (playlist == null || sortComboBox.getValue() == null) {
 			return;
 		}
-
 		switch (sortComboBox.getValue()) {
 			case "Titolo" -> playlist.sortSongsByTitle();
 			case "Autore" -> playlist.sortSongsByAuthor();
@@ -167,7 +191,6 @@ public class PlaylistController {
 				return;
 			}
 		}
-
 		refreshPlaylist();
 	}
 
@@ -199,8 +222,8 @@ public class PlaylistController {
 		}
 
 		try {
-            Command cmd = new RemoveSongFromPlaylistCommand(appContext.getMusicLibrary(), playlist, selectedSong);
-            executor.execute(cmd);
+			Command cmd = new RemoveSongFromPlaylistCommand(appContext.getMusicLibrary(), playlist, selectedSong);
+			executor.execute(cmd);
 			refreshPlaylist();
 			AlertManager.showInfo("Traccia rimossa dalla playlist.");
 		} catch (IllegalArgumentException | PersistenceException e) {
@@ -224,17 +247,18 @@ public class PlaylistController {
 		removeTrackButton.setVisible(showButton);
 	}
 
-    /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+	/**
+	 * Inizializza il pulsante per annullare l'ultima operazione effettuata. Il
+	 * pulsante è visibile e cliccabile solo se sono presenti operazioni da
+	 * annullare.
+	 */
+	private void initUndoButton() {
+		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
 
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
+		undoCommandButton.visibleProperty().bind(canUndo);
+		undoCommandButton.managedProperty().bind(canUndo);
+		undoCommandButton.disableProperty().bind(canUndo.not());
+	}
 
 	/**
 	 * Inizializza i criteri disponibili per l'ordinamento automatico della
@@ -242,14 +266,15 @@ public class PlaylistController {
 	 */
 	private void initSort() {
 		sortComboBox.getItems().setAll("Titolo", "Autore");
+		sortComboBox.setValue("Titolo");
 		updateSortState();
 	}
 
-	/**
-	 * Aggiorna lo stato del menu di ordinamento in base alla playlist corrente.
-	 */
+	/** * Aggiorna lo stato dei controlli di ordinamento. */
 	private void updateSortState() {
-		sortComboBox.setDisable(playlist == null || playlist.isEmpty() || appContext.isSelectedPlaylistReadOnly());
+		boolean disabled = playlist == null || playlist.isEmpty() || readOnly;
+		sortComboBox.setDisable(disabled);
+		sortButton.setDisable(disabled);
 	}
 
 	/**
@@ -322,9 +347,9 @@ public class PlaylistController {
 	}
 
 	/**
-	 * Ricarica i dati della playlist selezionata e aggiorna l'interfaccia.
-	 * Aggiorna le etichette descrittive, popola la tabella e gestisce la
-	 * visualizzazione del pannello di avviso se la playlist risulta vuota.
+	 * Ricarica i dati della playlist selezionata e aggiorna l'interfaccia. Aggiorna
+	 * le etichette descrittive, popola la tabella e gestisce la visualizzazione del
+	 * pannello di avviso se la playlist risulta vuota.
 	 */
 	private void refreshPlaylist() {
 		if (playlist == null) {
@@ -418,7 +443,6 @@ public class PlaylistController {
 
 		try {
 			appContext.getMusicLibrary().moveSongInPlaylist(draggedSong, playlist, targetPosition);
-			sortComboBox.setValue(null);
 			refreshPlaylist();
 			tracksTable.getSelectionModel().select(draggedSong);
 			return true;
@@ -477,13 +501,13 @@ public class PlaylistController {
 	}
 
 	private String formatTag(Tag tag) {
-        return tag != null ? tag.getLabel() : "";
-    }
+		return tag != null ? tag.getLabel() : "";
+	}
 
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
-        refreshPlaylist();
-    }
+	@FXML
+	public void onUndoCommand() {
+		executor.undo();
+		AlertManager.showInfo("L'operazione è stata annullata.");
+		refreshPlaylist();
+	}
 }

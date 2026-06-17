@@ -67,34 +67,37 @@ public class Player implements EventListener {
 		notifyQueueChanged();
 	}
 
-    /**
-     * Rimuove l'ultimo Playable aggiunto alla coda.
-     */
-    public void removeLast() {
-        queue.removeLast();
-        notifyQueueChanged();
-    }
+	/**
+	 * Rimuove l'ultimo Playable aggiunto alla coda.
+	 */
+	public void removeLast() {
+		queue.removeLast();
+		notifyQueueChanged();
+	}
 
-    /**
-     * Rimuove tutte le occorrenze del Playable specificato dalla coda di riproduzione.
-     *
-     * @param playable
-     *              Playable da rimuovere dalla coda
-     * @throws IllegalArgumentException
-     *               se il Playable è {@code null}
-     */
-    public void removeFromQueue(Playable playable) {
-        if (playable == null) throw new IllegalArgumentException("Playable non può essere null.");
+	/**
+	 * Rimuove tutte le occorrenze del Playable specificato dalla coda di
+	 * riproduzione.
+	 *
+	 * @param playable
+	 *            Playable da rimuovere dalla coda
+	 * @throws IllegalArgumentException
+	 *             se il Playable è {@code null}
+	 */
+	public void removeFromQueue(Playable playable) {
+		if (playable == null)
+			throw new IllegalArgumentException("Playable non può essere null.");
 
-        queue.remove(playable);
-        notifyQueueChanged();
-    }
+		queue.remove(playable);
+		notifyQueueChanged();
+	}
 
 	/**
 	 * Svuota la coda di riproduzione.
 	 */
 	public void clearQueue() {
-        if  (queue.isEmpty()) return;
+		if (queue.isEmpty())
+			return;
 
 		queue.clear();
 		notifyQueueChanged();

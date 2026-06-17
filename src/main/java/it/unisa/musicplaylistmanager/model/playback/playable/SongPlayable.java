@@ -37,7 +37,7 @@ public class SongPlayable extends Playable {
 		}
 
 		this.song = song;
-        this.id = "song-" + song.getId();
+		this.id = "song-" + song.getId();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
@@ -186,25 +186,30 @@ public class SongPlayable extends Playable {
 		}
 	}
 
-    public String getId() { return id; }
+	public String getId() {
+		return id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!  (o instanceof SongPlayable)) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof SongPlayable))
+			return false;
 
-        SongPlayable s = (SongPlayable) o;
-        return this.id.equals(s.id);
-    }
+		SongPlayable s = (SongPlayable) o;
+		return this.id.equals(s.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-    @Override
-    public String toString() {
-        return id + " " + song.toString();
-    }
+	@Override
+	public String toString() {
+		return id + " " + song.toString();
+	}
 }
