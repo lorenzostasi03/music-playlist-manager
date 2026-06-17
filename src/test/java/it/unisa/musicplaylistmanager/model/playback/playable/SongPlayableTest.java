@@ -1,4 +1,4 @@
-package it.unisa.musicplaylistmanager.model.playback;
+package it.unisa.musicplaylistmanager.model.playback.playable;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,7 +9,6 @@ import it.unisa.musicplaylistmanager.model.entity.Song;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import it.unisa.musicplaylistmanager.model.playback.events.EventType;
-import it.unisa.musicplaylistmanager.model.playback.playable.SongPlayable;
 import org.junit.jupiter.api.Test;
 
 class SongPlayableTest {
