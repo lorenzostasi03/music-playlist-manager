@@ -19,7 +19,7 @@ import javafx.stage.Window;
 import java.io.File;
 
 /**
- * Controller per la finestra modale dedicata alla creazione di una nuova
+ * Controller per la finestra dedicata alla creazione di una nuova
  * traccia o alla modifica di una traccia esistente nel catalogo. Gestisce la
  * validazione dei campi di input e l'aggiornamento dei dati.
  */
@@ -73,7 +73,7 @@ public class SongFormController {
 	private final AppContext appContext = AppContext.getInstance();
 
 	/**
-	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
+	 * Inizializza il form.
 	 */
 	@FXML
 	private void initialize() {

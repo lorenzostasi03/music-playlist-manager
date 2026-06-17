@@ -365,7 +365,7 @@ public class HomeController implements Initializable {
 
 		if (!readOnly) {
 			Button renameButton = createButton("✎", "Rinomina playlist", () -> openPlaylistForm(playlist));
-			Button deleteButton = createButton("×", "Elimina playlist", () -> deletePlaylist(playlist));
+			Button deleteButton = createButton("x", "Elimina playlist", () -> deletePlaylist(playlist));
 
 			row = new HBox(8, nameLabel, songsLabel, durationLabel, playCountLabel, playButton, enqueueButton,
 					renameButton, deleteButton);

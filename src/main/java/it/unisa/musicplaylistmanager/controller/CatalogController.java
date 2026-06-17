@@ -135,7 +135,7 @@ public class CatalogController {
 	}
 
 	/**
-	 * Crea una riga grafica per rappresentare visivamente una singola traccia nel
+	 * Crea una riga per rappresentare visivamente una singola traccia nel
 	 * catalogo, popolandola con i metadati della canzone e i pulsanti di
 	 * riproduzione, modifica ed eliminazione.
 	 *
@@ -151,7 +151,7 @@ public class CatalogController {
 
 		Button editButton = createButton("✎", "Modifica traccia", () -> openSongForm(song));
 
-		Button deleteButton = createButton("×", "Elimina traccia", () -> deleteSong(song));
+		Button deleteButton = createButton("x", "Elimina traccia", () -> deleteSong(song));
 
 		Label titleLabel = new Label(song.getTitle());
 		titleLabel.getStyleClass().add("row-title");

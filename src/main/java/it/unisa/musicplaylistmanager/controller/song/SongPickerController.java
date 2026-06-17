@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 /**
- * Controller per la finestra modale che permette di visualizzare i brani del
+ * Controller per la finestra che permette di visualizzare i brani del
  * catalogo non ancora presenti in una specifica playlist, consentendone la
  * selezione multipla per l'aggiunta in blocco.
  */

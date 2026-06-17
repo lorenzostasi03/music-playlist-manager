@@ -11,8 +11,7 @@ import javafx.scene.control.TextField;
 import java.util.Set;
 
 /**
- * Controller per la finestra modale dedicata alla creazione di una nuova
- * playlist o alla rinomina di una playlist esistente.
+ * Controller per la finestra per creare o rinominare una playlist.
  */
 public class PlaylistFormController {
 
@@ -39,7 +38,7 @@ public class PlaylistFormController {
 
 	private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
-	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
+	 * Inizializza il form.
 	 */
 	@FXML
 	private void initialize() {

@@ -9,8 +9,7 @@ import javafx.stage.Stage;
 
 /**
  * Classe principale dell'applicazione Music Playlist Manager. Gestisce l'avvio
- * dell'interfaccia grafica e mantiene i dati di sessione globali come la
- * libreria musicale e la playlist correntemente selezionata.
+ * dell'interfaccia grafica e mantiene i dati di sessione globali.
  */
 public class App extends Application {
 	/**
