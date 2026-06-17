@@ -16,7 +16,6 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,7 +26,7 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-    @FXML public Button undoCommandButton;
+    @FXML private Button undoCommandButton;
     @FXML private Label trackTitleLabel;
 	@FXML private Label trackArtistLabel;
 	@FXML private Slider progressSlider;
