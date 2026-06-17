@@ -253,12 +253,10 @@ public class CatalogController {
 	 *            un inserimento
 	 */
 	private void openSongForm(Song song) {
-        String title = (song == null)
-            ? "Nuova traccia"
-            : "Modifica traccia";
+		String title = (song == null) ? "Nuova traccia" : "Modifica traccia";
 
-		DialogUtil.open("SongFormView.fxml", title,
-				addTrackButton.getScene().getWindow(), (SongFormController controller) -> {
+		DialogUtil.open("SongFormView.fxml", title, addTrackButton.getScene().getWindow(),
+				(SongFormController controller) -> {
 					controller.setSongToEdit(song);
 					controller.setOnSave(this::refreshCatalog);
 				});

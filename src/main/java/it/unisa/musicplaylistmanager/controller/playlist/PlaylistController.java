@@ -107,25 +107,25 @@ public class PlaylistController {
 
 	@FXML
 	private void onPlay() {
-        if (playlist == null || playlist.size() == 0) {
-            AlertManager.showError("La playlist è vuota.");
-            return;
-        }
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
 
-        appContext.playPlayable(new PlaylistPlayable(playlist));
-        ViewSwitcher.switchTo("PlaybackView.fxml");
+		appContext.playPlayable(new PlaylistPlayable(playlist));
+		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
-    @FXML
-    private void onEnqueue() {
-        if (playlist == null || playlist.size() == 0) {
-            AlertManager.showError("La playlist è vuota.");
-            return;
-        }
+	@FXML
+	private void onEnqueue() {
+		if (playlist == null || playlist.size() == 0) {
+			AlertManager.showError("La playlist è vuota.");
+			return;
+		}
 
-        appContext.enqueuePlayable(new PlaylistPlayable(playlist));
-        AlertManager.showInfo("Playlist aggiunta alla coda.");
-    }
+		appContext.enqueuePlayable(new PlaylistPlayable(playlist));
+		AlertManager.showInfo("Playlist aggiunta alla coda.");
+	}
 
 	/**
 	 * Apre la finestra modale per modificare il nome della playlist corrente.

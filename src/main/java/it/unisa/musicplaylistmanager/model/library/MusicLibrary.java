@@ -12,6 +12,7 @@ import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -360,5 +361,34 @@ public class MusicLibrary {
 
 		return playlistCatalog.getAllPlaylists().stream().filter(p -> p.getPlayCount() > 0)
 				.sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed()).limit(n).toList();
+	}
+
+	public Playlist createAutomaticPlaylist(String name, Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+
+		if (genres == null || years == null || tags == null) {
+			throw new IllegalArgumentException("I criteri non possono essere null.");
+		}
+
+		if (genres.isEmpty() && years.isEmpty() && tags.isEmpty()) {
+			throw new IllegalArgumentException("Selezionare almeno un criterio.");
+		}
+
+		List<Song> matchingSongs = songCatalog.findSongsMatchingAnyCriteria(genres, years, tags);
+
+		if (matchingSongs.isEmpty()) {
+			throw new IllegalArgumentException("Nessuna traccia soddisfa i criteri selezionati.");
+		}
+
+		Playlist playlist = new Playlist(name);
+
+		// Prima registra la playlist nel catalogo e nel database.
+		addPlaylist(playlist);
+
+		// Poi aggiunge le canzoni
+		for (Song song : matchingSongs) {
+			addSongToPlaylist(song, playlist);
+		}
+
+		return playlist;
 	}
 }

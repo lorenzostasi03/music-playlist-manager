@@ -101,8 +101,7 @@ public class PlaylistCatalog {
 		}
 
 		return playlists.values().stream()
-				.filter(playlist -> playlist.getName().toLowerCase().contains(normalizedQuery))
-				.toList();
+				.filter(playlist -> playlist.getName().toLowerCase().contains(normalizedQuery)).toList();
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class PlaylistFormController {
 
 	private final AppContext appContext = AppContext.getInstance();
 
-    private final Set<String> defaultPlaylistNames = Set.of("Top 10");
+	private final Set<String> defaultPlaylistNames = Set.of("Top 10");
 	/**
 	 * Inizializza il form nascondendo preventivamente tutte le etichette di errore.
 	 */
@@ -87,14 +87,13 @@ public class PlaylistFormController {
 		try {
 			String name = nameField.getText();
 
-            boolean invalidName = defaultPlaylistNames.stream()
-                .map(String::toLowerCase)
-                .anyMatch(s -> s.equals(name.toLowerCase()));
+			boolean invalidName = defaultPlaylistNames.stream().map(String::toLowerCase)
+					.anyMatch(s -> s.equals(name.toLowerCase()));
 
-            if (invalidName) {
-                AlertManager.showError("Non è possibile creare una playlist con questo nome!");
-                return;
-            }
+			if (invalidName) {
+				AlertManager.showError("Non è possibile creare una playlist con questo nome!");
+				return;
+			}
 
 			if (playlistToEdit == null) {
 				appContext.getMusicLibrary().addPlaylist(new Playlist(name));
@@ -109,7 +108,7 @@ public class PlaylistFormController {
 			}
 			closeWindow();
 		} catch (IllegalArgumentException e) {
-            AlertManager.showError(e.getMessage());
+			AlertManager.showError(e.getMessage());
 		}
 	}
 

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * Rappresenta la coda degli oggetti riproducibili in attesa.
+ * Rappresenta la coda dei playable in attesa di essere riprodotti.
  */
 public class PlaybackQueue {
 

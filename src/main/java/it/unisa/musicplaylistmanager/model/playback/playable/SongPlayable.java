@@ -150,7 +150,6 @@ public class SongPlayable extends Playable {
 		}
 
 		if (mode == PlaybackMode.SHUFFLE) {
-			this.playbackMode = PlaybackMode.SEQUENTIAL;
 			return;
 		}
 

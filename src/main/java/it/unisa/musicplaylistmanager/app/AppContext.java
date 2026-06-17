@@ -29,7 +29,7 @@ public class AppContext {
 	private final Player player;
 
 	private Playlist selectedPlaylist;
-    private boolean selectedPlaylistReadOnly;
+	private boolean selectedPlaylistReadOnly;
 
 	private AppContext() {
 		musicLibrary = new MusicLibrary(new SQLiteSongDAO(DatabaseConfig.DB_URL),
@@ -63,8 +63,12 @@ public class AppContext {
 		selectedPlaylist = playlist;
 	}
 
-    public boolean isSelectedPlaylistReadOnly() { return selectedPlaylistReadOnly; }
-    public void setSelectedPlaylistReadOnly(boolean readOnly) { this.selectedPlaylistReadOnly = readOnly; }
+	public boolean isSelectedPlaylistReadOnly() {
+		return selectedPlaylistReadOnly;
+	}
+	public void setSelectedPlaylistReadOnly(boolean readOnly) {
+		this.selectedPlaylistReadOnly = readOnly;
+	}
 
 	public Playable getCurrentPlayable() {
 		return player.getCurrentPlayable();

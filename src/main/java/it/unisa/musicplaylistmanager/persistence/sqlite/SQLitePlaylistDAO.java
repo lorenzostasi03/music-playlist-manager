@@ -154,7 +154,7 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 				throw e;
 			}
 		} catch (SQLException | NullPointerException e) {
-			throw new PersistenceException("Si Ã¨ verificato un errore durante il riordinamento della playlist!");
+			throw new PersistenceException("Si è verificato un errore durante il riordinamento della playlist!");
 		}
 	}
 

@@ -25,8 +25,8 @@ module it.unisa.musicplaylistmanager {
 
 	exports it.unisa.musicplaylistmanager.exceptions;
 
-    exports it.unisa.musicplaylistmanager.model.playback.playable;
-    exports it.unisa.musicplaylistmanager.model.playback.mode;
-    exports it.unisa.musicplaylistmanager.model.playback.events;
-    exports it.unisa.musicplaylistmanager.model.playback.player;
+	exports it.unisa.musicplaylistmanager.model.playback.playable;
+	exports it.unisa.musicplaylistmanager.model.playback.mode;
+	exports it.unisa.musicplaylistmanager.model.playback.events;
+	exports it.unisa.musicplaylistmanager.model.playback.player;
 }
