@@ -53,7 +53,7 @@ class SQLiteSongDAOTest {
 
 	@Test
 	void addNullSong() {
-		assertThrows(PersistenceException.class, () -> songDAO.save(null));
+		assertThrows(NullPointerException.class, () -> songDAO.save(null));
 		assertTrue(songDAO.getSongs().isEmpty());
 	}
 
@@ -153,8 +153,8 @@ class SQLiteSongDAOTest {
 
 	@Test
 	void updateNullSong() {
-		assertThrows(PersistenceException.class, () -> songDAO.update(null));
-		assertThrows(PersistenceException.class, () -> songDAO.updatePlayCount(null, 4));
+		assertThrows(NullPointerException.class, () -> songDAO.update(null));
+		assertThrows(NullPointerException.class, () -> songDAO.updatePlayCount(null, 4));
 	}
 
 	@Test
@@ -179,7 +179,7 @@ class SQLiteSongDAOTest {
 
 	@Test
 	void deleteNullSong() {
-		assertThrows(PersistenceException.class, () -> songDAO.delete(null));
+		assertThrows(NullPointerException.class, () -> songDAO.delete(null));
 	}
 
 	@Test

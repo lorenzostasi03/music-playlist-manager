@@ -47,7 +47,7 @@ class SQLitePlaylistDAOTest {
 
 	@Test
 	void addNullPlaylist() {
-		assertThrows(PersistenceException.class, () -> playlistDAO.save(null));
+		assertThrows(NullPointerException.class, () -> playlistDAO.save(null));
 	}
 
 	@Test
@@ -83,13 +83,13 @@ class SQLitePlaylistDAOTest {
 
 	@Test
 	void updateNullPlaylist() {
-		assertThrows(PersistenceException.class, () -> playlistDAO.update(null));
-		assertThrows(PersistenceException.class, () -> playlistDAO.updatePlayCount(null, 2));
+		assertThrows(NullPointerException.class, () -> playlistDAO.update(null));
+		assertThrows(NullPointerException.class, () -> playlistDAO.updatePlayCount(null, 2));
 	}
 
 	@Test
 	void deleteNullPlaylist() {
-		assertThrows(PersistenceException.class, () -> playlistDAO.delete(null));
+		assertThrows(NullPointerException.class, () -> playlistDAO.delete(null));
 	}
 
 	@Test
@@ -130,7 +130,7 @@ class SQLitePlaylistDAOTest {
 
 		songDAO.save(song);
 
-		assertThrows(PersistenceException.class, () -> playlistDAO.addSong(null, song.getId()));
+		assertThrows(NullPointerException.class, () -> playlistDAO.addSong(null, song.getId()));
 	}
 
 	@Test
@@ -139,11 +139,11 @@ class SQLitePlaylistDAOTest {
 
 		playlistDAO.save(playlist);
 
-		assertThrows(PersistenceException.class, () -> playlistDAO.addSong(playlist.getId(), null));
+		assertThrows(NullPointerException.class, () -> playlistDAO.addSong(playlist.getId(), null));
 	}
 
 	@Test
 	void getSongIdsFromNullPlaylist() {
-		assertThrows(PersistenceException.class, () -> playlistDAO.getSongIds(null));
+		assertThrows(NullPointerException.class, () -> playlistDAO.getSongIds(null));
 	}
 }

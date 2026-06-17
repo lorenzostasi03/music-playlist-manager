@@ -26,6 +26,10 @@ public class SongCatalog {
 	 *
 	 * @param song
 	 *            traccia da aggiungere;
+     * @throws IllegalArgumentException
+     *             se la traccia è {@code null}
+     * @throws DuplicatedSongException
+     *              se il brano è già presente nel catalogo
 	 */
 	public void addSong(Song song) throws IllegalArgumentException, DuplicatedSongException {
 		if (song == null) {
@@ -42,6 +46,9 @@ public class SongCatalog {
 	 *
 	 * @param song
 	 *            traccia da rimuovere;
+     * @throws IllegalArgumentException
+     *             se la traccia è {@code null} o non è presente nel
+     *             catalogo
 	 */
 	public void removeSong(Song song) throws IllegalArgumentException {
 		if (song == null) {
@@ -60,6 +67,8 @@ public class SongCatalog {
 	 * @param query
 	 *            testo da cercare;
 	 * @return lista delle tracce
+     * @throws IllegalArgumentException
+     *          se la query di ricerca è vuota
 	 */
 	public List<Song> searchSong(String query) throws IllegalArgumentException {
 		if (query == null) {
@@ -158,6 +167,8 @@ public class SongCatalog {
 	 * @param tags
 	 *            tag selezionati
 	 * @return tracce che soddisfano almeno uno dei criteri
+     * @throws IllegalArgumentException
+     *            se i criteri per il filtraggio sono vuoti
 	 */
 	public List<Song> findSongsMatchingAnyCriteria(Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
 

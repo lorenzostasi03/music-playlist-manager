@@ -302,6 +302,7 @@ public class MusicLibrary {
 	public void removeSongFromPlaylist(Song song, Playlist playlist) {
 		playlist.removeSong(song);
 		playlistDAO.removeSong(playlist.getId(), song.getId());
+        playlistDAO.replaceSongs(playlist.getId(), playlist.getSongs().stream().map(Song::getId).toList());
 	}
 
 	/**

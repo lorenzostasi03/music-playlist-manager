@@ -26,6 +26,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -175,11 +176,12 @@ public class CatalogController {
 		Label genreLabel = createMetaLabel(song.getGenre().getLabel(), 55);
 		Label yearLabel = createMetaLabel(String.valueOf(song.getYear()), 40);
 		Label durationLabel = createMetaLabel(song.getDurationFormatted(), 60);
+        Label playCountLabel = createMetaLabel(String.valueOf(song.getPlayCount()), 90);
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, spacer, playButton,
+		HBox mainRow = new HBox(6, titleLabel, authorLabel, genreLabel, yearLabel, durationLabel, playCountLabel, spacer, playButton,
 				enqueueButton, editButton, deleteButton);
 
 		mainRow.setMaxWidth(Double.MAX_VALUE);
@@ -224,6 +226,7 @@ public class CatalogController {
 	 */
 	private Label createMetaLabel(String text, double width) {
 		Label label = new Label(text);
+        label.setTextAlignment(TextAlignment.CENTER);
 		label.getStyleClass().add("row-meta");
 		label.setMinWidth(width);
 		label.setPrefWidth(width);

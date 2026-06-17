@@ -41,7 +41,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 
 			stmt.executeUpdate();
 			saveTags(conn, song);
-		} catch (SQLException | NullPointerException e) {
+		} catch (SQLException e) {
+            System.err.println(e.getMessage());
 			throw new PersistenceException("Si è verificato un errore durante il salvataggio del brano!");
 		}
 	}
@@ -68,7 +69,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
                 loadTags(conn, song);
                 songs.add(song);
             }
-        } catch (SQLException | NullPointerException e) {
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
             throw new PersistenceException("Si è verificato un errore durante il caricamento dei brani!");
         }
 
@@ -96,7 +98,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			stmt.executeUpdate();
 			deleteTags(conn, song.getId());
 			saveTags(conn, song);
-		} catch (SQLException | NullPointerException e) {
+		} catch (SQLException e) {
+            System.err.println(e.getMessage());
 			throw new PersistenceException("Si è verificato un errore durante la modifica del brano!");
 		}
 	}
@@ -111,7 +114,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
             stmt.setString(1, songId.toString());
 
             stmt.executeUpdate();
-        } catch (SQLException | NullPointerException e) {
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
             throw new PersistenceException("Si è verificato un errore durante l'eliminazione del brano!");
         }
     }
@@ -128,7 +132,8 @@ public class SQLiteSongDAO extends SQLiteDAO implements SongDAO {
 			stmt.setString(2, songId.toString());
 			stmt.executeUpdate();
 
-		} catch (SQLException | NullPointerException e) {
+		} catch (SQLException e) {
+            System.err.println(e.getMessage());
 			throw new PersistenceException(
 					"Si è verificato un errore durante l'aggiornamento del play count del brano!");
 		}
