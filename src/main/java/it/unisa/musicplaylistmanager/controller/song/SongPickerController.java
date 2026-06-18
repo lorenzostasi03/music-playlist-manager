@@ -24,6 +24,8 @@ import java.util.List;
  * multipla per l'aggiunta in blocco.
  */
 public class SongPickerController {
+    @FXML
+    private TextField searchField;
 	@FXML
 	private TableView<SelectableSong> tracksTable;
 	@FXML
@@ -87,8 +89,7 @@ public class SongPickerController {
 	}
 
 	@FXML
-	private void onSearchChanged() {
-	}
+	private void onSearchChanged() { refreshSongs(); }
 
 	/**
 	 * Seleziona automaticamente tutte le tracce attualmente caricate nella tabella.
@@ -204,8 +205,12 @@ public class SongPickerController {
 		if (playlist == null)
 			return;
 
-		List<SelectableSong> available = appContext.getMusicLibrary().getAllSongs().stream()
-				.filter(song -> !playlist.contains(song)).map(SelectableSong::new).toList();
+        List<SelectableSong> available = appContext.getMusicLibrary()
+            .filterSongs(searchField.getText(), null, null, null, null)
+            .stream()
+            .filter(song -> !playlist.contains(song))
+            .map(SelectableSong::new)
+            .toList();
 
 		tracksTable.getItems().setAll(available);
 		updateSelectionState();

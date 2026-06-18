@@ -172,7 +172,7 @@ public class HomeController implements Initializable {
 	}
 
 	/**
-	 * Apre il form per la generazione automaautomatica di una playlist.
+	 * Apre il form per la generazione automatica di una playlist.
 	 */
 	@FXML
 	private void onAutoCreatePlaylist() {
