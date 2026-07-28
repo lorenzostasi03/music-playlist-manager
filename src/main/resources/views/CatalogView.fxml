@@ -40,7 +40,6 @@
             <HBox alignment="CENTER_LEFT">
                 <Button fx:id="addTrackButton" onAction="#onAddSong" prefWidth="170" styleClass="spotify-btn" text="+ Aggiungi traccia" wrapText="true" />
             <Region prefHeight="36.0" prefWidth="58.0" />
-            <Button fx:id="undoCommandButton" layoutX="10.0" layoutY="10.0" onAction="#onUndoCommand" prefWidth="170" styleClass="spotify-btn" text="Annulla operazione" wrapText="true" />
             </HBox>
         </VBox>
     </VBox>

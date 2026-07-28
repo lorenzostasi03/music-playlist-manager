@@ -26,7 +26,9 @@ public class RemovePlaylistCommand implements Command {
     @Override
     public void execute() {
         musicLibrary.removePlaylist(playlist);
-        player.removeFromQueue(new PlaylistPlayable(playlist));
+
+        if (!playlist.isEmpty())
+            player.removeFromQueue(new PlaylistPlayable(playlist));
     }
 
     @Override

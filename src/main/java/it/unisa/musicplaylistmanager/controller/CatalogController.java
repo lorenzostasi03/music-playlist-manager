@@ -38,9 +38,8 @@ import java.util.stream.Collectors;
  * base a vari criteri, e accedere alle funzioni di aggiunta, modifica,
  * eliminazione e riproduzione.
  */
-public class CatalogController {
+public class CatalogController implements Refreshable {
 
-    @FXML public Button undoCommandButton;
     @FXML private TextField searchField;
 	@FXML private ComboBox<String> genreFilter;
 	@FXML private ComboBox<String> authorFilter;
@@ -74,8 +73,6 @@ public class CatalogController {
 		yearFilter.setOnAction(event -> refreshCatalogIfReady());
 		tagFilter.setOnAction(event -> refreshCatalogIfReady());
 
-        initUndoButton();
-
 		refreshCatalog();
 	}
 
@@ -105,18 +102,6 @@ public class CatalogController {
 		tagFilter.getItems().addAll(Arrays.stream(Tag.values()).map(Tag::getLabel).toList());
 		tagFilter.setValue(ALL);
 	}
-
-    /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
 
 	/**
 	 * Ricarica e ridisegna la lista delle tracce a schermo. Aggiorna anche i menu a
@@ -403,10 +388,8 @@ public class CatalogController {
 		return song.getTags().stream().map(Tag::getLabel).collect(Collectors.joining(", "));
 	}
 
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
+    @Override
+    public void refresh() {
         refreshCatalog();
     }
 }

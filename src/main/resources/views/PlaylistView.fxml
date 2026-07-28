@@ -55,6 +55,5 @@
     <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-border-color: #282828; -fx-border-width: 1 0 0 0;">
         <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
         <Button fx:id="removeTrackButton" disable="true" onAction="#onRemoveTrack" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" styleClass="play-btn" text="Rimuovi selezionata" />
-      <Button fx:id="undoCommandButton" disable="true" layoutX="35.0" layoutY="26.0" onAction="#onUndoCommand" style="-fx-background-color: transparent; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;" styleClass="play-btn" text="Annulla operazione" />
     </HBox>
 </VBox>

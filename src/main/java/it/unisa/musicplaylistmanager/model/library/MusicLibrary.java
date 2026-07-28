@@ -282,8 +282,8 @@ public class MusicLibrary {
 			throw new IllegalArgumentException("La traccia '" + song.getTitle() + "' non è presente nel catalogo.");
 		}
 
-		playlist.addSong(song);
 		playlistDAO.addSong(playlist.getId(), song.getId());
+		playlist.addSong(song);
 	}
 
 	/**
@@ -299,8 +299,8 @@ public class MusicLibrary {
 	 *             se si verifica un errore durante la rimozione
 	 */
 	public void removeSongFromPlaylist(Song song, Playlist playlist) {
-		playlist.removeSong(song);
 		playlistDAO.removeSong(playlist.getId(), song.getId());
+		playlist.removeSong(song);
 	}
 
 	/**

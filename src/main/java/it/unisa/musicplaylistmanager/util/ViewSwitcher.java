@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.util;
 
+import it.unisa.musicplaylistmanager.controller.Refreshable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
@@ -16,6 +17,8 @@ import java.io.IOException;
 public final class ViewSwitcher {
 
 	private static BorderPane mainRoot;
+    private static Refreshable refreshable;
+    private static Object currentController;
 
 	private ViewSwitcher() {
 	}
@@ -52,10 +55,22 @@ public final class ViewSwitcher {
 			FXMLLoader loader = new FXMLLoader(ViewSwitcher.class.getResource(path));
 
 			Parent view = loader.load();
+
+            currentController = loader.getController();
+
 			mainRoot.setCenter(view);
 
 		} catch (IOException e) {
 			System.err.println("File non trovato: " + path);
 		}
 	}
+
+    public static void refreshCurrentView() {
+        if (currentController == null) return;
+
+        if (currentController instanceof Refreshable) {
+            refreshable = (Refreshable) currentController;
+            refreshable.refresh();
+        }
+    }
 }

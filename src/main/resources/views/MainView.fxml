@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<BorderPane fx:id="root" stylesheets="@style.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.MainController">
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #000000;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.MainController">
     <left>
         <VBox prefHeight="600.0" prefWidth="220.0" spacing="10.0" style="-fx-background-color: #121212; -fx-border-color: #282828; -fx-border-width: 0 1 0 0;" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="20.0" left="15.0" right="15.0" top="30.0" />
             </padding>
             <children>
-                <Label text="🎵 Playlist Manager" style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;">
+                <Label style="-fx-text-fill: #FFFFFF; -fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', sans-serif;" text="🎵 Playlist Manager">
                     <VBox.margin>
                         <Insets bottom="20.0" left="10.0" />
                     </VBox.margin>
@@ -19,6 +21,7 @@
                 <Button fx:id="homeButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onHome" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="🏠 Home" />
                 <Button fx:id="catalogButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onCatalog" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="🔍 Catalogo" />
                 <Button fx:id="playbackButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPlayback" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="▶ Riproduzione" />
+            <Button fx:id="undoCommandButton" alignment="BASELINE_LEFT" layoutX="25.0" layoutY="191.0" mnemonicParsing="false" onAction="#onUndoCommand" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="Annulla operazione" />
             </children>
         </VBox>
     </left>

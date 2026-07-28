@@ -114,19 +114,14 @@ public class SongPickerController {
 		List<Song> selectedSongs = tracksTable.getItems().stream().filter(SelectableSong::isSelected)
 				.map(SelectableSong::getSong).toList();
 
-		try {
-			addSongsToPlaylist(selectedSongs);
+        addSongsToPlaylist(selectedSongs);
 
-			if (onSave != null) {
-				onSave.run();
-			}
+        if (onSave != null) {
+            onSave.run();
+        }
 
-			AlertManager.showInfo("Tracce aggiunte alla playlist.");
-			closeWindow();
-
-		} catch (IllegalArgumentException e) {
-			AlertManager.showError(e.getMessage());
-		}
+        AlertManager.showInfo("Tracce aggiunte alla playlist.");
+        closeWindow();
 	}
 
 	/**

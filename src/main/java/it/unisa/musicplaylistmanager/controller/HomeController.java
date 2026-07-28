@@ -32,9 +32,8 @@ import java.util.ResourceBundle;
  * più ascoltati. Inoltre consente la creazione, modifica, eliminazione,
  * riproduzione e accodamento delle playlist.
  */
-public class HomeController implements Initializable {
+public class HomeController implements Initializable, Refreshable {
 
-    @FXML public Button undoCommandButton;
     @FXML private TextField searchBar;
     @FXML private Button newPlaylistBtn;
     @FXML private ComboBox<String> sortComboBox;
@@ -71,8 +70,6 @@ public class HomeController implements Initializable {
 
         initEmptyLabels();
         initSearch();
-
-        initUndoButton();
 
         updateViews();
     }
@@ -256,18 +253,6 @@ public class HomeController implements Initializable {
     }
 
     /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
-
-    /**
      * Aggiorna la sezione dedicata ai contenuti più riprodotti.
      *
      * Include la playlist dei {@value HomeController#TOP_SONGS} brani più ascoltati
@@ -445,10 +430,8 @@ public class HomeController implements Initializable {
         return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
 
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
+    @Override
+    public void refresh() {
         updateViews();
     }
 

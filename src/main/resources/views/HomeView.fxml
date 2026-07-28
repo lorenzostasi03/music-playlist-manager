@@ -39,7 +39,6 @@
             </MenuButton>
 
             <Button fx:id="newPlaylistBtn" minWidth="140.0" onAction="#onNewPlaylist" styleClass="spotify-btn" text="+ Nuova playlist" />
-         <Button fx:id="undoCommandButton" layoutX="534.0" layoutY="10.0" minWidth="-Infinity" onAction="#onUndoCommand" prefHeight="36.0" prefWidth="174.0" styleClass="spotify-btn" text="Annulla operazione" />
 
         </HBox>
     </VBox>

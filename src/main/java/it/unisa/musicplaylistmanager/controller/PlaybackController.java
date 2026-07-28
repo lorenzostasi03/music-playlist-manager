@@ -16,7 +16,6 @@ import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,7 +26,6 @@ import javafx.util.Duration;
 
 public class PlaybackController implements EventListener {
 
-    @FXML public Button undoCommandButton;
     @FXML private Label trackTitleLabel;
 	@FXML private Label trackArtistLabel;
 	@FXML private Slider progressSlider;
@@ -87,8 +85,6 @@ public class PlaybackController implements EventListener {
 				startProgressTimeline();
 			}
 		}
-
-        initUndoButton();
 
 		updatePlaybackModeButtons();
 		updateQueueView();
@@ -190,18 +186,6 @@ public class PlaybackController implements EventListener {
 		currentPlayable.setPlaybackMode(mode);
 		updatePlaybackModeButtons();
 	}
-
-    /**
-     * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-     * Il pulsante è visibile e cliccabile solo se sono presenti operazioni da annullare.
-     */
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
 
 	private void updatePlaybackModeButtons() {
 		if (currentPlayable == null) {
@@ -412,10 +396,4 @@ public class PlaybackController implements EventListener {
 	private void onLoop() {
 		setCurrentPlaybackMode(PlaybackMode.LOOP);
 	}
-
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
-        AlertManager.showInfo("L'operazione è stata annullata.");
-    }
 }

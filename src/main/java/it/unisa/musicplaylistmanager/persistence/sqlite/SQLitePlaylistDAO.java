@@ -108,7 +108,8 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 			stmt.executeUpdate();
 		} catch (SQLException | NullPointerException e) {
-			throw new PersistenceException("Si è verificato un errore durante l'aggiunta del brano alla playlist!");
+			//throw new PersistenceException("Si è verificato un errore durante l'aggiunta del brano alla playlist!");
+            throw new PersistenceException(e.getMessage());
 		}
 	}
 
