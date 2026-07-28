@@ -6,9 +6,17 @@ import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import it.unisa.musicplaylistmanager.model.playback.mode.*;
 import it.unisa.musicplaylistmanager.model.playback.player.AudioPlayer;
-
 import java.util.Objects;
 
+/**
+ * Adatta una playlist a un playable.
+ *
+ * <p>
+ * La classe riproduce i brani della playlist secondo una strategia
+ * configurabile e notifica il cambiamento del brano corrente e il completamento
+ * della riproduzione.
+ * </p>
+ */
 public class PlaylistPlayable extends Playable {
 
 	private final Playlist playlist;
@@ -20,6 +28,14 @@ public class PlaylistPlayable extends Playable {
 	private Song currentSong;
 	private boolean subscribed;
 
+	/**
+	 * Crea un playable associato alla playlist specificata.
+	 *
+	 * @param playlist
+	 *            playlist da riprodurre
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null} o vuota
+	 */
 	public PlaylistPlayable(Playlist playlist) {
 		if (playlist == null) {
 			throw new IllegalArgumentException("Playlist cannot be null.");
@@ -30,7 +46,7 @@ public class PlaylistPlayable extends Playable {
 		}
 
 		this.playlist = playlist;
-        this.id = "playlist-" + playlist.getName();
+		this.id = "playlist-" + playlist.getName();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.iteratorStrategy = new SequentialIteratorStrategy();
@@ -39,11 +55,20 @@ public class PlaylistPlayable extends Playable {
 		this.subscribed = false;
 	}
 
+	/**
+	 * Restituisce il nome della playlist.
+	 *
+	 * @return nome della playlist
+	 */
 	@Override
 	public String getTitle() {
 		return playlist.getName();
 	}
 
+	/**
+	 * Avvia la riproduzione della playlist dal primo brano determinato dalla
+	 * strategia corrente.
+	 */
 	@Override
 	public void play() {
 		subscribeToAudioPlayer();
@@ -63,6 +88,9 @@ public class PlaylistPlayable extends Playable {
 		audioPlayer.resume();
 	}
 
+	/**
+	 * Interrompe la riproduzione e ripristina lo stato iniziale dell'iteratore.
+	 */
 	@Override
 	public void stop() {
 		audioPlayer.stop();
@@ -77,12 +105,22 @@ public class PlaylistPlayable extends Playable {
 		return currentSong;
 	}
 
+	/**
+	 * Incrementa il numero di riproduzioni della playlist.
+	 */
 	@Override
 	protected void updatePlayCount() {
 		playlist.incrementPlayCount();
 		AppContext.getInstance().getMusicLibrary().updatePlaylistPlayCount(playlist);
 	}
 
+	/**
+	 * Alla conclusione di un brano tenta di avviare quello successivo. Se non sono
+	 * disponibili altri brani, notifica il completamento della playlist.
+	 *
+	 * @param eventType
+	 *            tipo di evento ricevuto
+	 */
 	@Override
 	public void update(EventType eventType) {
 		if (eventType != EventType.AUDIO_COMPLETED) {
@@ -95,6 +133,12 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
+	/**
+	 * Imposta la modalità di riproduzione e la strategia corrispondente.
+	 *
+	 * @param mode
+	 *            modalità di riproduzione da applicare
+	 */
 	@Override
 	public void setPlaybackMode(PlaybackMode mode) {
 		if (mode == null) {
@@ -117,6 +161,12 @@ public class PlaylistPlayable extends Playable {
 		return playbackMode;
 	}
 
+	/**
+	 * Sostituisce la strategia utilizzata per selezionare il prossimo brano.
+	 *
+	 * @param strategy
+	 *            nuova strategia di iterazione
+	 */
 	public void setIteratorStrategy(PlaylistIteratorStrategy strategy) {
 		if (strategy == null) {
 			throw new IllegalArgumentException("Playlist iterator strategy cannot be null.");
@@ -129,6 +179,12 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
+	/**
+	 * Seleziona e avvia il prossimo brano della playlist.
+	 *
+	 * @return {@code true} se è stato avviato un brano, {@code false} se la
+	 *         riproduzione è terminata
+	 */
 	private boolean playNextSong() {
 		currentSong = iterator.next();
 
@@ -143,16 +199,27 @@ public class PlaylistPlayable extends Playable {
 		return true;
 	}
 
+	/**
+	 * Passa al prossimo brano della playlist.
+	 *
+	 * @return {@code true} se esiste un altro brano, {@code false} altrimenti
+	 */
 	@Override
 	public boolean skipToNextSong() {
 		return playNextSong();
 	}
 
+	/**
+	 * Incrementa il numero di riproduzioni del brano corrente.
+	 */
 	private void updateCurrentSongPlayCount() {
 		currentSong.incrementPlayCount();
 		AppContext.getInstance().getMusicLibrary().updateSongPlayCount(currentSong);
 	}
 
+	/**
+	 * Registra il playable agli eventi di completamento dell'audio.
+	 */
 	private void subscribeToAudioPlayer() {
 		if (!subscribed) {
 			audioPlayer.getEvents().subscribe(EventType.AUDIO_COMPLETED, this);
@@ -160,6 +227,9 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
+	/**
+	 * Rimuove il playable dai listener del player audio.
+	 */
 	private void unsubscribeFromAudioPlayer() {
 		if (subscribed) {
 			audioPlayer.getEvents().unsubscribe(EventType.AUDIO_COMPLETED, this);
@@ -167,25 +237,30 @@ public class PlaylistPlayable extends Playable {
 		}
 	}
 
-    public String getId() { return id; }
+	public String getId() {
+		return id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!(o instanceof PlaylistPlayable)) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof PlaylistPlayable))
+			return false;
 
-        PlaylistPlayable p = (PlaylistPlayable) o;
-        return this.id.equals(p.id);
-    }
+		PlaylistPlayable p = (PlaylistPlayable) o;
+		return this.id.equals(p.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-    @Override
-    public String toString() {
-        return id + " " + playlist.toString();
-    }
+	@Override
+	public String toString() {
+		return id + " " + playlist.toString();
+	}
 }

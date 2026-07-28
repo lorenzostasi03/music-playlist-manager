@@ -9,11 +9,10 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="0" style="-fx-background-color: #000000;" stylesheets="@style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
+<VBox spacing="0" style="-fx-background-color: #000000;" stylesheets="@style.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.musicplaylistmanager.controller.playlist.PlaylistController">
     <VBox spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="20" left="25" right="25" top="25" /></padding>
         <HBox alignment="CENTER_LEFT" spacing="12">
@@ -31,11 +30,9 @@
     </VBox>
     <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-border-color: #282828; -fx-border-width: 0 0 1 0;">
         <padding><Insets bottom="15" left="25" right="25" top="15" /></padding>
-        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefWidth="250" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
-        <Separator orientation="VERTICAL" style="-fx-opacity: 0;" />
-        <Label style="-fx-text-fill: #B3B3B3; -fx-font-size: 14px;" text="Ordina per:" />
-        <ComboBox fx:id="sortComboBox" disable="true" onAction="#onSortChanged" promptText="—" styleClass="dark-combo" />
-        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="searchField" onKeyReleased="#onSearchChanged" prefHeight="36.0" prefWidth="198.0" promptText="Cerca per titolo…" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #B3B3B3; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-font-size: 14px;" />
+        <Button fx:id="sortButton" disable="true" onAction="#onSort" style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 15 8 15; -fx-cursor: hand;" text="Ordina per" /> 
+        <ComboBox fx:id="sortComboBox" disable="true" minWidth="130" styleClass="dark-combo" />
         <Button fx:id="addTrackButton" onAction="#onAddTrack" style="-fx-background-color: transparent; -fx-border-color: #1DB954; -fx-border-radius: 8; -fx-text-fill: #1DB954; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 7 15 7 15; -fx-cursor: hand;" text="+ Aggiungi traccia" />
     </HBox>
     <StackPane VBox.vgrow="ALWAYS">

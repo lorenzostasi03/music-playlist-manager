@@ -7,19 +7,24 @@ import it.unisa.musicplaylistmanager.model.playback.player.Player;
  * Comando concreto per rimuovere un Playable dalla coda.
  */
 public class RemovePlayableFromQueueCommand implements Command {
-    private final Playable playable;
-    private final Player player;
+	private final Player player;
+	private final Playable playable;
 
-    public RemovePlayableFromQueueCommand(Player player, Playable playable) {
-        if (player == null) throw new IllegalArgumentException("Player non può essere null!");
+	public RemovePlayableFromQueueCommand(Player player, Playable playable) {
+		if (player == null)
+			throw new IllegalArgumentException("Player non può essere null!");
 
-        this.player = player;
-        this.playable = playable;
-    }
+		this.player = player;
+		this.playable = playable;
+	}
 
-    @Override
-    public void execute() { player.removeFromQueue(playable); }
+	@Override
+	public void execute() {
+		player.removeFromQueue(playable);
+	}
 
-    @Override
-    public void undo() { player.enqueue(playable); }
+	@Override
+	public void undo() {
+		player.enqueue(playable);
+	}
 }

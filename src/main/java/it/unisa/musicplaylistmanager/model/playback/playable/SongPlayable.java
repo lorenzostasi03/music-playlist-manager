@@ -9,7 +9,7 @@ import it.unisa.musicplaylistmanager.model.playback.mode.PlaybackMode;
 import java.util.Objects;
 
 /**
- * Adatta una singola traccia al concetto di oggetto riproducibile.
+ * Adatta una singola traccia al playable.
  *
  * <p>
  * La classe utilizza {@link AudioPlayer} per riprodurre il file audio associato
@@ -24,7 +24,7 @@ public class SongPlayable extends Playable {
 	private boolean subscribed;
 
 	/**
-	 * Crea un nuovo oggetto riproducibile a partire da una traccia.
+	 * Crea un nuovo playable a partire da una traccia.
 	 *
 	 * @param song
 	 *            traccia da rendere riproducibile
@@ -37,7 +37,7 @@ public class SongPlayable extends Playable {
 		}
 
 		this.song = song;
-        this.id = "song-" + song.getId();
+		this.id = "song-" + song.getId();
 		this.playbackMode = PlaybackMode.SEQUENTIAL;
 		this.audioPlayer = AudioPlayer.getInstance();
 		this.subscribed = false;
@@ -92,7 +92,7 @@ public class SongPlayable extends Playable {
 	}
 
 	/**
-	 * Restituisce la traccia associata a questo oggetto riproducibile.
+	 * Restituisce la traccia associata a questo playable.
 	 *
 	 * @return traccia corrente
 	 */
@@ -153,7 +153,6 @@ public class SongPlayable extends Playable {
 		}
 
 		if (mode == PlaybackMode.SHUFFLE) {
-			this.playbackMode = PlaybackMode.SEQUENTIAL;
 			return;
 		}
 
@@ -187,25 +186,30 @@ public class SongPlayable extends Playable {
 		}
 	}
 
-    public String getId() { return id; }
+	public String getId() {
+		return id;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!  (o instanceof SongPlayable)) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof SongPlayable))
+			return false;
 
-        SongPlayable s = (SongPlayable) o;
-        return this.id.equals(s.id);
-    }
+		SongPlayable s = (SongPlayable) o;
+		return this.id.equals(s.id);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-    @Override
-    public String toString() {
-        return id + " " + song.toString();
-    }
+	@Override
+	public String toString() {
+		return id + " " + song.toString();
+	}
 }

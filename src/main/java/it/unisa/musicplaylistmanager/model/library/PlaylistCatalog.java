@@ -1,4 +1,5 @@
 package it.unisa.musicplaylistmanager.model.library;
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedPlaylistException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 
@@ -25,13 +26,17 @@ public class PlaylistCatalog {
 	 *
 	 * @param playlist
 	 *            playlist da aggiungere;
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null}
+	 * @throws DuplicatedPlaylistException
+	 *             se esiste già una playlist con lo stesso nome
 	 */
 	public void addPlaylist(Playlist playlist) {
 		if (playlist == null) {
 			throw new IllegalArgumentException("La playlist non può essere null.");
 		}
 		if (existsByName(playlist.getName())) {
-			throw new IllegalArgumentException("Esiste già una playlist con il nome '" + playlist.getName() + "'.");
+			throw new DuplicatedPlaylistException("Esiste già una playlist con il nome '" + playlist.getName() + "'.");
 		}
 		playlists.put(playlist.getId(), playlist);
 	}
@@ -44,6 +49,9 @@ public class PlaylistCatalog {
 	 *
 	 * @param playlist
 	 *            playlist da rimuovere;
+	 * @throws IllegalArgumentException
+	 *             se la playlist è {@code null} o se non è presente nella
+	 *             collezione
 	 */
 	public void removePlaylist(Playlist playlist) {
 		if (playlist == null) {
@@ -101,8 +109,7 @@ public class PlaylistCatalog {
 		}
 
 		return playlists.values().stream()
-				.filter(playlist -> playlist.getName().toLowerCase().contains(normalizedQuery))
-				.toList();
+				.filter(playlist -> playlist.getName().toLowerCase().contains(normalizedQuery)).toList();
 	}
 
 	/**

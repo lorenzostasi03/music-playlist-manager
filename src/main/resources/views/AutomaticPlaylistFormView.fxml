@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="380.0"
+      prefWidth="620.0"
+      spacing="18.0"
+      stylesheets="@style.css"
+      style="-fx-background-color: #121212;"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unisa.musicplaylistmanager.controller.playlist.AutomaticPlaylistFormController">
+
+    <padding>
+        <Insets bottom="24.0" left="24.0" right="24.0" top="24.0"/>
+    </padding>
+
+    <Label text="Crea playlist automatica"
+           style="-fx-text-fill: #FFFFFF; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+
+    <Label text="La playlist includerà tutte le tracce che soddisfano almeno uno dei criteri selezionati."
+           wrapText="true"
+           style="-fx-text-fill: #B3B3B3; -fx-font-size: 13px;"/>
+
+    <VBox spacing="7.0">
+        <Label text="Nome playlist"
+               style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+
+        <TextField fx:id="nameField"
+                   promptText="Inserisci il nome della playlist"
+                   styleClass="automatic-playlist-text-field"/>
+    </VBox>
+
+    <Label text="Criteri di selezione"
+           style="-fx-text-fill: #FFFFFF; -fx-font-weight: bold;"/>
+
+    <HBox spacing="12.0">
+
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <Label text="Generi"
+                   style="-fx-text-fill: #1DB954; -fx-font-weight: bold;"/>
+
+            <MenuButton fx:id="genresMenuButton"
+                        maxWidth="Infinity"
+                        prefWidth="180.0"
+                        text="Seleziona generi"
+                        styleClass="criteria-menu-button"/>
+        </VBox>
+
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <Label text="Anni"
+                   style="-fx-text-fill: #1DB954; -fx-font-weight: bold;"/>
+
+            <MenuButton fx:id="yearsMenuButton"
+                        maxWidth="Infinity"
+                        prefWidth="180.0"
+                        text="Seleziona anni"
+                        styleClass="criteria-menu-button"/>
+        </VBox>
+
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <Label text="Tag"
+                   style="-fx-text-fill: #1DB954; -fx-font-weight: bold;"/>
+
+            <MenuButton fx:id="tagsMenuButton"
+                        maxWidth="Infinity"
+                        prefWidth="180.0"
+                        text="Seleziona tag"
+                        styleClass="criteria-menu-button"/>
+        </VBox>
+
+    </HBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+        <Button fx:id="cancelButton"
+                onAction="#onCancel"
+                styleClass="transparent-btn"
+                text="Annulla"/>
+
+        <Button fx:id="generateButton"
+                onAction="#onGenerate"
+                styleClass="spotify-btn"
+                text="Genera playlist"/>
+    </HBox>
+
+</VBox>

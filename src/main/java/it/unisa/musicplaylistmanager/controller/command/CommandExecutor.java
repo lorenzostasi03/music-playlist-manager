@@ -9,48 +9,47 @@ import java.util.Deque;
 
 public class CommandExecutor {
 
-    private static CommandExecutor instance;
+	private static CommandExecutor instance;
 
-    private final Deque<Command> stack;
-    private final BooleanProperty canUndo;
+	private final Deque<Command> stack;
+	private final BooleanProperty canUndo;
 
-    private CommandExecutor() {
-        stack = new ArrayDeque<>();
-        canUndo = new SimpleBooleanProperty(false);
-    }
+	private CommandExecutor() {
+		stack = new ArrayDeque<>();
+		canUndo = new SimpleBooleanProperty(false);
+	}
 
-    public void execute(Command cmd) {
-        if (cmd == null)
-            throw new IllegalArgumentException("Il comando non può essere null!");
+	public void execute(Command cmd) {
+		if (cmd == null)
+			throw new IllegalArgumentException("Il comando non può essere null!");
 
-        cmd.execute();
-        stack.addFirst(cmd);
+		stack.addFirst(cmd);
+		cmd.execute();
 
-        updateCanUndo();
-    }
+		updateCanUndo();
+	}
 
-    public void undo() {
-        if (stack.isEmpty()) return;
+	public void undo() {
+		if (stack.isEmpty())
+			return;
 
-        Command last = stack.peekFirst();
+		Command last = stack.removeFirst();
+		last.undo();
 
-        last.undo();
+		updateCanUndo();
+	}
 
-        stack.removeFirst();
+	private void updateCanUndo() {
+		canUndo.set(!stack.isEmpty());
+	}
 
-        updateCanUndo();
-    }
+	public ReadOnlyBooleanProperty canUndoProperty() {
+		return canUndo;
+	}
 
-    private void updateCanUndo() {
-        canUndo.set(!stack.isEmpty());
-    }
-
-    public ReadOnlyBooleanProperty canUndoProperty() {
-        return canUndo;
-    }
-
-    public static CommandExecutor getInstance() {
-        if (instance == null) instance = new CommandExecutor();
-        return instance;
-    }
+	public static CommandExecutor getInstance() {
+		if (instance == null)
+			instance = new CommandExecutor();
+		return instance;
+	}
 }

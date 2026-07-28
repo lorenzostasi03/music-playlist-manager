@@ -14,153 +14,152 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test della classe {@link AddPlayableToQueueCommand}.
+ */
 class AddPlayableToQueueCommandTest {
 
-    private Player player;
-    private SongPlayable songPlayable;
-    private PlaylistPlayable playlistPlayable;
-    private AddPlayableToQueueCommand command;
+	private Player player;
+	private SongPlayable songPlayable;
+	private PlaylistPlayable playlistPlayable;
+	private AddPlayableToQueueCommand command;
 
-    @BeforeEach
-    void setUp() {
-        player = new Player();
+	@BeforeEach
+	void setUp() {
+		player = new Player();
 
-        Song song = new Song("Title", "Author", Genre.ROCK, 2001, 180, "file.mp3");
+		Song song = new Song("Title", "Author", Genre.ROCK, 2001, 180, "file.mp3");
 
-        Playlist playlist = new Playlist("TestPlaylist");
-        playlist.addSong(song);
+		Playlist playlist = new Playlist("TestPlaylist");
+		playlist.addSong(song);
 
-        songPlayable = new SongPlayable(song);
-        playlistPlayable = new PlaylistPlayable(playlist);
+		songPlayable = new SongPlayable(song);
+		playlistPlayable = new PlaylistPlayable(playlist);
 
-        command = new AddPlayableToQueueCommand(player, songPlayable);
-    }
+		command = new AddPlayableToQueueCommand(player, songPlayable);
+	}
 
-    @Test
-    void constructorThrowsWhenPlayerIsNull() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new AddPlayableToQueueCommand(null, songPlayable));
-    }
+	@Test
+	void constructorThrowsWhenPlayerIsNull() {
+		assertThrows(IllegalArgumentException.class, () -> new AddPlayableToQueueCommand(null, songPlayable));
+	}
 
-    @Test
-    void constructorThrowsWhenBothArgumentsAreNull() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new AddPlayableToQueueCommand(null, null));
-    }
+	@Test
+	void constructorThrowsWhenBothArgumentsAreNull() {
+		assertThrows(IllegalArgumentException.class, () -> new AddPlayableToQueueCommand(null, null));
+	}
 
-    @Test
-    void constructorAcceptsNullPlayable() {
-        assertDoesNotThrow(() -> new AddPlayableToQueueCommand(player, null));
-    }
+	@Test
+	void constructorAcceptsNullPlayable() {
+		assertDoesNotThrow(() -> new AddPlayableToQueueCommand(player, null));
+	}
 
-    @Test
-    void constructorSucceedsWithValidArguments() {
-        assertNotNull(new AddPlayableToQueueCommand(player, songPlayable));
-    }
+	@Test
+	void constructorSucceedsWithValidArguments() {
+		assertNotNull(new AddPlayableToQueueCommand(player, songPlayable));
+	}
 
-    @Test
-    void executeAddsSongPlayableToQueueOnce() {
-        command.execute();
+	@Test
+	void executeAddsSongPlayableToQueueOnce() {
+		command.execute();
 
-        List<Playable> queue = player.getQueueSnapshot();
-        assertEquals(1, queue.size());
-        assertSame(songPlayable, queue.get(0));
-    }
+		List<Playable> queue = player.getQueueSnapshot();
+		assertEquals(1, queue.size());
+		assertSame(songPlayable, queue.get(0));
+	}
 
-    @Test
-    void executeAddsPlaylistPlayableToQueueOnce() {
-        AddPlayableToQueueCommand cmd =
-            new AddPlayableToQueueCommand(player, playlistPlayable);
-        cmd.execute();
+	@Test
+	void executeAddsPlaylistPlayableToQueueOnce() {
+		AddPlayableToQueueCommand cmd = new AddPlayableToQueueCommand(player, playlistPlayable);
+		cmd.execute();
 
-        List<Playable> queue = player.getQueueSnapshot();
-        assertEquals(1, queue.size());
-        assertSame(playlistPlayable, queue.get(0));
-    }
+		List<Playable> queue = player.getQueueSnapshot();
+		assertEquals(1, queue.size());
+		assertSame(playlistPlayable, queue.get(0));
+	}
 
-    @Test
-    void executeDoesNotCallRemoveLast() {
-        command.execute();
-    }
+	@Test
+	void executeDoesNotCallRemoveLast() {
+		command.execute();
+	}
 
-    @Test
-    void executeCalledMultipleTimesEnqueuesEachTime() {
-        command.execute();
-        command.execute();
-        command.execute();
+	@Test
+	void executeCalledMultipleTimesEnqueuesEachTime() {
+		command.execute();
+		command.execute();
+		command.execute();
 
-        assertEquals(3, player.getQueueSnapshot().size());
-    }
+		assertEquals(3, player.getQueueSnapshot().size());
+	}
 
-    @Test
-    void executeWithNullPlayablePropagatesPlayerValidation() {
-        AddPlayableToQueueCommand cmdWithNullPlayable =
-            new AddPlayableToQueueCommand(player, null);
+	@Test
+	void executeWithNullPlayablePropagatesPlayerValidation() {
+		AddPlayableToQueueCommand cmdWithNullPlayable = new AddPlayableToQueueCommand(player, null);
 
-        assertThrows(IllegalArgumentException.class, cmdWithNullPlayable::execute);
-    }
+		assertThrows(IllegalArgumentException.class, cmdWithNullPlayable::execute);
+	}
 
-    @Test
-    void undoRemovesLastElementFromQueue() {
-        command.execute();
-        command.undo();
+	@Test
+	void undoRemovesLastElementFromQueue() {
+		command.execute();
+		command.undo();
 
-        assertTrue(player.getQueueSnapshot().isEmpty());
-    }
+		assertTrue(player.getQueueSnapshot().isEmpty());
+	}
 
-    @Test
-    void undoDoesNotCallEnqueue() {
-        command.execute();
-        command.undo();
+	@Test
+	void undoDoesNotCallEnqueue() {
+		command.execute();
+		command.undo();
 
-        assertTrue(player.getQueueSnapshot().isEmpty());
-    }
+		assertTrue(player.getQueueSnapshot().isEmpty());
+	}
 
-    @Test
-    void undoCalledMultipleTimesCallsRemoveLastEachTime() {
-        command.execute();
-        command.execute();
-        command.execute();
+	@Test
+	void undoCalledMultipleTimesCallsRemoveLastEachTime() {
+		command.execute();
+		command.execute();
+		command.execute();
 
-        command.undo();
-        command.undo();
-        command.undo();
+		command.undo();
+		command.undo();
+		command.undo();
 
-        assertTrue(player.getQueueSnapshot().isEmpty());
-    }
+		assertTrue(player.getQueueSnapshot().isEmpty());
+	}
 
-    @Test
-    void undoWithoutPriorExecuteDelegatesToRemoveLast() {
-        try {
-            command.undo();
-        } catch (Exception ignored) {
-        }
-    }
+	@Test
+	void undoWithoutPriorExecuteDelegatesToRemoveLast() {
+		try {
+			command.undo();
+		} catch (Exception ignored) {
+		}
+	}
 
-    @Test
-    void executeFollowedByUndoLeavesQueueEmpty() {
-        command.execute();
-        command.undo();
+	@Test
+	void executeFollowedByUndoLeavesQueueEmpty() {
+		command.execute();
+		command.undo();
 
-        assertTrue(player.getQueueSnapshot().isEmpty());
-    }
+		assertTrue(player.getQueueSnapshot().isEmpty());
+	}
 
-    @Test
-    void executeUndoExecuteProducesCorrectQueueStateAndCallCounts() {
-        command.execute();
-        command.undo();
-        command.execute();
+	@Test
+	void executeUndoExecuteProducesCorrectQueueStateAndCallCounts() {
+		command.execute();
+		command.undo();
+		command.execute();
 
-        assertEquals(1, player.getQueueSnapshot().size());
-    }
+		assertEquals(1, player.getQueueSnapshot().size());
+	}
 
-    @Test
-    void twoExecutesFollowedByTwoUndosProduceCorrectCountsAndEmptyQueue() {
-        command.execute();
-        command.execute();
-        command.undo();
-        command.undo();
+	@Test
+	void twoExecutesFollowedByTwoUndosProduceCorrectCountsAndEmptyQueue() {
+		command.execute();
+		command.execute();
+		command.undo();
+		command.undo();
 
-        assertTrue(player.getQueueSnapshot().isEmpty());
-    }
+		assertTrue(player.getQueueSnapshot().isEmpty());
+	}
 }

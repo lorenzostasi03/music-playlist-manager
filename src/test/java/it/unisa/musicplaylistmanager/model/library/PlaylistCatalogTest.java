@@ -1,5 +1,6 @@
 package it.unisa.musicplaylistmanager.model.library;
 
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedPlaylistException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
@@ -55,7 +56,7 @@ class PlaylistCatalogTest {
 	void testAggiuntaPlaylistDuplicataLanciaEccezione() {
 		catalog.addPlaylist(p1);
 		Playlist duplicata = new Playlist("Rock Classics");
-		assertThrows(IllegalArgumentException.class, () -> catalog.addPlaylist(duplicata));
+		assertThrows(DuplicatedPlaylistException.class, () -> catalog.addPlaylist(duplicata));
 	}
 
 	/**
@@ -65,7 +66,7 @@ class PlaylistCatalogTest {
 	void testUnicitaNomeCaseInsensitive() {
 		catalog.addPlaylist(p1);
 		Playlist duplicata = new Playlist("ROCK CLASSICS");
-		assertThrows(IllegalArgumentException.class, () -> catalog.addPlaylist(duplicata));
+		assertThrows(DuplicatedPlaylistException.class, () -> catalog.addPlaylist(duplicata));
 	}
 
 	/**

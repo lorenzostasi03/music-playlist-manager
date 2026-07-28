@@ -4,16 +4,16 @@ import it.unisa.musicplaylistmanager.model.playback.events.EventListener;
 import it.unisa.musicplaylistmanager.model.playback.events.EventManager;
 import it.unisa.musicplaylistmanager.model.playback.events.EventType;
 import it.unisa.musicplaylistmanager.model.playback.playable.Playable;
-
 import java.util.List;
 
 /**
  * Gestisce la riproduzione corrente dell'applicazione.
  *
  * <p>
- * Il player mantiene il riferimento all'oggetto riproducibile attualmente in
+ * Il player mantiene il riferimento al playable attualmente in
  * esecuzione e coordina le operazioni di avvio, pausa, ripresa, interruzione e
  * avanzamento della coda di riproduzione.
+ * </p>
  */
 public class Player implements EventListener {
 
@@ -39,11 +39,12 @@ public class Player implements EventListener {
 	 * <p>
 	 * Se un altro oggetto è già in riproduzione, questo viene interrotto prima di
 	 * avviare il nuovo oggetto. La coda di riproduzione non viene svuotata.
+	 * </p>
 	 *
 	 * @param playable
 	 *            oggetto da riprodurre
 	 * @throws IllegalArgumentException
-	 *             se l'oggetto riproducibile è {@code null}
+	 *             se il playable è {@code null}
 	 */
 	public void play(Playable playable) {
 		if (playable == null) {
@@ -55,45 +56,51 @@ public class Player implements EventListener {
 	}
 
 	/**
-	 * Aggiunge un oggetto riproducibile alla coda.
+	 * Aggiunge un playable alla coda.
 	 *
 	 * @param playable
 	 *            oggetto da aggiungere alla coda
 	 * @throws IllegalArgumentException
-	 *             se l'oggetto riproducibile è {@code null}
+	 *             se il playable è {@code null}
 	 */
 	public void enqueue(Playable playable) {
 		queue.enqueue(playable);
 		notifyQueueChanged();
 	}
 
-    /**
-     * Rimuove l'ultimo Playable aggiunto alla coda.
-     */
-    public void removeLast() {
-        queue.removeLast();
-        notifyQueueChanged();
-    }
+	/**
+	 * Rimuove l'ultimo playable aggiunto alla coda.
+	 */
+	public void removeLast() {
+		queue.removeLast();
+		notifyQueueChanged();
+	}
 
-    /**
-     * Rimuove tutte le occorrenze del Playable specificato dalla coda di riproduzione.
-     *
-     * @param playable
-     *              Playable da rimuovere dalla coda
-     * @throws IllegalArgumentException
-     *               se il Playable è {@code null}
-     */
-    public void removeFromQueue(Playable playable) {
-        if (playable == null) throw new IllegalArgumentException("Playable non può essere null.");
+	/**
+	 * Rimuove tutte le occorrenze del playable specificato dalla coda.
+	 *
+	 * @param playable
+	 *            playable da rimuovere
+	 * @throws IllegalArgumentException
+	 *             se il playable è {@code null}
+	 */
+	public void removeFromQueue(Playable playable) {
+		if (playable == null) {
+			throw new IllegalArgumentException("Playable non può essere null.");
+		}
 
-        queue.remove(playable);
-        notifyQueueChanged();
-    }
+		queue.remove(playable);
+		notifyQueueChanged();
+	}
 
 	/**
 	 * Svuota la coda di riproduzione.
 	 */
 	public void clearQueue() {
+		if (queue.isEmpty()) {
+			return;
+		}
+
 		queue.clear();
 		notifyQueueChanged();
 	}
@@ -101,7 +108,7 @@ public class Player implements EventListener {
 	/**
 	 * Restituisce una copia della coda corrente.
 	 *
-	 * @return lista degli elementi in coda
+	 * @return lista degli elementi presenti in coda
 	 */
 	public List<Playable> getQueueSnapshot() {
 		return queue.getSnapshot();
@@ -138,6 +145,14 @@ public class Player implements EventListener {
 		notifyCurrentPlayableChanged();
 	}
 
+	/**
+	 * Avanza al brano successivo del playable corrente.
+	 *
+	 * <p>
+	 * Se il playable non può gestire internamente l'avanzamento, viene interrotto e
+	 * viene avviato il primo elemento presente nella coda.
+	 * </p>
+	 */
 	public void skipSong() {
 		if (currentPlayable == null) {
 			playNextFromQueue();
@@ -152,6 +167,9 @@ public class Player implements EventListener {
 		}
 	}
 
+	/**
+	 * Interrompe il playable corrente e avvia il successivo presente nella coda.
+	 */
 	public void skipPlayable() {
 		stopCurrentPlayable();
 		playNextFromQueue();
@@ -169,24 +187,29 @@ public class Player implements EventListener {
 	/**
 	 * Restituisce l'oggetto attualmente gestito dal player.
 	 *
-	 * @return oggetto riproducibile corrente, oppure {@code null} se non è presente
-	 *         alcuna riproduzione
+	 * @return playable corrente, oppure {@code null} se non è presente alcuna
+	 *         riproduzione
 	 */
 	public Playable getCurrentPlayable() {
 		return currentPlayable;
 	}
 
 	/**
-	 * Restituisce il gestore eventi del player.
+	 * Restituisce il gestore degli eventi del player.
 	 *
-	 * @return event manager del player
+	 * @return gestore degli eventi
 	 */
 	public EventManager getEvents() {
 		return events;
 	}
 
 	/**
-	 * Gestisce gli eventi ricevuti dall'oggetto riproducibile corrente.
+	 * Gestisce gli eventi ricevuti dal playable corrente.
+	 *
+	 * <p>
+	 * Quando il playable termina, il player passa automaticamente al primo elemento
+	 * presente nella coda.
+	 * </p>
 	 *
 	 * @param eventType
 	 *            tipo di evento ricevuto
@@ -199,6 +222,13 @@ public class Player implements EventListener {
 		}
 	}
 
+	/**
+	 * Imposta e avvia il playable specificato, registrando il player al relativo
+	 * evento di completamento.
+	 *
+	 * @param playable
+	 *            playable da avviare
+	 */
 	private void startPlayable(Playable playable) {
 		currentPlayable = playable;
 		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
@@ -208,6 +238,10 @@ public class Player implements EventListener {
 		notifyCurrentPlayableChanged();
 	}
 
+	/**
+	 * Estrae e avvia il primo playable della coda. Se la coda è vuota, porta il
+	 * player nello stato {@link PlayerState#STOPPED}.
+	 */
 	private void playNextFromQueue() {
 		Playable nextPlayable = queue.dequeue();
 		notifyQueueChanged();
@@ -222,6 +256,10 @@ public class Player implements EventListener {
 		startPlayable(nextPlayable);
 	}
 
+	/**
+	 * Interrompe il playable corrente, rimuove la sottoscrizione ai suoi eventi e
+	 * ne elimina il riferimento.
+	 */
 	private void stopCurrentPlayable() {
 		if (currentPlayable != null) {
 			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
@@ -230,6 +268,9 @@ public class Player implements EventListener {
 		}
 	}
 
+	/**
+	 * Rimuove il riferimento al playable terminato.
+	 */
 	private void finishCurrentPlayable() {
 		if (currentPlayable != null) {
 			currentPlayable.getEvents().unsubscribe(EventType.PLAYABLE_COMPLETED, this);
@@ -237,10 +278,16 @@ public class Player implements EventListener {
 		}
 	}
 
+	/**
+	 * Notifica ai listener il cambiamento del playable corrente.
+	 */
 	private void notifyCurrentPlayableChanged() {
 		events.notifyListeners(EventType.CURRENT_PLAYABLE_CHANGED);
 	}
 
+	/**
+	 * Notifica ai listener una modifica della coda di riproduzione.
+	 */
 	private void notifyQueueChanged() {
 		events.notifyListeners(EventType.QUEUE_CHANGED);
 	}

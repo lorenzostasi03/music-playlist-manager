@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS playlist (
 CREATE TABLE IF NOT EXISTS playlist_song (
     playlist_id TEXT NOT NULL,
     song_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
 
     PRIMARY KEY (playlist_id, song_id),
 

@@ -26,6 +26,10 @@ public class SongCatalog {
 	 *
 	 * @param song
 	 *            traccia da aggiungere;
+	 * @throws IllegalArgumentException
+	 *             se la traccia è {@code null}
+	 * @throws DuplicatedSongException
+	 *             se il brano è già presente nel catalogo
 	 */
 	public void addSong(Song song) throws IllegalArgumentException, DuplicatedSongException {
 		if (song == null) {
@@ -42,6 +46,8 @@ public class SongCatalog {
 	 *
 	 * @param song
 	 *            traccia da rimuovere;
+	 * @throws IllegalArgumentException
+	 *             se la traccia è {@code null} o non è presente nel catalogo
 	 */
 	public void removeSong(Song song) throws IllegalArgumentException {
 		if (song == null) {
@@ -52,21 +58,6 @@ public class SongCatalog {
 		}
 
 		songs.remove(song.getId());
-	}
-
-	/**
-	 * Cerca tracce il cui titolo contenga la stringa specificata
-	 *
-	 * @param query
-	 *            testo da cercare;
-	 * @return lista delle tracce
-	 */
-	public List<Song> searchSong(String query) throws IllegalArgumentException {
-		if (query == null) {
-			throw new IllegalArgumentException("La query di ricerca non può essere null.");
-		}
-		String queryLower = query.trim().toLowerCase();
-		return songs.values().stream().filter(s -> s.getTitle().toLowerCase().contains(queryLower)).toList();
 	}
 
 	/**
@@ -141,6 +132,34 @@ public class SongCatalog {
 	public boolean isEmpty() {
 
 		return songs.isEmpty();
+	}
+
+	/**
+	 * Restituisce le tracce che soddisfano almeno uno dei criteri indicati.
+	 *
+	 * <p>
+	 * I criteri vengono combinati mediante OR: una traccia è inclusa se appartiene
+	 * a uno dei generi selezionati, se è stata pubblicata in uno degli anni
+	 * selezionati oppure se possiede almeno uno dei tag selezionati.
+	 *
+	 * @param genres
+	 *            generi selezionati
+	 * @param years
+	 *            anni selezionati
+	 * @param tags
+	 *            tag selezionati
+	 * @return tracce che soddisfano almeno uno dei criteri
+	 * @throws IllegalArgumentException
+	 *             se i criteri per il filtraggio sono vuoti
+	 */
+	public List<Song> findSongsMatchingAnyCriteria(Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+
+		if (genres == null || years == null || tags == null) {
+			throw new IllegalArgumentException("I criteri non possono essere null.");
+		}
+
+		return songs.values().stream().filter(song -> genres.contains(song.getGenre()) || years.contains(song.getYear())
+				|| tags.stream().anyMatch(song::hasTag)).toList();
 	}
 
 }

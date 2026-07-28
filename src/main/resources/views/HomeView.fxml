@@ -5,8 +5,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -27,16 +25,9 @@
 
             <TextField fx:id="searchBar" maxWidth="Infinity" prefWidth="340.0" promptText="Cerca playlist..." style="-fx-background-color: #121212; -fx-text-fill: #FFFFFF;" />
 
-            <MenuButton fx:id="autoCreateBtn" disable="true" minWidth="160.0" text="Playlist automatica">
+            <Region HBox.hgrow="ALWAYS" />
 
-                <items>
-                    <MenuItem onAction="#onAutoCreateByGenre" text="Per genere" />
-                    <MenuItem onAction="#onAutoCreateByYear" text="Per anno" />
-                    <MenuItem onAction="#onAutoCreateByArtist" text="Per artista" />
-                    <MenuItem onAction="#onAutoCreateByTag" text="Per tag" />
-                </items>
-
-            </MenuButton>
+            <Button fx:id="autoCreateBtn" minWidth="170.0" onAction="#onAutoCreatePlaylist" styleClass="spotify-btn" text="Playlist automatica" />
 
             <Button fx:id="newPlaylistBtn" minWidth="140.0" onAction="#onNewPlaylist" styleClass="spotify-btn" text="+ Nuova playlist" />
 

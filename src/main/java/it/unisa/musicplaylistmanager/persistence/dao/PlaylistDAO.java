@@ -22,6 +22,15 @@ public interface PlaylistDAO {
 	void save(Playlist playlist);
 
 	/**
+	 * Recupera tutte le playlist presenti nel database.
+	 *
+	 * @return lista di tutte le playlist
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il recupero
+	 */
+	List<Playlist> getPlaylists();
+
+	/**
 	 * Aggiorna una playlist esistente nel database.
 	 *
 	 * @param playlist
@@ -30,18 +39,6 @@ public interface PlaylistDAO {
 	 *             se si verifica un errore durante l'aggiornamento
 	 */
 	void update(Playlist playlist);
-
-	/**
-	 * Aggiorna il numero di riproduzioni di una playlist.
-	 *
-	 * @param playlistId
-	 *            identificativo della playlist da aggiornare
-	 * @param playCount
-	 *            nuovo numero di riproduzioni della playlist
-	 * @throws PersistenceException
-	 *             se si verifica un errore durante l'aggiornamento nel database
-	 */
-	void updatePlayCount(UUID playlistId, int playCount);
 
 	/**
 	 * Elimina una playlist dal database.
@@ -54,13 +51,16 @@ public interface PlaylistDAO {
 	void delete(UUID playlistId);
 
 	/**
-	 * Recupera tutte le playlist presenti nel database.
+	 * Aggiorna il numero di riproduzioni di una playlist.
 	 *
-	 * @return lista di tutte le playlist
+	 * @param playlistId
+	 *            identificativo della playlist da aggiornare
+	 * @param playCount
+	 *            nuovo numero di riproduzioni della playlist
 	 * @throws PersistenceException
-	 *             se si verifica un errore durante il recupero
+	 *             se si verifica un errore durante l'aggiornamento nel database
 	 */
-	List<Playlist> getPlaylists();
+	void updatePlayCount(UUID playlistId, int playCount);
 
 	/**
 	 * Aggiunge un brano a una playlist.

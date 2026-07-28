@@ -8,8 +8,7 @@ import javafx.scene.layout.BorderPane;
 import java.io.IOException;
 
 /**
- * Classe di utilità che gestisce la navigazione tra le schermate
- * dell'applicazione.
+ * Classe che gestisce la navigazione tra le schermate dell'applicazione.
  *
  * Le view FXML vengono caricate e mostrate nella regione centrale del layout
  * principale dell'applicazione.

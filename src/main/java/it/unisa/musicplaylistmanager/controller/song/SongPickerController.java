@@ -19,25 +19,36 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 
 /**
- * Controller per la finestra modale che permette di visualizzare i brani del
- * catalogo non ancora presenti in una specifica playlist, consentendone la
- * selezione multipla per l'aggiunta in blocco.
+ * Controller per la finestra che permette di visualizzare i brani del catalogo
+ * non ancora presenti in una specifica playlist, consentendone la selezione
+ * multipla per l'aggiunta in blocco.
  */
 public class SongPickerController {
-	@FXML private TableView<SelectableSong> tracksTable;
-	@FXML private TableColumn<SelectableSong, Boolean> checkColumn;
-	@FXML private TableColumn<SelectableSong, String> titleColumn;
-	@FXML private TableColumn<SelectableSong, String> authorColumn;
-	@FXML private TableColumn<SelectableSong, String> genreColumn;
-	@FXML private TableColumn<SelectableSong, String> yearColumn;
+    @FXML
+    private TextField searchField;
+	@FXML
+	private TableView<SelectableSong> tracksTable;
+	@FXML
+	private TableColumn<SelectableSong, Boolean> checkColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> titleColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> authorColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> genreColumn;
+	@FXML
+	private TableColumn<SelectableSong, String> yearColumn;
 
-	@FXML private VBox emptyStateBox;
+	@FXML
+	private VBox emptyStateBox;
 
-	@FXML private Button cancelButton;
-	@FXML private Button confirmButton;
+	@FXML
+	private Button cancelButton;
+	@FXML
+	private Button confirmButton;
 
-    private final AppContext appContext = AppContext.getInstance();
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final AppContext appContext = AppContext.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	private Playlist playlist;
 	private Runnable onSave;
@@ -53,6 +64,7 @@ public class SongPickerController {
 		configureCheckColumn();
 		configureTextColumns();
 		confirmButton.disableProperty().bind(hasSelection.not());
+        confirmButton.visibleProperty().bind(hasSelection);
 	}
 
 	/**
@@ -77,8 +89,7 @@ public class SongPickerController {
 	}
 
 	@FXML
-	private void onSearchChanged() {
-	}
+	private void onSearchChanged() { refreshSongs(); }
 
 	/**
 	 * Seleziona automaticamente tutte le tracce attualmente caricate nella tabella.
@@ -189,8 +200,12 @@ public class SongPickerController {
 		if (playlist == null)
 			return;
 
-		List<SelectableSong> available = appContext.getMusicLibrary().getAllSongs().stream()
-				.filter(song -> !playlist.contains(song)).map(SelectableSong::new).toList();
+        List<SelectableSong> available = appContext.getMusicLibrary()
+            .filterSongs(searchField.getText(), null, null, null, null)
+            .stream()
+            .filter(song -> !playlist.contains(song))
+            .map(SelectableSong::new)
+            .toList();
 
 		tracksTable.getItems().setAll(available);
 		updateSelectionState();
@@ -204,8 +219,8 @@ public class SongPickerController {
 
 	private void addSongsToPlaylist(List<Song> songs) {
 		try {
-            Command cmd = new AddSongsToPlaylistCommand(appContext.getMusicLibrary(), playlist, songs);
-            executor.execute(cmd);
+			Command cmd = new AddSongsToPlaylistCommand(appContext.getMusicLibrary(), playlist, songs);
+			executor.execute(cmd);
 		} catch (PersistenceException | IllegalArgumentException e) {
 			AlertManager.showError(e.getMessage());
 		}
