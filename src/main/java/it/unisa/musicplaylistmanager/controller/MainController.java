@@ -7,6 +7,9 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -27,6 +30,8 @@ public class MainController {
 		ViewSwitcher.switchTo("HomeView.fxml");
 
         initUndoButton();
+
+        setupUndoShortcut();
 	}
 
     private void initUndoButton() {
@@ -51,6 +56,23 @@ public class MainController {
 	private void onPlayback() {
 		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
+
+    private void setupUndoShortcut() {
+        root.sceneProperty().addListener((observable, oldScene, newScene) -> {
+
+            if (newScene != null) {
+                newScene.getAccelerators().put(
+                    new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+                    () -> {
+                        if (executor.canUndoProperty().get()) {
+                            onUndoCommand();
+                        }
+                    }
+                );
+            }
+
+        });
+    }
 
     @FXML
     public void onUndoCommand() {

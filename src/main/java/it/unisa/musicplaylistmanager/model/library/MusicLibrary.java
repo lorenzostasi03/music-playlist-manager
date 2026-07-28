@@ -224,6 +224,32 @@ public class MusicLibrary {
 		playlistDAO.delete(playlist.getId());
 	}
 
+    /**
+     * Ripristina una playlist precedentemente rimossa dalla collezione.
+     * Reintroduce la playlist nel catalogo e ricrea le associazioni con le
+     * tracce contenute all'interno del database.
+     *
+     * @param playlist
+     *            playlist da ripristinare
+     * @throws IllegalArgumentException
+     *             se la playlist è null o già presente nella collezione
+     * @throws PersistenceException
+     *             se si verifica un errore durante il salvataggio nel database
+     */
+    public void restorePlaylist(Playlist playlist) {
+
+        playlistCatalog.addPlaylist(playlist);
+
+        playlistDAO.save(playlist);
+
+        for (Song song : playlist.getSongs()) {
+            playlistDAO.addSong(
+                playlist.getId(),
+                song.getId()
+            );
+        }
+    }
+
 	/**
 	 * Rinomina una playlist esistente.
 	 *

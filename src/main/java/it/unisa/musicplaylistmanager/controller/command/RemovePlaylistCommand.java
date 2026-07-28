@@ -1,9 +1,13 @@
 package it.unisa.musicplaylistmanager.controller.command;
 
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
+import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.library.MusicLibrary;
 import it.unisa.musicplaylistmanager.model.playback.playable.PlaylistPlayable;
 import it.unisa.musicplaylistmanager.model.playback.player.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Comando concreto per rimuovere una playlist dal catalogo.
@@ -32,5 +36,7 @@ public class RemovePlaylistCommand implements Command {
     }
 
     @Override
-    public void undo() { musicLibrary.addPlaylist(playlist); }
+    public void undo() {
+        musicLibrary.restorePlaylist(playlist);
+    }
 }

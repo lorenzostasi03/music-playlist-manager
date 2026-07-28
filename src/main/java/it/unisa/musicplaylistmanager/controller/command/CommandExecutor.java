@@ -23,8 +23,8 @@ public class CommandExecutor {
         if (cmd == null)
             throw new IllegalArgumentException("Il comando non può essere null!");
 
-        stack.addFirst(cmd);
         cmd.execute();
+        stack.addFirst(cmd);
 
         updateCanUndo();
     }
@@ -32,8 +32,11 @@ public class CommandExecutor {
     public void undo() {
         if (stack.isEmpty()) return;
 
-        Command last = stack.removeFirst();
+        Command last = stack.peekFirst();
+
         last.undo();
+
+        stack.removeFirst();
 
         updateCanUndo();
     }
