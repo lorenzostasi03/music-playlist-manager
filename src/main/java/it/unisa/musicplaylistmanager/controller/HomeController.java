@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -42,10 +41,7 @@ import javafx.scene.layout.Region;
  * Inoltre consente la creazione, modifica, eliminazione, riproduzione,
  * accodamento e annullamento delle operazioni sulle playlist.
  */
-public class HomeController implements Initializable {
-
-	@FXML
-	private Button undoCommandButton;
+public class HomeController implements Initializable, Refreshable {
 
 	@FXML
 	private TextField searchBar;
@@ -89,8 +85,7 @@ public class HomeController implements Initializable {
 	 *
 	 * <p>
 	 * Configura i controlli, inizializza le {@link ListView}, imposta i messaggi
-	 * visualizzati in assenza di contenuti, configura il pulsante di undo e
-	 * aggiorna i dati mostrati all'utente.
+	 * visualizzati in assenza di contenuti e aggiorna i dati mostrati all'utente.
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -102,7 +97,6 @@ public class HomeController implements Initializable {
 
 		initEmptyLabels();
 		initSearch();
-		initUndoButton();
 
 		updateViews();
 	}
@@ -290,32 +284,6 @@ public class HomeController implements Initializable {
 			refreshPlaylists();
 			countLabel.setText(playlists.size() + " playlist");
 		});
-	}
-
-	/**
-	 * Configura il pulsante di annullamento.
-	 *
-	 * <p>
-	 * Il pulsante è visibile, gestito dal layout e utilizzabile soltanto quando il
-	 * {@link CommandExecutor} contiene almeno un comando annullabile.
-	 */
-	private void initUndoButton() {
-		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-		undoCommandButton.visibleProperty().bind(canUndo);
-		undoCommandButton.managedProperty().bind(canUndo);
-		undoCommandButton.disableProperty().bind(canUndo.not());
-	}
-
-	/**
-	 * Annulla l'ultimo comando eseguito e aggiorna le informazioni visualizzate.
-	 */
-	@FXML
-	private void onUndoCommand() {
-		executor.undo();
-		updateViews();
-
-		AlertManager.showInfo("L'operazione è stata annullata.");
 	}
 
 	/**
@@ -515,7 +483,12 @@ public class HomeController implements Initializable {
 		return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
 	}
 
-	/**
+    @Override
+    public void refresh() {
+        updateViews();
+    }
+
+    /**
 	 * Rappresenta un elemento visualizzato nelle liste della schermata Home.
 	 *
 	 * <p>

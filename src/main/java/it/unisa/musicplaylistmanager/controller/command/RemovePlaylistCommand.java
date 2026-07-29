@@ -29,14 +29,12 @@ public class RemovePlaylistCommand implements Command {
 	public void execute() {
 		musicLibrary.removePlaylist(playlist);
 
-		if (playlist.getSongs().isEmpty())
-			return;
-
-		player.removeFromQueue(new PlaylistPlayable(playlist));
+		if (!playlist.getSongs().isEmpty())
+            player.removeFromQueue(new PlaylistPlayable(playlist));
 	}
 
 	@Override
 	public void undo() {
-		musicLibrary.addPlaylist(playlist);
+        musicLibrary.restorePlaylist(playlist);
 	}
 }

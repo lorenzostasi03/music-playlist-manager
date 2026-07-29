@@ -4,8 +4,9 @@ module it.unisa.musicplaylistmanager {
 	requires java.sql;
 	requires javafx.media;
 	requires transitive javafx.graphics;
+    requires java.desktop;
 
-	opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
+    opens it.unisa.musicplaylistmanager.controller to javafx.fxml;
 	opens it.unisa.musicplaylistmanager.controller.playlist to javafx.fxml;
 	opens it.unisa.musicplaylistmanager.controller.song to javafx.fxml;
 

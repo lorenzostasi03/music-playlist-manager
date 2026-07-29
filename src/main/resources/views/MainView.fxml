@@ -21,7 +21,7 @@
                 <Button fx:id="homeButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onHome" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="🏠 Home" />
                 <Button fx:id="catalogButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onCatalog" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="🔍 Catalogo" />
                 <Button fx:id="playbackButton" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPlayback" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="▶ Riproduzione" />
-            <Button fx:id="undoCommandButton" alignment="BASELINE_LEFT" layoutX="25.0" layoutY="191.0" mnemonicParsing="false" onAction="#onUndoCommand" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="Annulla operazione" />
+            <Button fx:id="undoCommandButton" alignment="BASELINE_LEFT" layoutX="25.0" layoutY="191.0" mnemonicParsing="false" onAction="#onUndoCommand" prefHeight="40.0" prefWidth="200.0" styleClass="sidebar-btn" text="↶ Annulla operazione" />
             </children>
         </VBox>
     </left>

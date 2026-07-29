@@ -75,8 +75,6 @@
 
             <Button fx:id="skipPlayableButton" maxWidth="220.0" minWidth="220" onAction="#onSkipPlayable" prefWidth="220" style="-fx-min-width: 220; -fx-pref-width: 220; -fx-max-width: 220;" styleClass="spotify-btn" text="Riproduci prossimo" />
          <Button fx:id="clearQueueButton" layoutX="20.0" layoutY="74.0" maxWidth="220.0" minWidth="220" onAction="#onClearQueue" prefWidth="220" style="-fx-min-width: 220; -fx-pref-width: 220; -fx-max-width: 220;" styleClass="spotify-btn" text="Svuota coda" />
-
-            <Button fx:id="undoCommandButton" maxWidth="220" minWidth="220" onAction="#onUndoCommand" prefWidth="220" style="-fx-min-width: 220; -fx-pref-width: 220; -fx-max-width: 220;" styleClass="spotify-btn" text="Annulla operazione" />
         </VBox>
 
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0A0A0A; -fx-background-color: transparent; -fx-control-inner-background: #0A0A0A; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">

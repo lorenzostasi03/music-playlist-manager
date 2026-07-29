@@ -4,6 +4,8 @@ import it.unisa.musicplaylistmanager.app.AppContext;
 import it.unisa.musicplaylistmanager.controller.command.AddPlaylistCommand;
 import it.unisa.musicplaylistmanager.controller.command.Command;
 import it.unisa.musicplaylistmanager.controller.command.CommandExecutor;
+import it.unisa.musicplaylistmanager.exceptions.DuplicatedPlaylistException;
+import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import javafx.fxml.FXML;
@@ -23,11 +25,6 @@ public class PlaylistFormController {
 
 	@FXML
 	private TextField nameField;
-
-	@FXML
-	private Label nameErrorLabel;
-	@FXML
-	private Label globalErrorLabel;
 
 	@FXML
 	private Button cancelButton;
@@ -111,7 +108,7 @@ public class PlaylistFormController {
 				onSave.run();
 			}
 			closeWindow();
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException | DuplicatedPlaylistException | PersistenceException e) {
 			AlertManager.showError(e.getMessage());
 		}
 	}

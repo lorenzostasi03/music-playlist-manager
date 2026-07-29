@@ -38,9 +38,6 @@ import javafx.util.Duration;
  */
 public class PlaybackController implements EventListener {
 
-	@FXML
-	private Button undoCommandButton;
-	@FXML
 	private Label trackTitleLabel;
 	@FXML
 	private Label trackArtistLabel;
@@ -119,8 +116,6 @@ public class PlaybackController implements EventListener {
 				startProgressTimeline();
 			}
 		}
-
-		initUndoButton();
 
 		updatePlaybackModeButtons();
 		updateQueueView();
@@ -252,22 +247,6 @@ public class PlaybackController implements EventListener {
 
 		currentPlayable.setPlaybackMode(mode);
 		updatePlaybackModeButtons();
-	}
-
-	/**
-	 * Inizializza il pulsante per annullare l'ultima operazione effettuata.
-	 *
-	 * <p>
-	 * Il pulsante è visibile, gestito dal layout e cliccabile soltanto quando sono
-	 * presenti operazioni da annullare.
-	 * </p>
-	 */
-	private void initUndoButton() {
-		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-		undoCommandButton.visibleProperty().bind(canUndo);
-		undoCommandButton.managedProperty().bind(canUndo);
-		undoCommandButton.disableProperty().bind(canUndo.not());
 	}
 
 	/**
@@ -608,16 +587,6 @@ public class PlaybackController implements EventListener {
 	@FXML
 	private void onLoop() {
 		setCurrentPlaybackMode(PlaybackMode.LOOP);
-	}
-
-	/**
-	 * Annulla l'ultimo comando eseguito e aggiorna la visualizzazione della coda.
-	 */
-	@FXML
-	private void onUndoCommand() {
-		executor.undo();
-		AlertManager.showInfo("L'operazione è stata annullata.");
-		updateQueueView();
 	}
 
 	/**

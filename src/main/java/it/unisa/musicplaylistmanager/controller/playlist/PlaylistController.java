@@ -1,6 +1,7 @@
 package it.unisa.musicplaylistmanager.controller.playlist;
 
 import it.unisa.musicplaylistmanager.app.AppContext;
+import it.unisa.musicplaylistmanager.controller.Refreshable;
 import it.unisa.musicplaylistmanager.controller.command.*;
 import it.unisa.musicplaylistmanager.controller.song.SongPickerController;
 import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  * rimuoverle, oltre a gestire la rinomina o l'eliminazione dell'intera
  * playlist.
  */
-public class PlaylistController {
+public class PlaylistController implements Refreshable {
 	@FXML
 	private Label playlistNameLabel;
 	@FXML
@@ -50,8 +51,6 @@ public class PlaylistController {
 	private Button addTrackButton;
 	@FXML
 	private Button removeTrackButton;
-	@FXML
-	private Button undoCommandButton;
 
 	@FXML
 	private TextField searchField;
@@ -97,7 +96,7 @@ public class PlaylistController {
 		configureTable();
 
 		initButtons(readOnly);
-		initUndoButton();
+
 		initSort();
 
 		tracksTable.getSelectionModel().selectedItemProperty()
@@ -246,19 +245,6 @@ public class PlaylistController {
 
 		removeTrackButton.setDisable(!showButton);
 		removeTrackButton.setVisible(showButton);
-	}
-
-	/**
-	 * Inizializza il pulsante per annullare l'ultima operazione effettuata. Il
-	 * pulsante è visibile e cliccabile solo se sono presenti operazioni da
-	 * annullare.
-	 */
-	private void initUndoButton() {
-		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
-
-		undoCommandButton.visibleProperty().bind(canUndo);
-		undoCommandButton.managedProperty().bind(canUndo);
-		undoCommandButton.disableProperty().bind(canUndo.not());
 	}
 
 	/**
@@ -505,10 +491,8 @@ public class PlaylistController {
 		return tag != null ? tag.getLabel() : "";
 	}
 
-	@FXML
-	public void onUndoCommand() {
-		executor.undo();
-		AlertManager.showInfo("L'operazione è stata annullata.");
-		refreshPlaylist();
-	}
+    @Override
+    public void refresh() {
+        refreshPlaylist();
+    }
 }
