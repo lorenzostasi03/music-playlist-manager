@@ -64,6 +64,13 @@ public final class ViewSwitcher {
 		}
 	}
 
+    /**
+     * Aggiorna la schermata attualmente visualizzata, se il relativo controller
+     * implementa l'interfaccia {@link Refreshable}.
+     *
+     * Questo metodo consente di ricaricare dinamicamente lo stato della view
+     * corrente senza dover effettuare un nuovo caricamento del file FXML.
+     */
     public static void refreshCurrentView() {
         if (currentController == null) return;
 

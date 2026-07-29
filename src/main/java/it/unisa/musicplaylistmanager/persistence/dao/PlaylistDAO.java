@@ -63,7 +63,7 @@ public interface PlaylistDAO {
 	void updatePlayCount(UUID playlistId, int playCount);
 
 	/**
-	 * Aggiunge un brano a una playlist.
+	 * Aggiunge un brano in coda ad una playlist.
 	 *
 	 * @param playlistId
 	 *            identificatore della playlist
@@ -76,7 +76,7 @@ public interface PlaylistDAO {
 	void addSong(UUID playlistId, UUID songId);
 
 	/**
-	 * Rimuove un brano da una playlist.
+	 * Rimuove un brano da una playlist e aggiorna le posizioni degli altri brani.
 	 *
 	 * @param playlistId
 	 *            identificatore della playlist
