@@ -230,6 +230,8 @@ public class Player implements EventListener {
 	 *            playable da avviare
 	 */
 	private void startPlayable(Playable playable) {
+        if (playable == null) return;
+
 		currentPlayable = playable;
 		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);
 		currentPlayable.play();

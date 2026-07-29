@@ -38,6 +38,7 @@ import javafx.util.Duration;
  */
 public class PlaybackController implements EventListener {
 
+    @FXML
 	private Label trackTitleLabel;
 	@FXML
 	private Label trackArtistLabel;
