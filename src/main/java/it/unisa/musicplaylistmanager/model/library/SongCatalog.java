@@ -136,10 +136,19 @@ public class SongCatalog {
 	}
 
 	/**
-	 * Aggiungere commenti
+	 * Restituisce tutte le tracce che soddisfano almeno uno dei criteri
+	 * specificati.
+	 *
+	 * <p>
+	 * I criteri relativi a genere, anno e tag vengono combinati mediante OR.
+	 *
+	 * @param criteria
+	 *            criteri da applicare alle tracce del catalogo
+	 * @return lista delle tracce compatibili con almeno un criterio
+	 * @throws IllegalArgumentException
+	 *             se i criteri sono {@code null}
 	 */
 	public List<Song> findSongsMatchingAnyCriteria(PlaylistCriteria criteria) {
-
 		if (criteria == null) {
 			throw new IllegalArgumentException("I criteri non possono essere null.");
 		}

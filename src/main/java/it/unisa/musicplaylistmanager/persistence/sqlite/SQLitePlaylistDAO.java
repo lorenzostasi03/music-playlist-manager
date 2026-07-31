@@ -16,11 +16,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Implementazione SQLite del DAO delle playlist.
+ *
+ * <p>
+ * Gestisce la persistenza delle playlist manuali e automatiche, dei relativi
+ * criteri e delle associazioni ordinate tra playlist e tracce.
+ */
 public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
+	/**
+	 * Contiene i dati di base letti dalla tabella {@code playlist} prima della
+	 * ricostruzione del tipo concreto della playlist.
+	 */
 	private record PlaylistData(UUID id, String name, int playCount) {
 	}
 
+	/**
+	 * Crea un DAO collegato al database indicato.
+	 *
+	 * @param DB_URL
+	 *            URL JDBC del database SQLite
+	 */
 	public SQLitePlaylistDAO(String DB_URL) {
 		super(DB_URL);
 	}
@@ -28,7 +45,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 	// CRUD Playlist
 
 	/**
-	 * Aggiungere commenti
+	 * Salva una nuova playlist nel database.
+	 *
+	 * <p>
+	 * Se la playlist è automatica, salva nella stessa transazione anche i criteri
+	 * che ne determinano la composizione.
+	 *
+	 * @param playlist
+	 *            playlist da salvare
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il salvataggio
 	 */
 	@Override
 	public void save(Playlist playlist) {
@@ -64,6 +90,17 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Salva i criteri associati a una playlist automatica utilizzando la
+	 * connessione della transazione corrente.
+	 *
+	 * @param conn
+	 *            connessione al database
+	 * @param playlist
+	 *            playlist automatica di cui salvare i criteri
+	 * @throws SQLException
+	 *             se si verifica un errore durante l'inserimento
+	 */
 	private void saveCriteria(Connection conn, AutomaticPlaylist playlist) throws SQLException {
 
 		String query = """
@@ -95,6 +132,20 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Aggiunge al batch un criterio da associare alla playlist.
+	 *
+	 * @param stmt
+	 *            statement usato per l'inserimento
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param type
+	 *            tipo del criterio
+	 * @param value
+	 *            valore del criterio
+	 * @throws SQLException
+	 *             se si verifica un errore nella configurazione dello statement
+	 */
 	private void addCriterionToBatch(PreparedStatement stmt, UUID playlistId, String type, String value)
 			throws SQLException {
 
@@ -104,6 +155,18 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		stmt.addBatch();
 	}
 
+	/**
+	 * Carica tutte le playlist ordinate per nome.
+	 *
+	 * <p>
+	 * Le playlist prive di criteri vengono ricostruite come {@link Playlist},
+	 * mentre quelle con almeno un criterio vengono ricostruite come
+	 * {@link AutomaticPlaylist}.
+	 *
+	 * @return lista delle playlist salvate
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il caricamento
+	 */
 	@Override
 	public List<Playlist> getPlaylists() {
 		List<Playlist> playlists = new ArrayList<>();
@@ -138,6 +201,19 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		return playlists;
 	}
 
+	/**
+	 * Carica i criteri associati a una playlist.
+	 *
+	 * @param conn
+	 *            connessione al database
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @return criteri caricati, oppure {@code null} se la playlist è manuale
+	 * @throws SQLException
+	 *             se si verifica un errore durante il caricamento
+	 * @throws IllegalArgumentException
+	 *             se un valore persistito non può essere convertito nel tipo atteso
+	 */
 	private PlaylistCriteria loadCriteria(Connection conn, UUID playlistId) throws SQLException {
 
 		String query = """
@@ -183,6 +259,14 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		return new PlaylistCriteria(genres, years, tags);
 	}
 
+	/**
+	 * Aggiorna il nome di una playlist esistente.
+	 *
+	 * @param playlist
+	 *            playlist da aggiornare
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento
+	 */
 	@Override
 	public void update(Playlist playlist) {
 		String query = "UPDATE playlist SET name = ? WHERE id = ?";
@@ -199,6 +283,18 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Elimina una playlist dal database.
+	 *
+	 * <p>
+	 * Le associazioni con le tracce e gli eventuali criteri vengono eliminati
+	 * tramite le regole di cancellazione in cascata definite nello schema.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist da eliminare
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'eliminazione
+	 */
 	@Override
 	public void delete(UUID playlistId) {
 		String query = "DELETE FROM playlist WHERE id = ?";
@@ -216,6 +312,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 	// Gestione play count
 
+	/**
+	 * Aggiorna il numero di riproduzioni di una playlist.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param playCount
+	 *            nuovo numero di riproduzioni
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento
+	 */
 	@Override
 	public void updatePlayCount(UUID playlistId, int playCount) {
 		String query = "UPDATE playlist SET play_count = ? WHERE id = ?";
@@ -235,6 +341,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 
 	// Relazione Playlist - Song
 
+	/**
+	 * Aggiunge una traccia in fondo alla playlist.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param songId
+	 *            identificatore della traccia
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'inserimento
+	 */
 	@Override
 	public void addSong(UUID playlistId, UUID songId) {
 		String query = """
@@ -258,6 +374,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Rimuove una traccia dalla playlist e compatta le posizioni successive.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param songId
+	 *            identificatore della traccia
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante la rimozione
+	 */
 	@Override
 	public void removeSong(UUID playlistId, UUID songId) {
 		String getPositionQuery = """
@@ -324,6 +450,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Aggiorna l'ordine delle tracce presenti in una playlist.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @param songIds
+	 *            identificatori delle tracce nel nuovo ordine
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il riordinamento
+	 */
 	@Override
 	public void replaceSongs(UUID playlistId, List<UUID> songIds) {
 
@@ -372,6 +508,16 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
+	/**
+	 * Carica gli identificatori delle tracce di una playlist rispettandone
+	 * l'ordinamento.
+	 *
+	 * @param playlistId
+	 *            identificatore della playlist
+	 * @return identificatori delle tracce ordinati per posizione
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il caricamento
+	 */
 	@Override
 	public List<UUID> getSongIds(UUID playlistId) {
 		List<UUID> songIds = new ArrayList<>();

@@ -413,6 +413,30 @@ public class MusicLibrary {
 				.sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed()).limit(n).toList();
 	}
 
+	/**
+	 * Crea una playlist automatica contenente tutte le tracce che soddisfano almeno
+	 * uno dei criteri specificati.
+	 *
+	 * <p>
+	 * La playlist e i relativi criteri vengono salvati prima di persistere le
+	 * associazioni con le tracce compatibili.
+	 *
+	 * @param name
+	 *            nome della playlist
+	 * @param genres
+	 *            generi selezionati
+	 * @param years
+	 *            anni selezionati
+	 * @param tags
+	 *            tag selezionati
+	 * @return playlist automatica creata
+	 * @throws IllegalArgumentException
+	 *             se i criteri non sono validi o nessuna traccia li soddisfa
+	 * @throws DuplicatedPlaylistException
+	 *             se esiste già una playlist con lo stesso nome
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante il salvataggio
+	 */
 	public AutomaticPlaylist createAutomaticPlaylist(String name, Set<Genre> genres, Set<Integer> years,
 			Set<Tag> tags) {
 
@@ -426,10 +450,8 @@ public class MusicLibrary {
 
 		AutomaticPlaylist playlist = new AutomaticPlaylist(name, criteria);
 
-		// Salva prima la playlist e i relativi criteri.
 		addPlaylist(playlist);
 
-		// Poi salva le associazioni con le tracce iniziali.
 		for (Song song : matchingSongs) {
 			addSongToPlaylist(song, playlist);
 		}
@@ -437,15 +459,26 @@ public class MusicLibrary {
 		return playlist;
 	}
 
+	/**
+	 * Aggiorna l'appartenenza di una traccia a tutte le playlist automatiche.
+	 *
+	 * <p>
+	 * La traccia viene aggiunta alle playlist di cui soddisfa i criteri e rimossa
+	 * da quelle con cui non è più compatibile.
+	 *
+	 * @param song
+	 *            traccia da rivalutare
+	 * @throws PersistenceException
+	 *             se si verifica un errore durante l'aggiornamento delle
+	 *             associazioni nel database
+	 */
 	private void synchronizeAutomaticPlaylists(Song song) {
 		for (Playlist playlist : playlistCatalog.getAllPlaylists()) {
 			if (!(playlist instanceof AutomaticPlaylist automaticPlaylist)) {
-
 				continue;
 			}
 
 			boolean matches = automaticPlaylist.matches(song);
-
 			boolean contained = automaticPlaylist.contains(song);
 
 			if (matches && !contained) {

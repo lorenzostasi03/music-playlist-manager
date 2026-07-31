@@ -42,16 +42,36 @@ public class AutomaticPlaylist extends Playlist {
 		this.criteria = requireCriteria(criteria);
 	}
 
+	/**
+	 * Restituisce i criteri che determinano la composizione della playlist.
+	 *
+	 * @return criteri della playlist automatica
+	 */
 	public PlaylistCriteria getCriteria() {
 		return criteria;
 	}
 
+	/**
+	 * Verifica se una traccia soddisfa almeno uno dei criteri della playlist.
+	 *
+	 * @param song
+	 *            traccia da verificare
+	 * @return {@code true} se la traccia è compatibile con la playlist
+	 */
 	public boolean matches(Song song) {
 		return criteria.matches(song);
 	}
 
+	/**
+	 * Verifica che i criteri della playlist siano presenti.
+	 *
+	 * @param criteria
+	 *            criteri da validare
+	 * @return gli stessi criteri ricevuti
+	 * @throws IllegalArgumentException
+	 *             se i criteri sono {@code null}
+	 */
 	private static PlaylistCriteria requireCriteria(PlaylistCriteria criteria) {
-
 		if (criteria == null) {
 			throw new IllegalArgumentException("I criteri non possono essere null.");
 		}
