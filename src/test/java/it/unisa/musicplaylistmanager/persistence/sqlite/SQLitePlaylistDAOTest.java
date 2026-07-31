@@ -4,8 +4,12 @@ import it.unisa.musicplaylistmanager.exceptions.PersistenceException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.AutomaticPlaylist;
+import it.unisa.musicplaylistmanager.model.entity.PlaylistCriteria;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -146,4 +150,52 @@ class SQLitePlaylistDAOTest {
 	void getSongIdsFromNullPlaylist() {
 		assertThrows(NullPointerException.class, () -> playlistDAO.getSongIds(null));
 	}
+
+	@Test
+	void salvaECaricaPlaylistAutomaticaConCriteri() {
+		PlaylistCriteria criteria = new PlaylistCriteria(Set.of(Genre.ROCK, Genre.POP), Set.of(1968, 1969),
+				Set.of(Tag.FAVOURITE));
+
+		AutomaticPlaylist playlist = new AutomaticPlaylist("Rock e Pop preferiti", criteria);
+
+		playlistDAO.save(playlist);
+
+		List<Playlist> playlists = playlistDAO.getPlaylists();
+
+		assertEquals(1, playlists.size());
+
+		AutomaticPlaylist loadedPlaylist = assertInstanceOf(AutomaticPlaylist.class, playlists.getFirst());
+
+		assertAll(() -> assertEquals(playlist.getId(), loadedPlaylist.getId()),
+				() -> assertEquals(playlist.getName(), loadedPlaylist.getName()),
+				() -> assertEquals(criteria, loadedPlaylist.getCriteria()));
+	}
+
+	@Test
+	void playlistSenzaCriteriVieneCaricataComePlaylistManuale() {
+		Playlist playlist = new Playlist("Manuale");
+
+		playlistDAO.save(playlist);
+
+		Playlist loadedPlaylist = playlistDAO.getPlaylists().getFirst();
+
+		assertFalse(loadedPlaylist instanceof AutomaticPlaylist);
+	}
+
+	@Test
+	void eliminazionePlaylistAutomaticaEliminaAncheICriteri() {
+		PlaylistCriteria criteria = new PlaylistCriteria(Set.of(Genre.ROCK), Set.of(), Set.of(Tag.FAVOURITE));
+
+		AutomaticPlaylist playlist = new AutomaticPlaylist("Rock preferiti", criteria);
+
+		playlistDAO.save(playlist);
+		playlistDAO.delete(playlist.getId());
+
+		assertDoesNotThrow(() -> playlistDAO.save(playlist));
+
+		Playlist loadedPlaylist = playlistDAO.getPlaylists().getFirst();
+
+		assertInstanceOf(AutomaticPlaylist.class, loadedPlaylist);
+	}
+
 }

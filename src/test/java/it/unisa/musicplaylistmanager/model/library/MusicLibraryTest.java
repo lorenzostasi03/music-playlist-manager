@@ -7,6 +7,8 @@ import it.unisa.musicplaylistmanager.fake.FakeSongDAO;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
+import it.unisa.musicplaylistmanager.model.entity.AutomaticPlaylist;
+import it.unisa.musicplaylistmanager.model.entity.Tag;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -226,4 +228,81 @@ class MusicLibraryTest {
 		assertThrows(IllegalArgumentException.class,
 				() -> library.createAutomaticPlaylist("Playlist automatica", Set.of(), Set.of(), Set.of()));
 	}
+
+	@Test
+	void nuovaTracciaCompatibileVieneAggiuntaAllaPlaylistAutomatica() {
+		library.addSongToCatalog(song);
+
+		AutomaticPlaylist automaticPlaylist = library.createAutomaticPlaylist("Pop", Set.of(Genre.POP), Set.of(),
+				Set.of());
+
+		Song newSong = new Song("Let It Be", "Beatles", Genre.POP, 1970, 243, "/let-it-be.mp3");
+
+		library.addSongToCatalog(newSong);
+
+		assertTrue(automaticPlaylist.contains(newSong));
+	}
+
+	@Test
+	void nuovaTracciaIncompatibileNonVieneAggiuntaAllaPlaylistAutomatica() {
+		library.addSongToCatalog(song);
+
+		AutomaticPlaylist automaticPlaylist = library.createAutomaticPlaylist("Pop", Set.of(Genre.POP), Set.of(),
+				Set.of());
+
+		Song rockSong = new Song("Come Together", "Beatles", Genre.ROCK, 1969, 259, "/come-together.mp3");
+
+		library.addSongToCatalog(rockSong);
+
+		assertFalse(automaticPlaylist.contains(rockSong));
+	}
+
+	@Test
+	void modificaTracciaDaIncompatibileACompatibileLaAggiungeAllaPlaylistAutomatica() {
+		song.addTag(Tag.FAVOURITE);
+		library.addSongToCatalog(song);
+
+		Song candidate = new Song("Hey Jude", "Beatles", Genre.POP, 1968, 431, "/hey-jude.mp3");
+
+		library.addSongToCatalog(candidate);
+
+		AutomaticPlaylist automaticPlaylist = library.createAutomaticPlaylist("Preferiti", Set.of(), Set.of(),
+				Set.of(Tag.FAVOURITE));
+
+		assertFalse(automaticPlaylist.contains(candidate));
+
+		candidate.addTag(Tag.FAVOURITE);
+		library.updateSong(candidate);
+
+		assertTrue(automaticPlaylist.contains(candidate));
+	}
+
+	@Test
+	void modificaTracciaDaCompatibileAIncompatibileLaRimuoveDallaPlaylistAutomatica() {
+		library.addSongToCatalog(song);
+
+		AutomaticPlaylist automaticPlaylist = library.createAutomaticPlaylist("Brani del 1965", Set.of(), Set.of(1965),
+				Set.of());
+
+		assertTrue(automaticPlaylist.contains(song));
+
+		song.setYear(1966);
+		library.updateSong(song);
+
+		assertFalse(automaticPlaylist.contains(song));
+	}
+
+	@Test
+	void modificaDiTracciaAncoraCompatibileNonCreaDuplicati() {
+		library.addSongToCatalog(song);
+
+		AutomaticPlaylist automaticPlaylist = library.createAutomaticPlaylist("Pop", Set.of(Genre.POP), Set.of(),
+				Set.of());
+
+		song.setTitle("Yesterday Remastered");
+		library.updateSong(song);
+
+		assertAll(() -> assertEquals(1, automaticPlaylist.size()), () -> assertTrue(automaticPlaylist.contains(song)));
+	}
+
 }
