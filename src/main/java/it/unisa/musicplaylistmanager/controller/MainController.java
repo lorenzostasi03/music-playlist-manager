@@ -23,48 +23,45 @@ public class MainController {
 	@FXML
 	private BorderPane root;
 
-    @FXML
-    private Button undoCommandButton;
+	@FXML
+	private Button undoCommandButton;
 
-    @FXML
+	@FXML
 
-    private final CommandExecutor executor = CommandExecutor.getInstance();
+	private final CommandExecutor executor = CommandExecutor.getInstance();
 
 	@FXML
 	private void initialize() {
 		ViewSwitcher.setMainRoot(root);
 		ViewSwitcher.switchTo("HomeView.fxml");
 
-        initUndoButton();
-        setupUndoShortcut();
+		initUndoButton();
+		setupUndoShortcut();
 	}
 
-    private void initUndoButton() {
-        ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
+	private void initUndoButton() {
+		ReadOnlyBooleanProperty canUndo = executor.canUndoProperty();
 
-        undoCommandButton.visibleProperty().bind(canUndo);
-        undoCommandButton.managedProperty().bind(canUndo);
-        undoCommandButton.disableProperty().bind(canUndo.not());
-    }
+		undoCommandButton.visibleProperty().bind(canUndo);
+		undoCommandButton.managedProperty().bind(canUndo);
+		undoCommandButton.disableProperty().bind(canUndo.not());
+	}
 
-    private void setupUndoShortcut() {
-        root.sceneProperty().addListener((observable, oldScene, newScene) -> {
+	private void setupUndoShortcut() {
+		root.sceneProperty().addListener((observable, oldScene, newScene) -> {
 
-            if (newScene != null) {
-                newScene.getAccelerators().put(
-                    new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
-                    () -> {
-                        if (executor.canUndoProperty().get()) {
-                            onUndoCommand();
-                        }
-                    }
-                );
-            }
+			if (newScene != null) {
+				newScene.getAccelerators().put(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN), () -> {
+					if (executor.canUndoProperty().get()) {
+						onUndoCommand();
+					}
+				});
+			}
 
-        });
-    }
+		});
+	}
 
-    @FXML
+	@FXML
 	private void onHome() {
 		ViewSwitcher.switchTo("HomeView.fxml");
 	}
@@ -79,12 +76,12 @@ public class MainController {
 		ViewSwitcher.switchTo("PlaybackView.fxml");
 	}
 
-    @FXML
-    public void onUndoCommand() {
-        executor.undo();
+	@FXML
+	public void onUndoCommand() {
+		executor.undo();
 
-        AlertManager.showInfo("L'operazione è stata annullata.");
+		AlertManager.showInfo("L'operazione è stata annullata.");
 
-        ViewSwitcher.refreshCurrentView();
-    }
+		ViewSwitcher.refreshCurrentView();
+	}
 }

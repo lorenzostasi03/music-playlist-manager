@@ -9,6 +9,7 @@
         <javafx.version>21.0.2</javafx.version>
         <junit.version>5.10.2</junit.version>
         <spotless.version>2.46.1</spotless.version>
+        <jaudiotagger.version>3.0.1</jaudiotagger.version>
     </properties>
     <dependencies>
         <!--  JavaFX  -->
@@ -27,6 +28,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- Audio metadata -->
+        <dependency>
+            <groupId>net.jthink</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>${jaudiotagger.version}</version>
         </dependency>
 
         <!-- JUnit -->

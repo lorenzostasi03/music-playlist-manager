@@ -19,8 +19,7 @@ public abstract class Playable implements EventListener {
 	private final EventManager events;
 
 	/**
-	 * Crea un nuovo playable inizializzando il relativo gestore di
-	 * eventi.
+	 * Crea un nuovo playable inizializzando il relativo gestore di eventi.
 	 */
 	protected Playable() {
 		this.events = new EventManager();

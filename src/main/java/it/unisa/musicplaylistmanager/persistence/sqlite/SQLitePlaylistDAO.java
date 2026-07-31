@@ -131,72 +131,71 @@ public class SQLitePlaylistDAO extends SQLiteDAO implements PlaylistDAO {
 		}
 	}
 
-    @Override
-    public void removeSong(UUID playlistId, UUID songId) {
-        String getPositionQuery = """
-            SELECT position
-            FROM playlist_song
-            WHERE playlist_id = ? AND song_id = ?
-            """;
+	@Override
+	public void removeSong(UUID playlistId, UUID songId) {
+		String getPositionQuery = """
+				SELECT position
+				FROM playlist_song
+				WHERE playlist_id = ? AND song_id = ?
+				""";
 
-        String deleteQuery = """
-            DELETE FROM playlist_song
-            WHERE playlist_id = ? AND song_id = ?
-            """;
+		String deleteQuery = """
+				DELETE FROM playlist_song
+				WHERE playlist_id = ? AND song_id = ?
+				""";
 
-        String updatePositionsQuery = """
-            UPDATE playlist_song
-            SET position = position - 1
-            WHERE playlist_id = ?
-              AND position > ?
-            """;
+		String updatePositionsQuery = """
+				UPDATE playlist_song
+				SET position = position - 1
+				WHERE playlist_id = ?
+				  AND position > ?
+				""";
 
-        try (Connection conn = getConnection()) {
+		try (Connection conn = getConnection()) {
 
-            conn.setAutoCommit(false);
+			conn.setAutoCommit(false);
 
-            try {
-                int removedPosition;
+			try {
+				int removedPosition;
 
-                try (PreparedStatement stmt = conn.prepareStatement(getPositionQuery)) {
-                    stmt.setString(1, playlistId.toString());
-                    stmt.setString(2, songId.toString());
+				try (PreparedStatement stmt = conn.prepareStatement(getPositionQuery)) {
+					stmt.setString(1, playlistId.toString());
+					stmt.setString(2, songId.toString());
 
-                    try (ResultSet rs = stmt.executeQuery()) {
-                        if (!rs.next()) {
-                            conn.rollback();
-                            return;
-                        }
+					try (ResultSet rs = stmt.executeQuery()) {
+						if (!rs.next()) {
+							conn.rollback();
+							return;
+						}
 
-                        removedPosition = rs.getInt("position");
-                    }
-                }
+						removedPosition = rs.getInt("position");
+					}
+				}
 
-                try (PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
-                    stmt.setString(1, playlistId.toString());
-                    stmt.setString(2, songId.toString());
-                    stmt.executeUpdate();
-                }
+				try (PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+					stmt.setString(1, playlistId.toString());
+					stmt.setString(2, songId.toString());
+					stmt.executeUpdate();
+				}
 
-                try (PreparedStatement stmt = conn.prepareStatement(updatePositionsQuery)) {
-                    stmt.setString(1, playlistId.toString());
-                    stmt.setInt(2, removedPosition);
-                    stmt.executeUpdate();
-                }
+				try (PreparedStatement stmt = conn.prepareStatement(updatePositionsQuery)) {
+					stmt.setString(1, playlistId.toString());
+					stmt.setInt(2, removedPosition);
+					stmt.executeUpdate();
+				}
 
-                conn.commit();
+				conn.commit();
 
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            }
+			} catch (SQLException e) {
+				conn.rollback();
+				throw e;
+			}
 
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-            throw new PersistenceException(
-                "Si è verificato un errore durante la rimozione del brano dalla playlist!");
-        }
-    }
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+			throw new PersistenceException("Si è verificato un errore durante la rimozione del brano dalla playlist!");
+		}
+	}
 
 	@Override
 	public void replaceSongs(UUID playlistId, List<UUID> songIds) {

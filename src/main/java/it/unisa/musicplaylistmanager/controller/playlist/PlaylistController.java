@@ -491,8 +491,8 @@ public class PlaylistController implements Refreshable {
 		return tag != null ? tag.getLabel() : "";
 	}
 
-    @Override
-    public void refresh() {
-        refreshPlaylist();
-    }
+	@Override
+	public void refresh() {
+		refreshPlaylist();
+	}
 }

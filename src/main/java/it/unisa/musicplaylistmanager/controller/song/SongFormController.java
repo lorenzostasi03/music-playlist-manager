@@ -10,6 +10,7 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.util.AlertManager;
+import it.unisa.musicplaylistmanager.util.AudioMetadataReader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -20,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Controller per la finestra dedicata alla creazione di una nuova traccia o
@@ -39,8 +41,6 @@ public class SongFormController {
 	private ComboBox<String> genreComboBox;
 	@FXML
 	private TextField yearField;
-	@FXML
-	private TextField durationField;
 
 	@FXML
 	private CheckBox favouriteCheckBox;
@@ -61,6 +61,7 @@ public class SongFormController {
 	private Song songToEdit;
 	private Runnable onSave;
 	private String selectedFilePath;
+	private int selectedDuration;
 
 	private final AppContext appContext = AppContext.getInstance();
 
@@ -91,10 +92,12 @@ public class SongFormController {
 		authorField.setText(song.getAuthor());
 		genreComboBox.setValue(song.getGenre().getLabel());
 		yearField.setText(String.valueOf(song.getYear()));
-		durationField.setText(String.valueOf(song.getDuration()));
+
 		favouriteCheckBox.setSelected(song.hasTag(Tag.FAVOURITE));
 		explicitCheckBox.setSelected(song.hasTag(Tag.EXPLICIT));
 		newReleaseCheckBox.setSelected(song.hasTag(Tag.NEW_RELEASE));
+
+		selectedDuration = song.getDuration();
 		selectedFilePath = song.getFilePath();
 		updateFilePathLabel();
 	}
@@ -110,20 +113,31 @@ public class SongFormController {
 	}
 
 	/**
-	 * Apre un selettore di sistema (FileChooser) per permettere all'utente di
-	 * cercare e selezionare il file audio da associare alla traccia.
+	 * Apre un selettore di sistema per scegliere il file audio da associare alla
+	 * traccia e ne legge automaticamente la durata.
 	 */
 	@FXML
 	private void onChooseFile() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Seleziona file audio");
-		fileChooser.getExtensionFilters()
-				.add(new FileChooser.ExtensionFilter("File audio", "*.mp3", "*.wav", "*.aac", "*.flac", "*.ogg"));
+
+		fileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("File audio supportati", "*.mp3", "*.wav", "*.m4a", "*.aif", "*.aiff"));
 
 		File file = fileChooser.showOpenDialog(getWindow());
-		if (file != null) {
+
+		if (file == null) {
+			return;
+		}
+
+		try {
+			int duration = AudioMetadataReader.readDurationInSeconds(file);
+
 			selectedFilePath = file.getAbsolutePath();
+			selectedDuration = duration;
 			updateFilePathLabel();
+		} catch (IOException e) {
+			AlertManager.showError("Impossibile leggere la durata del file audio selezionato.");
 		}
 	}
 
@@ -144,17 +158,20 @@ public class SongFormController {
 			String author = authorField.getText();
 			Genre genre = parseGenre(genreComboBox.getValue());
 			int year = parseYear();
-			int duration = parseDuration();
 
-			if (selectedFilePath == null || selectedFilePath.isBlank()) {
-				AlertManager.showError("Seleziona un file audio.");
+			if (selectedFilePath == null || selectedFilePath.isBlank() || selectedDuration <= 0) {
+				AlertManager.showError("Seleziona un file audio valido.");
 				return;
 			}
+
+			int duration = selectedDuration;
 
 			if (songToEdit == null) {
 				Song song = new Song(title, author, genre, year, duration, selectedFilePath);
 				applyTags(song);
+
 				Command cmd = new AddSongToCatalogCommand(appContext.getMusicLibrary(), song);
+
 				CommandExecutor.getInstance().execute(cmd);
 				AlertManager.showInfo("Traccia aggiunta al catalogo.");
 			} else {
@@ -165,6 +182,7 @@ public class SongFormController {
 				songToEdit.setDuration(duration);
 				songToEdit.setFilePath(selectedFilePath);
 				applyTags(songToEdit);
+
 				appContext.getMusicLibrary().updateSong(songToEdit);
 				AlertManager.showInfo("Traccia modificata correttamente.");
 			}
@@ -189,32 +207,6 @@ public class SongFormController {
 			return Integer.parseInt(yearField.getText().trim());
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("L'anno deve essere un numero valido.");
-		}
-	}
-	/**
-	 * Analizza e valida il testo inserito nel campo della durata. Supporta sia
-	 * l'inserimento diretto in secondi, sia il formato classico "minuti:secondi".
-	 *
-	 * @return la durata totale calcolata in secondi
-	 * @throws IllegalArgumentException
-	 *             se il formato della durata non è riconosciuto
-	 */
-	private int parseDuration() {
-		String text = durationField.getText().trim();
-
-		try {
-			if (text.contains(":")) {
-				String[] parts = text.split(":");
-				if (parts.length != 2) {
-					throw new NumberFormatException();
-				}
-				return Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]);
-			}
-
-			return Integer.parseInt(text);
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("La durata deve essere un numero intero di secondi " +
-                "oppure nel formato mm:ss.");
 		}
 	}
 

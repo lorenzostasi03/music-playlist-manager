@@ -10,9 +10,9 @@ import java.util.List;
  * Gestisce la riproduzione corrente dell'applicazione.
  *
  * <p>
- * Il player mantiene il riferimento al playable attualmente in
- * esecuzione e coordina le operazioni di avvio, pausa, ripresa, interruzione e
- * avanzamento della coda di riproduzione.
+ * Il player mantiene il riferimento al playable attualmente in esecuzione e
+ * coordina le operazioni di avvio, pausa, ripresa, interruzione e avanzamento
+ * della coda di riproduzione.
  * </p>
  */
 public class Player implements EventListener {
@@ -230,7 +230,8 @@ public class Player implements EventListener {
 	 *            playable da avviare
 	 */
 	private void startPlayable(Playable playable) {
-        if (playable == null) return;
+		if (playable == null)
+			return;
 
 		currentPlayable = playable;
 		currentPlayable.getEvents().subscribe(EventType.PLAYABLE_COMPLETED, this);

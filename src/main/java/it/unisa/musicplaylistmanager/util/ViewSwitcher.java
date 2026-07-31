@@ -16,8 +16,8 @@ import java.io.IOException;
 public final class ViewSwitcher {
 
 	private static BorderPane mainRoot;
-    private static Refreshable refreshable;
-    private static Object currentController;
+	private static Refreshable refreshable;
+	private static Object currentController;
 
 	private ViewSwitcher() {
 	}
@@ -55,7 +55,7 @@ public final class ViewSwitcher {
 
 			Parent view = loader.load();
 
-            currentController = loader.getController();
+			currentController = loader.getController();
 
 			mainRoot.setCenter(view);
 
@@ -64,19 +64,20 @@ public final class ViewSwitcher {
 		}
 	}
 
-    /**
-     * Aggiorna la schermata attualmente visualizzata, se il relativo controller
-     * implementa l'interfaccia {@link Refreshable}.
-     *
-     * Questo metodo consente di ricaricare dinamicamente lo stato della view
-     * corrente senza dover effettuare un nuovo caricamento del file FXML.
-     */
-    public static void refreshCurrentView() {
-        if (currentController == null) return;
+	/**
+	 * Aggiorna la schermata attualmente visualizzata, se il relativo controller
+	 * implementa l'interfaccia {@link Refreshable}.
+	 *
+	 * Questo metodo consente di ricaricare dinamicamente lo stato della view
+	 * corrente senza dover effettuare un nuovo caricamento del file FXML.
+	 */
+	public static void refreshCurrentView() {
+		if (currentController == null)
+			return;
 
-        if (currentController instanceof Refreshable) {
-            refreshable = (Refreshable) currentController;
-            refreshable.refresh();
-        }
-    }
+		if (currentController instanceof Refreshable) {
+			refreshable = (Refreshable) currentController;
+			refreshable.refresh();
+		}
+	}
 }

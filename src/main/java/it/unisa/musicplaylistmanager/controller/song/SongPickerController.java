@@ -24,8 +24,8 @@ import java.util.List;
  * multipla per l'aggiunta in blocco.
  */
 public class SongPickerController {
-    @FXML
-    private TextField searchField;
+	@FXML
+	private TextField searchField;
 	@FXML
 	private TableView<SelectableSong> tracksTable;
 	@FXML
@@ -64,7 +64,7 @@ public class SongPickerController {
 		configureCheckColumn();
 		configureTextColumns();
 		confirmButton.disableProperty().bind(hasSelection.not());
-        confirmButton.visibleProperty().bind(hasSelection);
+		confirmButton.visibleProperty().bind(hasSelection);
 	}
 
 	/**
@@ -89,7 +89,9 @@ public class SongPickerController {
 	}
 
 	@FXML
-	private void onSearchChanged() { refreshSongs(); }
+	private void onSearchChanged() {
+		refreshSongs();
+	}
 
 	/**
 	 * Seleziona automaticamente tutte le tracce attualmente caricate nella tabella.
@@ -125,14 +127,14 @@ public class SongPickerController {
 		List<Song> selectedSongs = tracksTable.getItems().stream().filter(SelectableSong::isSelected)
 				.map(SelectableSong::getSong).toList();
 
-        addSongsToPlaylist(selectedSongs);
+		addSongsToPlaylist(selectedSongs);
 
-        if (onSave != null) {
-            onSave.run();
-        }
+		if (onSave != null) {
+			onSave.run();
+		}
 
-        AlertManager.showInfo("Tracce aggiunte alla playlist.");
-        closeWindow();
+		AlertManager.showInfo("Tracce aggiunte alla playlist.");
+		closeWindow();
 	}
 
 	/**
@@ -200,12 +202,9 @@ public class SongPickerController {
 		if (playlist == null)
 			return;
 
-        List<SelectableSong> available = appContext.getMusicLibrary()
-            .filterSongs(searchField.getText(), null, null, null, null)
-            .stream()
-            .filter(song -> !playlist.contains(song))
-            .map(SelectableSong::new)
-            .toList();
+		List<SelectableSong> available = appContext.getMusicLibrary()
+				.filterSongs(searchField.getText(), null, null, null, null).stream()
+				.filter(song -> !playlist.contains(song)).map(SelectableSong::new).toList();
 
 		tracksTable.getItems().setAll(available);
 		updateSelectionState();

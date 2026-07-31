@@ -76,21 +76,21 @@ class MusicLibraryTest {
 		assertFalse(library.getAllPlaylists().contains(playlist));
 	}
 
-    @Test
-    void ripristinoPlaylistRipristinaBraniNelDatabase() {
-        FakePlaylistDAO playlistDAO = new FakePlaylistDAO();
-        library = new MusicLibrary(new FakeSongDAO(), playlistDAO);
+	@Test
+	void ripristinoPlaylistRipristinaBraniNelDatabase() {
+		FakePlaylistDAO playlistDAO = new FakePlaylistDAO();
+		library = new MusicLibrary(new FakeSongDAO(), playlistDAO);
 
-        library.addSongToCatalog(song);
-        library.addPlaylist(playlist);
-        library.addSongToPlaylist(song, playlist);
+		library.addSongToCatalog(song);
+		library.addPlaylist(playlist);
+		library.addSongToPlaylist(song, playlist);
 
-        library.removePlaylist(playlist);
+		library.removePlaylist(playlist);
 
-        library.restorePlaylist(playlist);
+		library.restorePlaylist(playlist);
 
-        assertTrue(playlistDAO.getSongIds(playlist.getId()).contains(song.getId()));
-    }
+		assertTrue(playlistDAO.getSongIds(playlist.getId()).contains(song.getId()));
+	}
 
 	@Test
 	void rinominaPlaylistConNomeValido() {

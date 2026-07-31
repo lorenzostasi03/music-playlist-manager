@@ -483,12 +483,12 @@ public class HomeController implements Initializable, Refreshable {
 		return String.format("%d:%02d", totalSeconds / 60, totalSeconds % 60);
 	}
 
-    @Override
-    public void refresh() {
-        updateViews();
-    }
+	@Override
+	public void refresh() {
+		updateViews();
+	}
 
-    /**
+	/**
 	 * Rappresenta un elemento visualizzato nelle liste della schermata Home.
 	 *
 	 * <p>

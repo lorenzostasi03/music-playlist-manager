@@ -92,15 +92,8 @@
                     <TextField fx:id="yearField" promptText="es. 1975" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
                 </VBox>
 
-                <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3">
-                    <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Durata (in secondi o mm:ss)" />
-
-                    <TextField fx:id="durationField" promptText="es. 120" style="-fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-prompt-text-fill: #8E8E93; -fx-background-radius: 8; -fx-padding: 10 15 10 15; -fx-font-size: 14px;" />
-                </VBox>
-
                 <VBox spacing="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4">
                     <Label style="-fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold;" text="File audio" />
-
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Button fx:id="chooseFileButton" onAction="#onChooseFile" style="-fx-background-color: #000000; -fx-text-fill: #EBEBF5; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;" text="Scegli file" />
 
@@ -109,7 +102,6 @@
                 </VBox>
 
                 <rowConstraints>
-                    <RowConstraints />
                     <RowConstraints />
                     <RowConstraints />
                     <RowConstraints />

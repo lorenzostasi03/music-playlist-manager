@@ -395,8 +395,8 @@ public class CatalogController implements Refreshable {
 		return song.getTags().stream().map(Tag::getLabel).collect(Collectors.joining(", "));
 	}
 
-    @Override
-    public void refresh() {
-        refreshCatalog();
-    }
+	@Override
+	public void refresh() {
+		refreshCatalog();
+	}
 }
