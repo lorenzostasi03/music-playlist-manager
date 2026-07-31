@@ -2,6 +2,7 @@ package it.unisa.musicplaylistmanager.model.library;
 
 import it.unisa.musicplaylistmanager.exceptions.DuplicatedSongException;
 import it.unisa.musicplaylistmanager.model.entity.Genre;
+import it.unisa.musicplaylistmanager.model.entity.PlaylistCriteria;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
 
@@ -135,31 +136,15 @@ public class SongCatalog {
 	}
 
 	/**
-	 * Restituisce le tracce che soddisfano almeno uno dei criteri indicati.
-	 *
-	 * <p>
-	 * I criteri vengono combinati mediante OR: una traccia è inclusa se appartiene
-	 * a uno dei generi selezionati, se è stata pubblicata in uno degli anni
-	 * selezionati oppure se possiede almeno uno dei tag selezionati.
-	 *
-	 * @param genres
-	 *            generi selezionati
-	 * @param years
-	 *            anni selezionati
-	 * @param tags
-	 *            tag selezionati
-	 * @return tracce che soddisfano almeno uno dei criteri
-	 * @throws IllegalArgumentException
-	 *             se i criteri per il filtraggio sono vuoti
+	 * Aggiungere commenti
 	 */
-	public List<Song> findSongsMatchingAnyCriteria(Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+	public List<Song> findSongsMatchingAnyCriteria(PlaylistCriteria criteria) {
 
-		if (genres == null || years == null || tags == null) {
+		if (criteria == null) {
 			throw new IllegalArgumentException("I criteri non possono essere null.");
 		}
 
-		return songs.values().stream().filter(song -> genres.contains(song.getGenre()) || years.contains(song.getYear())
-				|| tags.stream().anyMatch(song::hasTag)).toList();
+		return songs.values().stream().filter(criteria::matches).toList();
 	}
 
 }

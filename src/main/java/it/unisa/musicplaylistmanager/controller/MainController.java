@@ -11,8 +11,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 
-import javax.swing.text.View;
-
 /**
  * Controller principale dell'applicazione. Gestisce la barra di navigazione per
  * spostarsi tra le sezioni principali del programma (Home, Catalogo,

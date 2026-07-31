@@ -17,6 +17,22 @@ CREATE TABLE IF NOT EXISTS playlist (
     play_count INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS playlist_criterion (
+    playlist_id TEXT NOT NULL,
+    criterion_type TEXT NOT NULL
+        CHECK (criterion_type IN ('GENRE', 'YEAR', 'TAG')),
+    criterion_value TEXT NOT NULL,
+
+    PRIMARY KEY (
+        playlist_id,
+        criterion_type,
+        criterion_value
+    ),
+
+    FOREIGN KEY (playlist_id) REFERENCES playlist(id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS playlist_song (
     playlist_id TEXT NOT NULL,
     song_id TEXT NOT NULL,

@@ -7,6 +7,8 @@ import it.unisa.musicplaylistmanager.model.entity.Genre;
 import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
+import it.unisa.musicplaylistmanager.model.entity.AutomaticPlaylist;
+import it.unisa.musicplaylistmanager.model.entity.PlaylistCriteria;
 import it.unisa.musicplaylistmanager.persistence.dao.PlaylistDAO;
 import it.unisa.musicplaylistmanager.persistence.dao.SongDAO;
 
@@ -75,6 +77,8 @@ public class MusicLibrary {
 	public void addSongToCatalog(Song song) {
 		songCatalog.addSong(song);
 		songDAO.save(song);
+
+		synchronizeAutomaticPlaylists(song);
 	}
 
 	/**
@@ -112,6 +116,8 @@ public class MusicLibrary {
 	 */
 	public void updateSong(Song song) {
 		songDAO.update(song);
+
+		synchronizeAutomaticPlaylists(song);
 	}
 
 	/**
@@ -407,32 +413,47 @@ public class MusicLibrary {
 				.sorted(Comparator.comparingInt(Playlist::getPlayCount).reversed()).limit(n).toList();
 	}
 
-	public Playlist createAutomaticPlaylist(String name, Set<Genre> genres, Set<Integer> years, Set<Tag> tags) {
+	public AutomaticPlaylist createAutomaticPlaylist(String name, Set<Genre> genres, Set<Integer> years,
+			Set<Tag> tags) {
 
-		if (genres == null || years == null || tags == null) {
-			throw new IllegalArgumentException("I criteri non possono essere null.");
-		}
+		PlaylistCriteria criteria = new PlaylistCriteria(genres, years, tags);
 
-		if (genres.isEmpty() && years.isEmpty() && tags.isEmpty()) {
-			throw new IllegalArgumentException("Selezionare almeno un criterio.");
-		}
-
-		List<Song> matchingSongs = songCatalog.findSongsMatchingAnyCriteria(genres, years, tags);
+		List<Song> matchingSongs = songCatalog.findSongsMatchingAnyCriteria(criteria);
 
 		if (matchingSongs.isEmpty()) {
 			throw new IllegalArgumentException("Nessuna traccia soddisfa i criteri selezionati.");
 		}
 
-		Playlist playlist = new Playlist(name);
+		AutomaticPlaylist playlist = new AutomaticPlaylist(name, criteria);
 
-		// Prima registra la playlist nel catalogo e nel database.
+		// Salva prima la playlist e i relativi criteri.
 		addPlaylist(playlist);
 
-		// Poi aggiunge le canzoni
+		// Poi salva le associazioni con le tracce iniziali.
 		for (Song song : matchingSongs) {
 			addSongToPlaylist(song, playlist);
 		}
 
 		return playlist;
 	}
+
+	private void synchronizeAutomaticPlaylists(Song song) {
+		for (Playlist playlist : playlistCatalog.getAllPlaylists()) {
+			if (!(playlist instanceof AutomaticPlaylist automaticPlaylist)) {
+
+				continue;
+			}
+
+			boolean matches = automaticPlaylist.matches(song);
+
+			boolean contained = automaticPlaylist.contains(song);
+
+			if (matches && !contained) {
+				addSongToPlaylist(song, automaticPlaylist);
+			} else if (!matches && contained) {
+				removeSongFromPlaylist(song, automaticPlaylist);
+			}
+		}
+	}
+
 }

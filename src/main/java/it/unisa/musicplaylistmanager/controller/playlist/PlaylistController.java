@@ -10,10 +10,12 @@ import it.unisa.musicplaylistmanager.model.entity.Playlist;
 import it.unisa.musicplaylistmanager.model.entity.Song;
 import it.unisa.musicplaylistmanager.model.entity.Tag;
 import it.unisa.musicplaylistmanager.model.playback.playable.PlaylistPlayable;
+import it.unisa.musicplaylistmanager.model.entity.AutomaticPlaylist;
 import it.unisa.musicplaylistmanager.util.AlertManager;
 import it.unisa.musicplaylistmanager.util.DialogUtil;
 import it.unisa.musicplaylistmanager.util.ViewSwitcher;
-import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
@@ -76,6 +78,8 @@ public class PlaylistController implements Refreshable {
 	private TableColumn<Song, Integer> yearColumn;
 	@FXML
 	private TableColumn<Song, String> tagsColumn;
+	@FXML
+	private HBox removeTrackBar;
 
 	private final AppContext appContext = AppContext.getInstance();
 	private final CommandExecutor executor = CommandExecutor.getInstance();
@@ -95,7 +99,7 @@ public class PlaylistController implements Refreshable {
 
 		configureTable();
 
-		initButtons(readOnly);
+		initButtons();
 
 		initSort();
 
@@ -200,6 +204,10 @@ public class PlaylistController implements Refreshable {
 	 */
 	@FXML
 	private void onAddTrack() {
+		if (!canEditMembership()) {
+			return;
+		}
+
 		openSongPicker();
 	}
 
@@ -209,8 +217,13 @@ public class PlaylistController implements Refreshable {
 	 */
 	@FXML
 	private void onRemoveTrack() {
+		if (!canEditMembership()) {
+			return;
+		}
+
 		Song selectedSong = tracksTable.getSelectionModel().getSelectedItem();
-		if (playlist == null || selectedSong == null) {
+
+		if (selectedSong == null) {
 			return;
 		}
 
@@ -223,28 +236,38 @@ public class PlaylistController implements Refreshable {
 
 		try {
 			Command cmd = new RemoveSongFromPlaylistCommand(appContext.getMusicLibrary(), playlist, selectedSong);
+
 			executor.execute(cmd);
 			refreshPlaylist();
+
 			AlertManager.showInfo("Traccia rimossa dalla playlist.");
 		} catch (IllegalArgumentException | PersistenceException e) {
+
 			AlertManager.showError(e.getMessage());
 		}
 	}
 
-	private void initButtons(boolean readOnly) {
-		boolean showButton = playlist != null && !readOnly;
+	private void initButtons() {
+		boolean playlistEditable = canEditPlaylist();
 
-		addTrackButton.setDisable(!showButton);
-		addTrackButton.setVisible(showButton);
+		boolean membershipEditable = canEditMembership();
 
-		editNameButton.setDisable(!showButton);
-		editNameButton.setVisible(showButton);
+		setNodeAvailable(editNameButton, playlistEditable);
 
-		deletePlaylistButton.setDisable(!showButton);
-		deletePlaylistButton.setVisible(showButton);
+		setNodeAvailable(deletePlaylistButton, playlistEditable);
 
-		removeTrackButton.setDisable(!showButton);
-		removeTrackButton.setVisible(showButton);
+		setNodeAvailable(addTrackButton, membershipEditable);
+
+		setNodeAvailable(removeTrackBar, membershipEditable);
+
+		removeTrackButton.setDisable(true);
+	}
+
+	private void setNodeAvailable(Node node, boolean available) {
+
+		node.setVisible(available);
+		node.setManaged(available);
+		node.setDisable(!available);
 	}
 
 	/**
@@ -367,7 +390,9 @@ public class PlaylistController implements Refreshable {
 	}
 
 	private void updateSelectionButtons(Song selectedSong) {
-		boolean disabled = selectedSong == null || readOnly;
+
+		boolean disabled = selectedSong == null || !canEditMembership();
+
 		removeTrackButton.setDisable(disabled);
 	}
 
@@ -453,14 +478,14 @@ public class PlaylistController implements Refreshable {
 	 * Istanzia e visualizza la finestra per la selezione dei brani.
 	 */
 	private void openSongPicker() {
-		if (playlist == null) {
+		if (!canEditMembership()) {
 			return;
 		}
 
 		DialogUtil.open("SongPickerView.fxml", "Aggiungi tracce", addTrackButton.getScene().getWindow(),
-				(SongPickerController c) -> {
-					c.setPlaylist(playlist);
-					c.setOnSave(this::refreshPlaylist);
+				(SongPickerController controller) -> {
+					controller.setPlaylist(playlist);
+					controller.setOnSave(this::refreshPlaylist);
 				});
 	}
 
@@ -489,6 +514,14 @@ public class PlaylistController implements Refreshable {
 
 	private String formatTag(Tag tag) {
 		return tag != null ? tag.getLabel() : "";
+	}
+
+	private boolean canEditPlaylist() {
+		return playlist != null && !readOnly;
+	}
+
+	private boolean canEditMembership() {
+		return canEditPlaylist() && !(playlist instanceof AutomaticPlaylist);
 	}
 
 	@Override
