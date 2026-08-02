@@ -128,32 +128,6 @@ public class ConfigurablePlaylistIterator implements PlaylistIterator {
 	}
 
 	/**
-	 * Restituisce l'ultimo indice conosciuto del brano corrente.
-	 *
-	 * <p>
-	 * Prima dell'avvio della riproduzione il valore restituito è {@code -1}.
-	 * </p>
-	 *
-	 * @return indice dell'ultimo brano selezionato, oppure {@code -1} se non è
-	 *         stato ancora selezionato alcun brano
-	 */
-	@Override
-	public int getCurrentIndex() {
-		return lastKnownIndex;
-	}
-
-	/**
-	 * Restituisce il brano attualmente selezionato dall'iteratore.
-	 *
-	 * @return brano corrente, oppure {@code null} se l'iterazione non è ancora
-	 *         iniziata
-	 */
-	@Override
-	public Song getCurrentSong() {
-		return currentSong;
-	}
-
-	/**
 	 * Determina la posizione corrente del brano nella versione aggiornata della
 	 * playlist.
 	 *

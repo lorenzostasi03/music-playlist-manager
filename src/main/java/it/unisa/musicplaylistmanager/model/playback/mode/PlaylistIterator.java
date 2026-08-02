@@ -10,8 +10,4 @@ public interface PlaylistIterator {
 	Song next();
 
 	void setStrategy(PlaylistIteratorStrategy strategy);
-
-	int getCurrentIndex();
-
-	Song getCurrentSong();
 }
