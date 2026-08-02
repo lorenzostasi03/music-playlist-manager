@@ -74,14 +74,14 @@ public abstract class Playable implements EventListener {
 	public abstract Song getCurrentSong();
 
 	/**
-	 * * Avanza al brano successivo all'interno del playable. * * @return
-	 * {@code true} se il playable ha gestito internamente * l'avanzamento,
-	 * {@code false} se non sono presenti altri brani e il * player deve passare al
+	 * Avanza al brano successivo all'interno del playable.
+     * @return {@code true} se il playable ha gestito internamente l'avanzamento,
+	 * {@code false} se non sono presenti altri brani e il player deve passare al
 	 * playable successivo
 	 */
 	public abstract boolean skipToNextSong();
 
-	/*
+	/**
 	 * Imposta la modalità di riproduzione del playable.
 	 */
 	public abstract void setPlaybackMode(PlaybackMode mode);
@@ -93,7 +93,7 @@ public abstract class Playable implements EventListener {
 	 */
 	public abstract PlaybackMode getPlaybackMode();
 
-	/*
+	/**
 	 * Aggiorna il numero di riproduzioni dell'entità associata al playable
 	 */
 	protected abstract void updatePlayCount();
