@@ -61,12 +61,6 @@ public abstract class Playable implements EventListener {
 	public abstract void stop();
 
 	/**
-	 * Restituisce la traccia attualmente associata alla riproduzione.
-	 *
-	 * @return traccia corrente
-	 */
-
-	/**
 	 * Restituisce la traccia attualmente riprodotta dal playable.
 	 *
 	 * @return traccia corrente, oppure {@code null} se non è disponibile
